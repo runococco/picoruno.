@@ -306,12 +306,12 @@ const SWEETS=[
 ];
 const NT=SWEETS.length;
 // ほしクッキー：入れかえた相手と同じおやつを全部消す
-const EGG_SVG=`<path d="M50.0 15.0 L61.2 39.6 L88.0 42.6 L68.1 60.9 L73.5 87.4 L50.0 74.0 L26.5 87.4 L31.9 60.9 L12.0 42.6 L38.8 39.6 Z" fill="#dda35c" stroke="#dda35c" stroke-width="9" stroke-linejoin="round"/>
+const EGG_SVG=`<path class="thk" d="M50.0 15.0 L61.2 39.6 L88.0 42.6 L68.1 60.9 L73.5 87.4 L50.0 74.0 L26.5 87.4 L31.9 60.9 L12.0 42.6 L38.8 39.6 Z" fill="#dda35c" stroke="#dda35c" stroke-width="9" stroke-linejoin="round"/>
   <g fill="#c4874a"><circle cx="34" cy="49" r="2.2"/><circle cx="66" cy="49" r="2.2"/><circle cx="40" cy="74" r="2"/><circle cx="60" cy="74" r="2"/><circle cx="50" cy="30" r="2"/></g>
   ${face(53,8,'#ef9a86')}`;
-// ふち線：形の外側をふくらませて、こげ茶でぐるっと囲む
-const OUTLINE=`<filter id="ol" x="-15%" y="-15%" width="130%" height="130%"><feMorphology in="SourceAlpha" operator="dilate" radius="5" result="d"/><feFlood flood-color="${INK}"/><feComposite in2="d" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
-const svgOf=(i,extra='')=>`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-7 -7 114 114" ${extra}><defs>${OUTLINE}</defs><g filter="url(#ol)">${i<0?EGG_SVG:SWEETS[i].svg}</g></svg>`;
+// ふち線：同じ形を太いこげ茶の線で描いた影を、うしろに敷く（角も丸くつながる）
+const OUTLINE=`<style>.ol *{fill:${INK}!important;stroke:${INK}!important;stroke-width:11px!important;stroke-linejoin:round!important;stroke-linecap:round!important;opacity:1!important}.ol .thk{stroke-width:20px!important}</style>`;
+const svgOf=(i,extra='')=>`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-7 -7 114 114" ${extra}><defs>${OUTLINE}</defs><g class="ol">${i<0?EGG_SVG:SWEETS[i].svg}</g>${i<0?EGG_SVG:SWEETS[i].svg}</svg>`;
 const BOMB_RING=`<circle cx="50" cy="50" r="44" fill="none" stroke="#e3c26b" stroke-width="7" stroke-dasharray="12 8"/>`;
 const BOMB_STAR=`<path d="M82 14 q4 -9 11 -8" stroke="#9a7a5f" stroke-width="3.5" stroke-linecap="round" fill="none"/><circle cx="78" cy="22" r="10" fill="${INK}"/><circle cx="94" cy="6" r="5" fill="#f2a65a"/>`;
 const BOMB_BADGE=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${BOMB_RING}</svg>`;
@@ -1055,7 +1055,7 @@ function toast(s){const t=$('toast');t.textContent=s;t.hidden=false;clearTimeout
 $('logo').innerHTML=[...'ころころおやつ'].map((ch,i)=>`<span class="c${i}" style="--i:${i}">${ch}</span>`).join('');
 $('parade').innerHTML=SWEETS.map((a,i)=>`<i style="--i:${i}">${svgOf(i)}</i>`).join('');
 const inSv=(inner)=>`<svg viewBox="0 0 100 100" aria-hidden="true">${inner}</svg>`;
-const piece=(i,extra='')=>`<defs>${OUTLINE}</defs><g filter="url(#ol)"><g transform="translate(10 10) scale(.8)">${SWEETS[i].svg}</g></g>${extra}`;
+const piece=(i,extra='')=>`<defs>${OUTLINE}</defs><g class="ol"><g transform="translate(10 10) scale(.8)">${SWEETS[i].svg}</g></g><g transform="translate(10 10) scale(.8)">${SWEETS[i].svg}</g>${extra}`;
 const tri=(h)=>h?`<path d="M3 50 l14 -12 v24z M97 50 l-14 -12 v24z" fill="#ec7a74" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"/>`:`<path d="M50 3 l-12 14 h24z M50 97 l-12 -14 h24z" fill="#ec7a74" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"/>`;
 const SPARK=`<path d="M22 6 l5 11 11 5 -11 5 -5 11 -5 -11 -11 -5 11 -5z" fill="#ffe27a" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`;
 $('specials').innerHTML=[
