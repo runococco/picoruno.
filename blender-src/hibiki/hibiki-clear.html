@@ -444,17 +444,17 @@ function musicStep(t,step){
 /* ---------- 楽章（ステージ） ---------- */
 // 楽章ごとに、いろいろなものの形をしたステンドグラス（a〜e=色、大文字=厚い、数字=いちばん厚い）
 const STAGES=[
- {name:'ハート',map:[
-  "..bb....bb..",
-  ".baab..baab.",
-  "baeaabbaaaab",
-  "baeaaaaaaaab",
-  "baaaaaaaaaab",
-  ".baaaaaaaab.",
-  "..baaaaaab..",
-  "...baaaab...",
-  "....baab....",
-  ".....bb....."]},
+ {name:'ハート',tint:{b:{h:338,s:95,l:12},c:{h:322,s:85,l:16}},map:[
+  "..cc....cc..",
+  ".cbbc..cbbc.",
+  "cbbbbccbbbbc",
+  "cbbbbbbbbbbc",
+  "cbbbbbbbbbbc",
+  ".cbbbbbbbbc.",
+  "..cbbbbbbc..",
+  "...cbbbbc...",
+  "....cbbc....",
+  ".....cc....."]},
  {name:'さかな',map:[
   "....dddd....",
   "..ddDDDDd..d",
@@ -732,7 +732,8 @@ function buildStage(i){
     let cf=0,dc=null;if(note<0){if(!clearAt(i,name,map,r,c))return;note=5;hp=1;cf=NOTES[(c+r)%5].f*(r<2?1:.5);
       // 小物は1マスおきに
       if(deco&&((c+r)%2===0))dc=deco;}
-    blocks.push({x:OX+c*(BW+GAP),y:oy+r*(BH+GAP),w:BW,h:BH,note,cf,deco:dc,oct:r<2?2:1,hp,max:hp,cracks:[],dead:false,queued:false,wob:0,flash:0,glow:0,seed:R()});
+    const tint=STAGES[i%STAGES.length].tint&&STAGES[i%STAGES.length].tint[ch.toLowerCase()];
+    blocks.push({tint,x:OX+c*(BW+GAP),y:oy+r*(BH+GAP),w:BW,h:BH,note,cf,deco:dc,oct:r<2?2:1,hp,max:hp,cracks:[],dead:false,queued:false,wob:0,flash:0,glow:0,seed:R()});
   });});
   queue=[];shards=[];rings=[];floats=[];dust=[];flashes=[];bolts=[];layerFull=true;
   const lap=Math.floor(i/STAGES.length);
@@ -805,7 +806,7 @@ function hitBlock(b,ix,iy,depth){
 }
 function shatter(b,ix,iy,depth,crit){
   b.dead=true;b.queued=false;
-  const cx=b.x+b.w/2,cy=b.y+b.h/2,nt=NOTES[b.note],chain=depth+1;if(!nt.clear){ball.hue=nt.h;ball.pulse=1;}
+  const cx=b.x+b.w/2,cy=b.y+b.h/2,nt=Object.assign({},NOTES[b.note],b.tint),chain=depth+1;if(!nt.clear){ball.hue=nt.h;ball.pulse=1;}
   // 割れ方の種類：0=薄い 1=ふつう 2=厚い（共鳴で割れたものは res）
   const kind=b.max===1?0:b.max===2?1:2,res=depth>0;
   sfx.shatter(freqOf(b),panOf(cx),depth,b.note,kind,res);
@@ -1068,7 +1069,7 @@ function makeBg(){
 function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
 function paintGlass(b){
   if(NOTES[b.note].clear)return paintClear(b);
-  const nt=NOTES[b.note],h=nt.h,s=nt.s;let x=b.x,y=b.y;
+  const nt=Object.assign({},NOTES[b.note],b.tint),h=nt.h,s=nt.s,lift=nt.l||0;let x=b.x,y=b.y;
   const th=b.max,w=b.w,hh=b.h,rad=1.6;
   // 板を通った色の光が下に落ちる
   ctx.save();ctx.globalCompositeOperation='lighter';
@@ -1081,9 +1082,9 @@ function paintGlass(b){
   ctx.drawImage(bg,(x+(w-sw)/2+3)*BGS,(y+(hh-sh)/2+2)*BGS,sw*BGS,sh*BGS,x,y,w,hh);
   // ② 色ガラスは光を「透かして染める」：乗算で背景に色を付け、ごく薄く色を足す
   ctx.globalCompositeOperation='multiply';
-  ctx.fillStyle=`hsl(${h},${s+20}%,${78-th*6}%)`;ctx.fillRect(x,y,w,hh);
+  ctx.fillStyle=`hsl(${h},${s+20}%,${Math.min(96,78-th*6+lift)}%)`;ctx.fillRect(x,y,w,hh);
   ctx.globalCompositeOperation='source-over';
-  ctx.globalCompositeOperation='screen';ctx.fillStyle=`hsla(${h},${Math.min(95,s+30)}%,55%,${.38+th*.05})`;ctx.fillRect(x,y,w,hh);ctx.globalCompositeOperation='source-over';
+  ctx.globalCompositeOperation='screen';ctx.fillStyle=`hsla(${h},${Math.min(lift?100:95,s+30)}%,${lift?60:55}%,${.38+th*.05+(lift?.12:0)})`;ctx.fillRect(x,y,w,hh);ctx.globalCompositeOperation='source-over';
   // ③ 縁ほど色が濃く見える（光が斜めに長く通るため）
   const ew=2.2+th*1.1;
   ctx.lineWidth=ew*2;ctx.strokeStyle=`hsla(${h},${s+10}%,${42-th*4}%,${.32+th*.08})`;rr(x,y,w,hh,rad);ctx.stroke();
@@ -1211,7 +1212,7 @@ function drawBlock(b){
   ctx.drawImage(b.cache,x-PADX,b.y-PADT,b.w+PADX*2,b.h+PADT+PADB);
   if(b.flash>0){ctx.fillStyle=`rgba(255,255,255,${b.flash*.25})`;ctx.fillRect(x,b.y,b.w,b.h);}
   if(b.queued||b.glow>0){
-    const a=b.queued?.55+Math.sin(time*40)*.3:b.glow,h=NOTES[b.note].h;
+    const a=b.queued?.55+Math.sin(time*40)*.3:b.glow,h=(b.tint&&b.tint.h)??NOTES[b.note].h;
     ctx.save();ctx.globalCompositeOperation='lighter';
     if(b.queued&&b.cracks.length){ctx.beginPath();
       for(const c of b.cracks)for(const ln of c.lines){ctx.moveTo(x+ln.pts[0][0],b.y+ln.pts[0][1]);for(let i=1;i<ln.pts.length;i++)ctx.lineTo(x+ln.pts[i][0],b.y+ln.pts[i][1]);}
