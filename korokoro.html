@@ -80,6 +80,8 @@ button{font-family:inherit;color:inherit}
 .sp svg{width:44px;height:44px;display:block;margin:0 auto 2px}
 .sp b{display:block;font-family:var(--pop);font-weight:400;font-size:.8rem}
 .best{font-family:var(--pop);font-size:.95rem;margin:0;color:var(--sub)}
+.best:empty{display:none}
+.dailyline{margin:-4px 0 0;font-size:.78rem;color:var(--sub);font-weight:700;text-align:center}
 .foot{font-size:.75rem;color:var(--sub);margin:4px 0 0;display:flex;gap:12px;align-items:center}
 .foot a{color:var(--sub)}
 
@@ -166,11 +168,14 @@ button{font-family:inherit;color:inherit}
     <b>①</b> おやつをスワイプして、となりと入れかえ<br>
     <b>②</b> たて・よこに3ついじょう並ぶと消える<br>
     <b>③</b> 時間内に<b>お客さんの注文</b>をそろえるとステージクリア<br>
-    <b>④</b> すばやく消し続けると<b>コンボ</b>、たまると<b>フィーバー</b>！
+    <b>④</b> すばやく消し続けると<b>コンボ</b>、たまると<b>フィーバー</b>！<br>
+    <b>⑤</b> とくしゅコマどうしを入れかえると<b>がったい技</b>！
   </p>
   <div class="specials" id="specials"></div>
   <button class="btn" id="startBtn" type="button">あそぶ</button>
   <p class="best" id="bestLine"></p>
+  <button class="btn light" id="dailyBtn" type="button">今日のチャレンジ</button>
+  <p class="dailyline" id="dailyLine"></p>
   <p class="foot"><a href="https://runococco.github.io/picoruno./">別のゲーム</a><button class="iconbtn" id="muteBtn" type="button" aria-pressed="false">おと：オン</button></p>
 </section>
 
@@ -200,7 +205,7 @@ button{font-family:inherit;color:inherit}
 <!-- ===== 結果 ===== -->
 <section class="screen" id="result" hidden>
   <div class="rcard">
-    <p class="rhead">ころころおやつ ・ けっか</p>
+    <p class="rhead" id="rHead">ころころおやつ ・ けっか</p>
     <p class="rlabel">あなたの称号は…</p>
     <p class="rank" id="rRank"></p>
     <p class="rbig" id="rScore"></p>
@@ -208,7 +213,7 @@ button{font-family:inherit;color:inherit}
     <div class="rstats">
       <div><span>とうたつ</span><b id="rStage"></b></div>
       <div><span>さいだいコンボ</span><b id="rCombo"></b></div>
-      <div><span>ボム・ほし</span><b id="rSp"></b></div>
+      <div><span>とくしゅコマ</span><b id="rSp"></b></div>
     </div>
     <div class="catches" id="rCatches"></div>
     <p class="fav" id="rFav"></p>
@@ -333,6 +338,10 @@ const sfx={
   boom(){noise(.3,.22);tone(110,.25,'sine',.2)},
   egg(){[784,988,1175,1568,1976].forEach((f,i)=>tone(f,.16,'sine',.1,i*.04))},
   make(){tone(1047,.08,'sine',.1);tone(1568,.12,'sine',.08,.06)},
+  line(){if(muted||!actx)return;const t=actx.currentTime,o=actx.createOscillator(),g=actx.createGain();o.type='sawtooth';
+    o.frequency.setValueAtTime(300,t);o.frequency.exponentialRampToValueAtTime(1800,t+.18);g.gain.setValueAtTime(.08,t);g.gain.exponentialRampToValueAtTime(.0001,t+.22);
+    o.connect(g).connect(actx.destination);o.start(t);o.stop(t+.25)},
+  ice(){tone(2093,.06,'sine',.07);tone(2637,.08,'sine',.05,.04)},
   gold(){tone(1319,.1,'sine',.1);tone(1760,.16,'sine',.08,.07)},
   clear(){[523,659,784,1047].forEach((f,i)=>tone(f,.18,'triangle',.14,i*.08))},
   fever(){[392,523,659,784,1047,1319].forEach((f,i)=>tone(f,.14,'square',.06,i*.05))},
@@ -402,15 +411,22 @@ const RANKS=[ // 到達ステージで称号
 ];
 const rankOf=s=>{let r=RANKS[0][1];for(const [n,name] of RANKS) if(s>=n) r=name;return r};
 
+/* ===== 乱数：今日のチャレンジは日付から作った乱数で、みんな同じ盤面・同じ注文になる ===== */
+function seeded(seed){let a=seed>>>0;return()=>{a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const jstDate=()=>new Date(Date.now()+9*3600e3).toISOString().slice(0,10);
+const dateSeed=d=>[...d].reduce((h,ch)=>Math.imul(h^ch.charCodeAt(0),16777619),2166136261);
+let rnd=Math.random, rndOrder=Math.random;
+const KEY_DAILY='korokoro-daily';
+
 /* ===== 状態 ===== */
 let G=null, uid=0;
-function newTile(t,r,c,y,gold=false){return {t,r,c,x:c,y:y==null?r:y,vy:0,s:1,pop:-1,id:++uid,sq:0,sp:t<0?2:0,gold,grow:0}}
+function newTile(t,r,c,y,gold=false){return {t,r,c,x:c,y:y==null?r:y,vy:0,s:1,pop:-1,id:++uid,sq:0,sp:t<0?2:0,gold,grow:0,ice:0}}
 function makeOrder(s){
-  const k=orderKinds(s), n=orderCount(s), ids=[...Array(NT).keys()].sort(()=>Math.random()-.5).slice(0,k).sort((a,b)=>a-b);
+  const k=orderKinds(s), n=orderCount(s), ids=[...Array(NT).keys()].map(i=>[rndOrder(),i]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]).slice(0,k).sort((a,b)=>a-b);
   const q=Array(NT).fill(0); ids.forEach(i=>q[i]=n); return q;
 }
-function freshState(){
-  return {stage:1,score:0,time:TIME_MAX,quota:makeOrder(1),caught:Array(NT).fill(0),
+function freshState(mode){
+  return {mode,lines:0,stage:1,score:0,time:TIME_MAX,quota:makeOrder(1),caught:Array(NT).fill(0),
     combo:0,comboT:0,maxCombo:0,fever:0,feverT:0,fevers:0,bombs:0,eggs:0,busy:false,over:false,paused:false,idle:0,hint:null,
     sel:null,clock:0,grid:null,fx:[],texts:[],timers:[],tick:0,banner:0,stageClearPending:false};
 }
@@ -419,14 +435,14 @@ function freshState(){
 function randType(){
   // 注文に入っているおやつは少しだけ出やすい
   const w=G.quota.map(q=>q>0?1.15:.85), sum=w.reduce((a,b)=>a+b,0);
-  let x=Math.random()*sum; for(let i=0;i<NT;i++){x-=w[i];if(x<0)return i} return NT-1;
+  let x=rnd()*sum; for(let i=0;i<NT;i++){x-=w[i];if(x<0)return i} return NT-1;
 }
 function at(r,c){return r>=0&&r<N&&c>=0&&c<N?G.grid[r][c]:null}
 function typeAt(r,c){const t=at(r,c);return t?t.t:-1}
 function fillBoard(){
   G.grid=[];
   for(let r=0;r<N;r++){G.grid.push([]);for(let c=0;c<N;c++){
-    let t; do{t=Math.floor(Math.random()*NT)}while((c>=2&&typeAt(r,c-1)===t&&typeAt(r,c-2)===t)||(r>=2&&typeAt(r-1,c)===t&&typeAt(r-2,c)===t));
+    let t; do{t=Math.floor(rnd()*NT)}while((c>=2&&typeAt(r,c-1)===t&&typeAt(r,c-2)===t)||(r>=2&&typeAt(r-1,c)===t&&typeAt(r-2,c)===t));
     G.grid[r].push(newTile(t,r,c,r-N-1-(N-r)*.15));
   }}
   if(!findMove()) fillBoard();
@@ -451,8 +467,8 @@ function findMove(){
   const opts=[];
   for(let r=0;r<N;r++)for(let c=0;c<N;c++)for(const [dr,dc] of [[0,1],[1,0]]){
     const r2=r+dr,c2=c+dc; if(r2>=N||c2>=N) continue;
-    const A=at(r,c),B=at(r2,c2); if(!A||!B) continue;
-    if(A.sp===2||B.sp===2){opts.push([[r,c],[r2,c2]]);continue}
+    const A=at(r,c),B=at(r2,c2); if(!A||!B||A.ice||B.ice) continue;
+    if(A.sp===2||B.sp===2||(A.sp&&B.sp)){opts.push([[r,c],[r2,c2]]);continue}
     if(A.t===B.t) continue;
     rawSwap([r,c],[r2,c2]); const ok=lineAt(r,c)||lineAt(r2,c2); rawSwap([r,c],[r2,c2]);
     if(ok) opts.push([[r,c],[r2,c2]]);
@@ -466,21 +482,44 @@ function settled(){for(const row of G.grid)for(const t of row){if(t&&(t.y!==t.r|
 function waitSettle(){const g=G;return new Promise(res=>{const chk=()=>{if(G!==g||settled())res();else g.timers.push({t:g.clock+.016,res:chk})};chk()})}
 function tween(t,dur){t.tw={fx:t.x,fy:t.y,t:0,d:dur}}
 
+/* ===== 特殊コマの範囲 ===== */
+// sp: 1=ボム(3×3) 2=ほしクッキー 3=よこライン 4=たてライン
+const area=(r,c,d)=>{const o=[];for(let i=r-d;i<=r+d;i++)for(let j=c-d;j<=c+d;j++)if(i>=0&&i<N&&j>=0&&j<N)o.push([i,j]);return o};
+const rowCells=r=>[...Array(N).keys()].map(c=>[r,c]);
+const colCells=c=>[...Array(N).keys()].map(r=>[r,c]);
+const SP_RANK={0:0,3:1,4:1,1:2,2:3};
+
 /* ===== 1手 ===== */
 async function trySwap(a,b){
   if(G.busy||G.over||G.paused) return;
   const A=at(...a),B=at(...b); if(!A||!B) return;
+  if(A.ice||B.ice){sfx.bad(); G.sel=null; return}
   const g=G;
   G.busy=true; G.sel=null; G.hint=null; G.idle=0; sfx.swap();
   rawSwap(a,b); tween(A,.13); tween(B,.13); await waitSettle();
   if(G!==g) return;
   if(A.sp===2||B.sp===2){
-    // ほしクッキー：相手と同じおやつを全部。ほしクッキー同士なら盤面ぜんぶ
+    // ほしクッキー：相手と同じおやつを全部。ほしクッキー同士なら盤面ぜんぶ。
+    // 相手がボム・ラインなら、同じおやつが全部その特殊コマに変わって一気に発動
     const other=A.sp===2?B:A, cells=[];
     for(let r=0;r<N;r++)for(let c=0;c<N;c++){const t=G.grid[r][c];
       if(t===A||t===B||(other.sp===2?true:(t.t===other.t&&t.sp!==2))) cells.push([r,c])}
+    if(other.sp&&other.sp!==2){
+      for(const [r,c] of cells){const t=G.grid[r][c]; if(t!==A&&t!==B&&t.t===other.t){t.sp=other.sp===1?1:(rnd()<.5?3:4);t.grow=1}}
+      showBanner('がったい！','',.8); sfx.make(); await wait(.35); if(G!==g) return;
+    }
     sfx.egg(); shake();
     await resolve([a,b],cells);
+  }else if(A.sp&&B.sp){
+    // 特殊コマどうしの合体技
+    const [r,c]=b, s1=A.sp, s2=B.sp; let cells;
+    if(s1===1&&s2===1) cells=area(r,c,2);
+    else if(s1===1||s2===1){cells=[];for(let i=-1;i<=1;i++){cells.push(...rowCells(Math.min(N-1,Math.max(0,r+i))),...colCells(Math.min(N-1,Math.max(0,c+i))))}}
+    else cells=[...rowCells(r),...colCells(c)];
+    A.sp=0; B.sp=0;
+    showBanner('がったい！','',.8); sfx.boom(); shake();
+    if(s1!==1||s2!==1) beam(true,r), beam(false,c);
+    await resolve([a,b],cells,b);
   }else if(!(lineAt(...a)||lineAt(...b))){
     sfx.bad(); rawSwap(a,b); tween(A,.13); tween(B,.13); await waitSettle();
     if(G!==g) return;
@@ -491,15 +530,16 @@ async function trySwap(a,b){
   if(G.stageClearPending) await stageClear();
   if(G===g&&G.time<=0) endGame();
 }
-async function resolve(moved,preset){
+async function resolve(moved,preset,origin){
   const g=G, movedKeys=new Set(moved.map(([r,c])=>r*N+c));
   let first=true;
   while(G===g){
     const groups=preset?[]:findMatches();
     if(!preset&&!groups.length) break;
-    const gone=new Map(), make=new Map();
+    const gone=new Map(), make=new Map(), keep=new Set(), flying=new Map();
     if(preset){
-      preset.forEach(([r,c])=>gone.set(r*N+c,[r,c]));
+      preset.forEach(([r,c])=>{gone.set(r*N+c,[r,c]); if(origin) flying.set(r*N+c,[r,c,origin[0],origin[1]])});
+      origin=null;
       G.combo++; G.comboT=COMBO_WIN; G.maxCombo=Math.max(G.maxCombo,G.combo);
       const [er,ec]=moved[1]; addScore(150*preset.length,ec,er);
       preset=null;
@@ -513,35 +553,39 @@ async function resolve(moved,preset){
       let cr=0,cc=0; gr.cells.forEach(([r,c])=>{cr+=r;cc+=c}); cr/=len; cc/=len;
       addScore(100+(len-3)*120,cc,cr);
       if(len>=4){
-        // 4つでボム、5つでほしクッキー。動かしたマスがあればそこに、なければ真ん中に
+        // 4つでライン（そろえた向きの1列）、5つでほしクッキー。動かしたマスがあればそこに、なければ真ん中に
         const pick=(first&&gr.cells.find(([r,c])=>movedKeys.has(r*N+c)))||gr.cells.find(([r,c])=>cnt.get(r*N+c)>1)||gr.cells[len>>1];
-        const k=pick[0]*N+pick[1], sp=len>=5?2:1;
-        make.set(k,Math.max(make.get(k)||0,sp));
+        const k=pick[0]*N+pick[1], sp=len>=5?2:(gr.cells[0][0]===gr.cells[1][0]?3:4);
+        if(SP_RANK[sp]>SP_RANK[make.get(k)||0]) make.set(k,sp);
       }
       if(G.feverT<=0){G.fever=Math.min(100,G.fever+3+Math.min(G.combo,20)*.2+(len-3)*4); if(G.fever>=100) startFever()}
       for(const [r,c] of gr.cells) gone.set(r*N+c,[r,c]);
     }
-    for(const [k,n] of cnt) if(n>1&&!make.has(k)) make.set(k,1);
-    // ボムの爆発（3×3）。巻きこんだボムも連鎖
-    const queue=[...gone.values()], blasted=new Set(), flying=new Map();
-    let booms=0;
+    // L字・T字はボム
+    for(const [k,n] of cnt) if(n>1&&SP_RANK[1]>SP_RANK[make.get(k)||0]) make.set(k,1);
+    // ボム（3×3）・ライン（1列）の発動。巻きこんだ特殊コマも連鎖
+    const queue=[...gone.values()], blasted=new Set();
+    let booms=0, zips=0;
     while(queue.length){
       const [r,c]=queue.pop(), t=G.grid[r][c];
-      if(!t||t.sp!==1||blasted.has(t.id)) continue;
-      blasted.add(t.id); booms++; flying.set(r*N+c,[r,c]);
-      for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){
-        const rr=r+dr,cc=c+dc,n=at(rr,cc),k=rr*N+cc;
+      if(!t||!(t.sp===1||t.sp===3||t.sp===4)||blasted.has(t.id)) continue;
+      blasted.add(t.id); if(!flying.has(r*N+c)) flying.set(r*N+c,[r,c]);
+      const cells=t.sp===1?area(r,c,1):t.sp===3?rowCells(r):colCells(c);
+      if(t.sp===1){booms++; ring(c,r)} else {zips++; beam(t.sp===3,t.sp===3?r:c)}
+      for(const [rr,cc] of cells){
+        const n=at(rr,cc),k=rr*N+cc;
         if(!n||n.sp===2||gone.has(k)) continue;
         gone.set(k,[rr,cc]); queue.push([rr,cc]); addScore(40,cc,rr,true); if(!flying.has(k)) flying.set(k,[rr,cc,r,c]);
       }
-      ring(c,r);
     }
     if(booms){sfx.boom(); shake(); if(navigator.vibrate)try{navigator.vibrate(30)}catch(_){}}
-    // できたボム・ほしクッキーの場所はコマを残す
-    for(const k of make.keys()){const r=Math.floor(k/N),c=k%N,t=G.grid[r][c]; if(t&&blasted.has(t.id)&&t.sp===1) make.delete(k)}
+    if(zips){sfx.line(); if(!booms) shake()}
+    // 発動した特殊コマの場所には、新しい特殊コマを作らない
+    for(const k of make.keys()){const r=Math.floor(k/N),c=k%N,t=G.grid[r][c]; if(t&&blasted.has(t.id)) make.delete(k)}
     sfx.pop(G.combo);
     for(const [k,[r,c]] of gone){
       const t=G.grid[r][c]; if(!t) continue;
+      if(t.ice){t.ice=0; keep.add(k); crack(c,r); continue}  // こおりは割れるだけ
       if(t.t>=0){G.caught[t.t]++; if(G.quota[t.t]>0){G.quota[t.t]--; bumpQuota(t.t)}}
       if(t.gold){t.gold=false; goldBonus(c,r)}
       if(make.has(k)) continue;
@@ -553,7 +597,8 @@ async function resolve(moved,preset){
     await wait(.2);
     if(G!==g) return;
     for(const [k,[r,c]] of gone){
-      if(make.has(k)){const t=G.grid[r][c], sp=make.get(k); t.sp=sp; if(sp===2){t.t=-1; G.eggs++} else G.bombs++; t.grow=1; continue}
+      if(make.has(k)){const t=G.grid[r][c], sp=make.get(k); t.sp=sp; t.ice=0; if(sp===2){t.t=-1; G.eggs++} else if(sp===1) G.bombs++; else G.lines++; t.grow=1; continue}
+      if(keep.has(k)) continue;
       G.grid[r][c]=null;
     }
     if(make.size) sfx.make();
@@ -577,7 +622,7 @@ function gravity(){
     let w=N-1;
     for(let r=N-1;r>=0;r--){const t=G.grid[r][c]; if(t){if(w!==r){G.grid[w][c]=t;G.grid[r][c]=null;t.r=w} w--}}
     const k=w+1;
-    for(let r=w;r>=0;r--) G.grid[r][c]=newTile(randType(),r,c,r-k-.3,Math.random()<GOLD_RATE);
+    for(let r=w;r>=0;r--) G.grid[r][c]=newTile(randType(),r,c,r-k-.3,rnd()<GOLD_RATE);
   }
 }
 async function shuffle(){
@@ -588,13 +633,23 @@ async function shuffle(){
   const tiles=G.grid.flat();
   let tries=0;
   do{
-    for(let i=tiles.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[tiles[i],tiles[j]]=[tiles[j],tiles[i]]}
+    for(let i=tiles.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[tiles[i],tiles[j]]=[tiles[j],tiles[i]]}
     tiles.forEach((t,i)=>{const r=Math.floor(i/N),c=i%N;G.grid[r][c]=t;t.r=r;t.c=c});
     tries++;
   }while((findMatches().length||!findMove())&&tries<200);
   if(tries>=200){const old=G.grid; fillBoard(); G.grid.flat().forEach(t=>{t.y=old[t.r][t.c].y;t.x=old[t.r][t.c].x})}
   G.grid.flat().forEach(t=>tween(t,.35));
   await waitSettle();
+}
+// こおり：ステージ3から。動かせないけれど、そろえたりボムに巻きこんだりすると割れる
+function freeze(stage){
+  if(stage<3) return 0;
+  const want=Math.min(2+(stage-3)*2,12), now=G.grid.flat().filter(t=>t.ice).length;
+  const cand=G.grid.flat().filter(t=>!t.ice&&!t.sp&&!t.gold);
+  let n=0;
+  while(n<want-now&&cand.length){const i=Math.floor(rndOrder()*cand.length);cand.splice(i,1)[0].ice=1;n++}
+  if(n) sfx.ice();
+  return n;
 }
 function startFever(){
   G.feverT=FEVER_TIME; G.fevers++; G.fever=100; sfx.fever(); bgmPlay('fever');
@@ -614,9 +669,11 @@ async function stageClear(){
   if(G!==g) return;
   G.stage++; G.quota=makeOrder(G.stage);
   buildQuota(); renderHud();
-  showBanner(`ステージ${G.stage}`,'新しい注文がきたよ',1); G.banner=1;
-  await wait(1);
+  const iced=freeze(G.stage);
+  showBanner(`ステージ${G.stage}`,iced?'こおりが出たよ！そろえて割ろう':'新しい注文がきたよ',iced?1.4:1); G.banner=iced?1.4:1;
+  await wait(G.banner>0?G.banner:1);
   if(G!==g) return;
+  if(!findMove()) await shuffle();
   G.busy=false; G.idle=0;
 }
 
@@ -663,6 +720,10 @@ function drawFlies(dt){
   flies=flies.filter(f=>f.t<f.life&&f.y<H+cell*2);
 }
 function ring(c,r){G.fx.push({ring:true,x:c+.5,y:r+.5,t:0,life:.35})}
+function beam(horiz,i){G.fx.push({beam:true,horiz,i,t:0,life:.4})}
+function crack(c,r){sfx.ice(); if(reduceMotion) return;
+  for(let i=0;i<7;i++){const a=Math.random()*Math.PI*2,v=1.5+Math.random()*2.5;
+    G.fx.push({x:c+.5,y:r+.5,vx:Math.cos(a)*v,vy:Math.sin(a)*v-1.5,t:0,life:.5,col:'#d4ebf7',sz:.05+Math.random()*.05,shard:true})}}
 function shake(){if(reduceMotion)return;const b=$('board');b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake')}
 let bannerTimer=0;
 function showBanner(big,small,sec){
@@ -728,6 +789,19 @@ function draw(){
       ctx.fillStyle=INK;ctx.beginPath();ctx.arc(bx,by,R,0,7);ctx.fill();
       ctx.fillStyle=k>.5?'#f2a65a':'#f3c24f';ctx.beginPath();ctx.arc(bx+R*1.5,by-R*1.5,R*(.35+.25*k),0,7);ctx.fill();
     }
+    if((t.sp===3||t.sp===4)&&t.pop<0){ // ラインのしるし：向きを示す三角
+      const k=(Math.sin(G.clock*8)+1)/2, d=cell*(.4+.04*k), a=cell*.1;
+      ctx.fillStyle='#ec8a83';
+      for(const sg of [-1,1]){ctx.beginPath();
+        if(t.sp===3){const x=cx+sg*d;ctx.moveTo(x+sg*a,cy);ctx.lineTo(x,cy-a);ctx.lineTo(x,cy+a)}
+        else{const y=cy+sg*d;ctx.moveTo(cx,y+sg*a);ctx.lineTo(cx-a,y);ctx.lineTo(cx+a,y)}
+        ctx.closePath();ctx.fill()}
+    }
+    if(t.ice&&t.pop<0){ // こおり
+      ctx.fillStyle='rgba(196,228,246,.62)';rrect(ctx,cx-cell*.46,cy-cell*.46,cell*.92,cell*.92,cell*.16);ctx.fill();
+      ctx.strokeStyle='rgba(255,255,255,.95)';ctx.lineWidth=Math.max(1.5,cell*.04);ctx.stroke();
+      ctx.lineCap='round';ctx.beginPath();ctx.moveTo(cx-cell*.3,cy-cell*.12);ctx.lineTo(cx-cell*.12,cy-cell*.3);ctx.moveTo(cx-cell*.3,cy+.02*cell);ctx.lineTo(cx+.02*cell,cy-cell*.3);ctx.stroke();
+    }
     if(t.gold&&t.pop<0){ // きらり
       const k=(Math.sin(G.clock*6+t.id)+1)/2, sx=cx-cell*.28, sy=cy-cell*.28, L=cell*(.06+.08*k);
       ctx.strokeStyle='#fff';ctx.lineWidth=2.5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(sx-L,sy);ctx.lineTo(sx+L,sy);ctx.moveTo(sx,sy-L);ctx.lineTo(sx,sy+L);ctx.stroke();
@@ -737,6 +811,12 @@ function draw(){
   for(const p of G.fx){
     ctx.globalAlpha=Math.max(0,1-p.t/p.life);
     if(p.ring){ctx.strokeStyle='#f3b65f';ctx.lineWidth=cell*.12;ctx.beginPath();ctx.arc(p.x*cell,p.y*cell,cell*(.4+p.t/p.life*1.2),0,7);ctx.stroke();continue}
+    if(p.beam){const k=p.t/p.life, w=cell*(.9-.7*k);
+      ctx.fillStyle='rgba(255,243,201,.95)';
+      if(p.horiz) ctx.fillRect(0,(p.i+.5)*cell-w/2,size,w); else ctx.fillRect((p.i+.5)*cell-w/2,0,w,size);
+      ctx.fillStyle='rgba(236,138,131,.5)';
+      if(p.horiz) ctx.fillRect(0,(p.i+.5)*cell-w/6,size,w/3); else ctx.fillRect((p.i+.5)*cell-w/6,0,w/3,size);
+      continue}
     ctx.fillStyle=p.col;
     ctx.beginPath();ctx.arc(p.x*cell,p.y*cell,p.sz*cell,0,7);ctx.fill();
   }
@@ -774,7 +854,7 @@ function step(dt){
     if(t.grow>0) t.grow=Math.max(0,t.grow-dt*4);
     if(t.pop>=0) t.pop+=dt;
   }
-  G.fx.forEach(p=>{p.t+=dt;if(!p.ring){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=9*dt}}); G.fx=G.fx.filter(p=>p.t<p.life);
+  G.fx.forEach(p=>{p.t+=dt;if(!p.ring&&!p.beam){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=9*dt}}); G.fx=G.fx.filter(p=>p.t<p.life);
   G.texts.forEach(x=>x.t+=dt); G.texts=G.texts.filter(x=>x.t<.9);
   if(G.over) return;
   if(G.feverT>0){G.feverT-=dt;G.fever=Math.max(0,100*G.feverT/FEVER_TIME);
@@ -846,11 +926,12 @@ cv.addEventListener('pointercancel',()=>drag=null);
 
 /* ===== 画面 ===== */
 function show(id){['title','play','result'].forEach(s=>$(s).hidden=s!==id);window.scrollTo(0,0)}
-function startGame(){
+function startGame(mode='normal'){
   ac(); clearTimeout(bannerTimer); $('banner').hidden=true;
-  G=freshState(); show('play'); resize(); buildQuota(); fillBoard(); hudCache=''; renderHud();
+  if(mode==='daily'){const sd=dateSeed(jstDate()); rnd=seeded(sd); rndOrder=seeded(sd^0x9e3779b9)} else {rnd=Math.random; rndOrder=Math.random}
+  G=freshState(mode); show('play'); resize(); buildQuota(); fillBoard(); hudCache=''; renderHud();
   $('board').classList.remove('fev'); $('feverBar').classList.remove('on');
-  const g=G; G.busy=true; showBanner('スタート！','注文のおやつを集めよう',1.2); G.banner=1.2;
+  const g=G; G.busy=true; showBanner(mode==='daily'?'今日のチャレンジ':'スタート！',mode==='daily'?'みんな同じ盤面・同じ注文':'注文のおやつを集めよう',1.2); G.banner=1.2;
   wait(1.2).then(()=>{if(G===g)G.busy=false});
   BGM.mode='normal'; BGM.step=0; bgmPlay('normal');
   pingPlay();
@@ -870,26 +951,34 @@ let lastShare=null;
 function showResult(){
   const S=G; if(!S) return;
   const reached=S.stage, rank=rankOf(reached);
-  const best=LS.get(KEY_BEST,0), isNew=S.score>best;
-  if(isNew) LS.set(KEY_BEST,S.score);
+  const daily=S.mode==='daily', today=jstDate();
+  let best, isNew;
+  if(daily){const d=LS.get(KEY_DAILY,{}); best=d.date===today?d.best:0; isNew=S.score>best; LS.set(KEY_DAILY,{date:today,best:Math.max(best,S.score)})}
+  else{best=LS.get(KEY_BEST,0); isNew=S.score>best; if(isNew) LS.set(KEY_BEST,S.score)}
+  const md=today.slice(5).replace('-','/').replace(/^0/,'');
+  $('rHead').textContent=daily?`今日のチャレンジ ・ ${md}`:'ころころおやつ ・ けっか';
   let fav=0; S.caught.forEach((n,i)=>{if(n>S.caught[fav])fav=i});
   const total=S.caught.reduce((a,b)=>a+b,0);
   $('rRank').textContent=`「${rank}」`;
   $('rScore').innerHTML=`${S.score.toLocaleString()}<small>点</small>`;
   $('rNew').hidden=!isNew||S.score===0;
+  $('rNew').textContent=daily?'今日のベスト更新！':'じこベスト更新！';
   $('rStage').textContent=`ステージ${reached}`;
   $('rCombo').textContent=S.maxCombo;
-  $('rSp').textContent=`${S.bombs}・${S.eggs}`;
+  $('rSp').textContent=S.bombs+S.lines+S.eggs;
   $('rCatches').innerHTML=SWEETS.map((a,i)=>`<div>${svgOf(i,`role="img" aria-label="${a.name}"`)}${S.caught[i]}</div>`).join('');
   $('rFav').textContent=total?`いちばん集めたのは ${SWEETS[fav].name}（${S.caught[fav]}こ）`:'';
-  const text=`ころころおやつ ステージ${reached}まで到達！\n${S.score.toLocaleString()}点・最大${S.maxCombo}コンボ\n称号は「${rank}」でした${SWEETS[fav].emoji}\n#ころころおやつ`;
-  lastShare={text,rank,reached,score:S.score,combo:S.maxCombo,bombs:S.bombs,eggs:S.eggs,caught:S.caught.slice(),fav,total};
+  const text=daily?`ころころおやつ 今日のチャレンジ ${md}\n${S.score.toLocaleString()}点・ステージ${reached}・最大${S.maxCombo}コンボ\n称号は「${rank}」でした${SWEETS[fav].emoji}\nみんな同じ盤面だよ。勝てる？\n#ころころおやつ`:`ころころおやつ ステージ${reached}まで到達！\n${S.score.toLocaleString()}点・最大${S.maxCombo}コンボ\n称号は「${rank}」でした${SWEETS[fav].emoji}\n#ころころおやつ`;
+  lastShare={text,daily,md,rank,reached,score:S.score,combo:S.maxCombo,sps:S.bombs+S.lines+S.eggs,caught:S.caught.slice(),fav,total};
+  $('againBtn').textContent=daily?'もういちど（今日のチャレンジ）':'もういちど';
   $('xBtn').href='https://twitter.com/intent/tweet?text='+encodeURIComponent(text)+'&url='+encodeURIComponent(GAME_URL);
   show('result');
 }
 function refreshTitle(){
   const b=LS.get(KEY_BEST,0);
   $('bestLine').textContent=b?`じこベスト ${b.toLocaleString()} 点`:'';
+  const d=LS.get(KEY_DAILY,{}), today=jstDate();
+  $('dailyLine').textContent=d.date===today&&d.best?`今日のベスト ${d.best.toLocaleString()} 点`:'みんな同じ盤面・同じ注文で、1日ごとに変わります';
 }
 
 /* ===== シェア画像 ===== */
@@ -904,7 +993,7 @@ async function makeShareImage(){
   for(let y=0;y<H;y+=60)for(let x=0;x<W;x+=60) if(((x+y)/60)%2){c.fillStyle='#F1E9DC';c.fillRect(x,y,60,60)}
   c.fillStyle='#FFFDF8'; rrect(c,60,60,W-120,H-120,56); c.fill(); c.lineWidth=8; c.strokeStyle='#5B4D45'; c.stroke();
   c.textAlign='center'; c.textBaseline='middle';
-  c.fillStyle='#8E8077'; c.font='44px '+POP; c.fillText('ころころおやつ',W/2,140);
+  c.fillStyle='#8E8077'; c.font='44px '+POP; c.fillText(S.daily?`ころころおやつ ・ 今日のチャレンジ ${S.md}`:'ころころおやつ',W/2,140,W-200);
   const ims=await Promise.all(SWEETS.map((a,i)=>svgImg(svgOf(i,'width="200" height="200"'))));
   if(ims[S.fav]&&S.total) c.drawImage(ims[S.fav],W/2-110,180,220,220);
   c.fillStyle='#8E8077'; c.font=BODY; c.fillText('わたしの称号は…',W/2,440);
@@ -912,7 +1001,7 @@ async function makeShareImage(){
   c.font='34px '+POP; const lv=`ステージ ${S.reached} までいけた！`, lw=c.measureText(lv).width+56;
   rrect(c,W/2-lw/2,580,lw,62,31); c.fillStyle='#E8877F'; c.fill(); c.fillStyle='#FFFDF8'; c.fillText(lv,W/2,612);
   c.fillStyle='#5B4D45'; c.font='76px '+POP; c.fillText(`${S.score.toLocaleString()} 点`,W/2,712);
-  c.fillStyle='#8E8077'; c.font=BODY; c.fillText(`さいだい ${S.combo} コンボ ・ ボム ${S.bombs} ・ ほしクッキー ${S.eggs}`,W/2,782,W-200);
+  c.fillStyle='#8E8077'; c.font=BODY; c.fillText(`さいだい ${S.combo} コンボ ・ とくしゅコマ ${S.sps} こ`,W/2,782,W-200);
   const sz=96, gp=18, x0=W/2-(7*sz+6*gp)/2;
   ims.forEach((im,i)=>{if(im)c.drawImage(im,x0+i*(sz+gp),818,sz,sz);
     c.fillStyle='#5B4D45';c.font='30px '+POP;c.fillText(String(S.caught[i]),x0+i*(sz+gp)+sz/2,942)});
@@ -948,14 +1037,22 @@ function toast(s){const t=$('toast');t.textContent=s;t.hidden=false;clearTimeout
 /* ===== タイトルの飾り ===== */
 $('logo').innerHTML=[...'ころころおやつ'].map((ch,i)=>`<span class="c${i}" style="--i:${i}">${ch}</span>`).join('');
 $('parade').innerHTML=SWEETS.map((a,i)=>`<i style="--i:${i}">${svgOf(i)}</i>`).join('');
-$('specials').innerHTML=
-  `<div class="sp"><svg viewBox="0 0 100 100" aria-hidden="true">${BOMB_RING}<defs>${OUTLINE}</defs><g filter="url(#ol)"><g transform="translate(10 10) scale(.8)">${SWEETS[1].svg}</g></g>${BOMB_STAR}</svg><b>ボム</b>4つそろえると<br>まわり9マスを消す</div>`+
-  `<div class="sp"><svg viewBox="0 0 100 100" aria-hidden="true">${svgOf(-1).replace(/^<svg[^>]*>|<\/svg>$/g,'')}</svg><b>ほしクッキー</b>5つそろえると<br>相手と同じ種類を全部</div>`+
-  `<div class="sp"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#ffeca0" opacity=".7"/><defs>${OUTLINE}</defs><g filter="url(#ol)"><g transform="translate(10 10) scale(.8)">${SWEETS[0].svg}</g></g><path d="M22 14 v16 M14 22 h16" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg><b>キラキラ</b>たまに出る<br>消すと＋2秒</div>`;
+const inSv=(inner)=>`<svg viewBox="0 0 100 100" aria-hidden="true">${inner}</svg>`;
+const piece=(i,extra='')=>`<defs>${OUTLINE}</defs><g filter="url(#ol)"><g transform="translate(10 10) scale(.8)">${SWEETS[i].svg}</g></g>${extra}`;
+const tri=(h)=>h?`<path d="M2 50 l9 -8 v16z M98 50 l-9 -8 v16z" fill="#ec8a83"/>`:`<path d="M50 2 l-8 9 h16z M50 98 l-8 -9 h16z" fill="#ec8a83"/>`;
+$('specials').innerHTML=[
+  [inSv(BOMB_RING+piece(1,BOMB_STAR)),'ボム','L字・T字で<br>まわり9マス'],
+  [inSv(piece(3,tri(true))),'ライン','4つそろえると<br>その向きに1列'],
+  [inSv(svgOf(-1).replace(/^<svg[^>]*>|<\/svg>$/g,'')),'ほしクッキー','5つそろえると<br>同じ種類を全部'],
+  [inSv(`<circle cx="50" cy="50" r="48" fill="#ffeca0" opacity=".7"/>${piece(0)}<path d="M22 14 v16 M14 22 h16" stroke="#fff" stroke-width="5" stroke-linecap="round"/>`),'キラキラ','たまに出る<br>消すと＋2秒'],
+  [inSv(`${piece(5)}<rect x="8" y="8" width="84" height="84" rx="16" fill="rgba(196,228,246,.62)" stroke="#fff" stroke-width="4"/><path d="M22 40 L40 22 M22 56 L56 22" stroke="#fff" stroke-width="4" stroke-linecap="round"/>`),'こおり','ステージ3から<br>そろえて割ろう'],
+  [inSv(`<g transform="translate(-14 0)">${BOMB_RING}${piece(1,BOMB_STAR)}</g><g transform="translate(30 10) scale(.8)">${piece(3,tri(true))}</g><path d="M50 16 l3 7 7 1 -5 5 1 7 -6 -3 -6 3 1 -7 -5 -5 7 -1z" fill="#f3c24f"/>`),'がったい','とくしゅコマを<br>入れかえる'],
+].map(([svg,name,desc])=>`<div class="sp">${svg}<b>${name}</b>${desc}</div>`).join('');
 
 /* ===== 操作 ===== */
-$('startBtn').onclick=startGame;
-$('againBtn').onclick=startGame;
+$('startBtn').onclick=()=>startGame('normal');
+$('dailyBtn').onclick=()=>startGame('daily');
+$('againBtn').onclick=()=>startGame(lastShare&&lastShare.daily?'daily':'normal');
 $('homeBtn').onclick=()=>{bgmStop();refreshTitle();show('title')};
 $('pauseBtn').onclick=()=>pause(true);
 $('resumeBtn').onclick=()=>pause(false);
@@ -974,7 +1071,7 @@ document.addEventListener('keydown',e=>{
   if(G&&!G.over&&!$('play').hidden) pause(!G.paused);
 });
 setMuteLabel(); refreshTitle();
-window.__oyatsu={get G(){return G},findMove,trySwap};
+window.__oyatsu={get G(){return G},findMove,trySwap,startGame};
 </script>
 <script>
 /* 遊んだ回数を数える（トップページの ▶ 回数）。同じタブでの再読みこみは1回だけ数えます。 */
