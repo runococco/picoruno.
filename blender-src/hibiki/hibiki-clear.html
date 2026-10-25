@@ -239,6 +239,8 @@ function initAudio(){
   const rev=AC.createConvolver();rev.buffer=makeIR(1.4);
   const wet=AC.createGain();wet.gain.value=.28;rev.connect(wet);wet.connect(master);
   bus=AC.createGain();bus.connect(master);bus.connect(rev);
+  // 左右の定位は9本の固定の通り道に振り分ける（音ごとにパンナーを作らない）
+  if(AC.createStereoPanner)for(let i=0;i<9;i++){const sp=AC.createStereoPanner();sp.pan.value=(i-4)/4;sp.connect(bus);PANS.push(sp);}
   return new Promise(res=>{
     // 合成は少しずつ進めて、画面が固まらないようにする
     const jobs=[];
@@ -251,17 +253,20 @@ function initAudio(){
     run();
   });
 }
-function out(p){
-  if(AC.createStereoPanner){const s=AC.createStereoPanner();s.pan.value=Math.max(-1,Math.min(1,p));s.connect(bus);return s;}
-  return bus;
-}
+const PANS=[];
+function out(p){return PANS.length?PANS[Math.round((Math.max(-1,Math.min(1,p))+1)*4)]:bus;}
+// 同時に鳴っている発音の数。共鳴の大連鎖で数百本の発振器が一度に立ち上がって固まらないよう、
+// 多いときは倍音を省き、さらに多いときは新しい余韻を鳴らさない（割れる音のサンプルは必ず鳴る）
+let ACT=[];
+function busy(){const t=AC.currentTime;if(ACT.length>40)ACT=ACT.filter(e=>e>t);return ACT.length;}
 function play(buf,p,gain,rate,when=0){
   if(!buf)return;
   const s=AC.createBufferSource();s.buffer=buf;s.playbackRate.value=rate;
   const g=AC.createGain();g.gain.value=gain;s.connect(g);g.connect(out(p*.6));s.start(AC.currentTime+.002+when);
 }
 function voice(f,t,amp,dur,parts,o){
-  for(const [r,a,d] of parts){
+  const n=busy();if(n>70)return;if(n>36)parts=parts.slice(0,1);
+  for(const [r,a,d] of parts){ACT.push(t+dur*d);
     const fr=f*r;if(fr>16000)continue;
     const os=AC.createOscillator();os.type='sine';os.frequency.value=fr*(1+(R()-.5)*.004);
     const g=AC.createGain();
@@ -282,7 +287,7 @@ const sfx={
   shatter(f,p,depth,note,kind,res){if(!this.ok())return;
     load+=1;const lg=1/(1+load*.28),t=AC.currentTime+.003,o=out(p);
     // 第1層 衝突音：鋭く短い「カキン／ピキッ」。音の輪郭を先に立てる
-    voice(f*(kind===2?2:4),t,.06*lg,.09,[[1,1,1],[2.43,.6,.7],[3.97,.35,.5]],o);
+    if(load<4)voice(f*(kind===2?2:4),t,.06*lg,.09,[[1,1,1],[2.43,.6,.7],[3.97,.35,.5]],o);
     if(kind===2)voice(f/4,t,.12*lg,.12,[[1,1,1]],o);
     // 第2層 主破砕音：厚さで音色を変え、共鳴で割れたときは少し控えめに
     const main=[SAMP.thin,SAMP.shatter,SAMP.heavy][kind];
@@ -291,9 +296,9 @@ const sfx={
     // 第4層 澄んだ余韻：その色の音。共鳴のときはこちらを主役に、連鎖が続くほど上の音が積み上がる
     const ring=[1.4,2.2,3.1][kind]*(depth>=3?1.3:1);
     voice(f,t+.004,(res?.13:.075)/(1+load*.12),ring,GLASS,o);
-    if(depth>0)voice(arpF(note+depth+5),t+.012,.07/(1+load*.1),1.5+Math.min(depth,6)*.15,[[1,1,1],[2.71,.3,.5]],o);
+    if(depth>0&&(load<5||depth%2))voice(arpF(note+depth+5),t+.012,.07/(1+load*.1),1.5+Math.min(depth,6)*.15,[[1,1,1],[2.71,.3,.5]],o);
   },
-  hum(f,p,delay){if(!this.ok())return;const t=AC.currentTime,o=out(p);
+  hum(f,p,delay){if(!this.ok()||busy()>30)return;const t=AC.currentTime,o=out(p);ACT.push(t+delay+.55);
     const os=AC.createOscillator();os.type='sine';os.frequency.value=f;
     const lfo=AC.createOscillator();lfo.frequency.value=6.2;const lg=AC.createGain();lg.gain.value=f*.006;
     lfo.connect(lg);lg.connect(os.frequency);
@@ -799,7 +804,10 @@ function shatter(b,ix,iy,depth,crit){
     bvx:depth===0?ball.vx:0,bvy:depth===0?ball.vy:0,spawned:false};
   flashes.push({x:b.x+lx,y:b.y+ly,life:1,r:kind===2?20:14});
   score+=100*chain;
-  if(res){bumpMusic(depth);maxChain=Math.max(maxChain,chain);floats.push({x:cx,y:cy,text:'共鳴 ×'+chain,life:1,h:nt.h});}
+  if(res){bumpMusic(depth);maxChain=Math.max(maxChain,chain);{const fl=floats.find(f=>f.chain&&f.life>.3);
+    // 連鎖中は「共鳴 ×n」を1つだけにして、数字を更新する（文字が何十個も重ならないように）
+    if(fl){if(chain>=fl.chain){fl.chain=chain;fl.text='共鳴 ×'+chain;fl.x=cx;fl.y=cy;fl.life=1;fl.h=nt.h;}}
+    else floats.push({x:cx,y:cy,text:'共鳴 ×'+chain,life:1,h:nt.h,chain});}}
   if(!calm)shake=Math.min(7,1.6+depth*1.1+kind*1.2);
   rings.push({x:cx,y:cy,r:4,max:crit?RES_R*1.7:RES_R,life:1,h:nt.h});
   if(crit){score+=300;floats.push({x:cx,y:cy-12,text:'会心',life:1.2,h:50});sfx.crit(panOf(cx));if(!calm)shake=8;
@@ -815,12 +823,12 @@ function shatter(b,ix,iy,depth,crit){
     if(nt.clear||o.dead||o.queued||o.note!==b.note)continue;
     const d=Math.hypot(o.x+o.w/2-cx,o.y+o.h/2-cy);
     if(d<=(crit?RES_R*1.7:RES_R)){const delay=.13+d/1400;o.queued=true;queue.push({b:o,t:time+delay,depth:depth+1});sfx.hum(freqOf(o),panOf(o.x+o.w/2),delay);
-      bolts.push(makeBolt(cx,cy,o.x+o.w/2,o.y+o.h/2,nt.h,delay));}
+      if(bolts.length<24)bolts.push(makeBolt(cx,cy,o.x+o.w/2,o.y+o.h/2,nt.h,delay));}
   }
 }
 function spawnShards(b){
   const k=b.brk,{n,V}=k.geo,direct=!k.res;
-  const heavyLoad=load>3||shards.length>(quality<2?80:160);
+  const heavyLoad=load>3||shards.length>(quality<2?60:100);
   // 大連鎖中や重い端末では、細かいかけらは軽い光の粒に置きかえる
   const minA=(quality<2?6:3)*(heavyLoad?2.5:1)*(k.kind===0?.7:1);
   const spread=(k.chain>=3?1.25:1)*(k.kind===2?.75:1);
@@ -841,7 +849,7 @@ function spawnShards(b){
       rot:0,vr:(R()-.5)*(10/size+2),flip:0,vf:(R()-.5)*(16/size+3),
       h:k.h,sat:k.s,f:freqOf(b),thick:b.max,gloss:k.chain>=3?1.4:1,life:1,landed:false,caught:false,rest:0});
   }
-  const cap=quality<2?110:220;if(shards.length>cap)shards.splice(0,shards.length-cap);
+  const cap=quality<2?90:150;if(shards.length>cap)shards.splice(0,shards.length-cap);
   const nd=(quality<2?8:14)*(heavyLoad?.5:1);
   for(let i=0;i<nd;i++)dust.push({x:b.x+k.lx+(R()-.5)*14,y:b.y+k.ly+(R()-.5)*10,vx:(R()-.5)*150*spread,vy:(R()-.5)*120-40,life:.5+R()*.5,tw:R()*6});
   k.spawned=true;
@@ -963,7 +971,7 @@ function update(dt){
   dust=dust.filter(d=>d.life>0);
   for(const r of rings){r.r+=(r.max-r.r)*Math.min(1,dt*7);r.life-=dt*1.8;}
   rings=rings.filter(r=>r.life>0);
-  for(const f of flashes){f.life-=dt*9;}
+  for(const f of flashes){f.life-=dt*9;}if(flashes.length>14)flashes.splice(0,flashes.length-14);
   for(const bo of bolts){if(bo.grow<1)bo.grow=Math.min(1,bo.grow+dt*bo.speed);else bo.life-=dt*3.5;}
   bolts=bolts.filter(bo=>bo.life>0);
   flashes=flashes.filter(f=>f.life>0);
@@ -1290,7 +1298,7 @@ let last=performance.now();
 function frame(now){
   const raw=(now-last)/1000,dt=Math.min(1/30,raw);last=now;
   if(state==='play'&&raw<.25){ftAvg=ftAvg*.95+raw*.05;
-    if(quality===2&&ftAvg>1/42){if(++slowFrames>90){quality=1;resize();}}else slowFrames=0;}
+    if(quality===2&&ftAvg>1/42){if(++slowFrames>40){quality=1;resize();}}else slowFrames=0;}
   if(!document.hidden){
     if(state==='title'){time+=dt;banner=0;}
     else{const sc=slowT>0?.42:1;slowT=Math.max(0,slowT-dt);update(dt*sc);}
