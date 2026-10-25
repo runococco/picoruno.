@@ -93,7 +93,7 @@ def build_chick():
     red = mat('red', srgb('#e5322b'), 0.9)
     ora = mat('ora', srgb('#ffb21e'), 0.9)
     leg = mat('leg', srgb('#f39a1c'), 0.9)
-    blk = mat('blk', (0.01, 0.01, 0.012), 1.0)
+    blk = mat('blk', (0.0, 0.0, 0.0), 1.0)
     wht = mat('wht', (1, 1, 1), 0.3, emit=((1, 1, 1), 2.0))
     pnk = mat('pnk', srgb('#ff9aa8'), 0.95)
     # body + head
@@ -117,7 +117,7 @@ def build_chick():
     for s in (-1, 1):
         ex, ez = s * 0.095, 0.66
         e = on_head(ex, ez)
-        sphere((ex, e[1] + 0.012, ez), (0.043, 0.022, 0.058), blk, root)          # eyes
+        sphere((ex, e[1] + 0.022, ez), (0.042, 0.042, 0.042), blk, root)          # eyes: plain round black dots
         c = on_head(s * 0.15, 0.56)
         sphere((c[0], c[1] + 0.012, c[2]), (0.04, 0.015, 0.026), pnk, root)      # cheeks
         w = sphere((s * 0.31, 0.08, 0.33), (0.06, 0.2, 0.13), shade, root)       # wings
