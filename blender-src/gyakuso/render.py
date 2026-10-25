@@ -86,44 +86,59 @@ SPRITE_ELEV = 38
 
 # ---------- chick ----------
 def build_chick():
+    # a round white rooster (ルノコッコ style): forward is -Y, towards the camera when unrotated
     root = bpy.data.objects.new('chick', None); bpy.context.collection.objects.link(root)
-    yel = mat('yel', srgb('#ffd23a'), 0.55, sss=0.15)
-    yel2 = mat('yel2', srgb('#f2b622'), 0.6)
-    red = mat('red', srgb('#e8382f'), 0.4, coat=0.3)
-    ora = mat('ora', srgb('#ff8a1e'), 0.35, coat=0.4)
+    wht_b = mat('feather', srgb('#f7f4ec'), 0.6, sss=0.12)
+    shade = mat('feather2', srgb('#e4e0d6'), 0.65)
+    red = mat('red', srgb('#e5322b'), 0.4, coat=0.3)
+    ora = mat('ora', srgb('#ffb21e'), 0.35, coat=0.4)
+    leg = mat('leg', srgb('#f39a1c'), 0.45)
     blk = mat('blk', (0.01, 0.01, 0.012), 0.15, coat=1.0)
     wht = mat('wht', (1, 1, 1), 0.3, emit=((1, 1, 1), 2.0))
-    pnk = mat('pnk', srgb('#ff8fa0'), 0.6)
-    R = 0.37; CZ = 0.38
-    sphere((0, 0, CZ), (R, R * 0.96, R * 0.97), yel, root, 64)
-    def front(x, z, inset=0.0):  # a point on the body's front surface
-        return -(max(R * R - x * x - (z - CZ) ** 2, 0) ** 0.5) * 0.96 + inset
-    for i, (x, z, r) in enumerate([(-0.09, 0.72, .07), (0, 0.76, .09), (0.09, 0.72, .07)]):
-        sphere((x, -0.02, z), (r * 0.8, r, r), red, root)                 # comb
-    bz = 0.40
-    bpy.ops.mesh.primitive_cone_add(vertices=24, radius1=0.075, depth=0.14, location=(0, front(0, bz) - 0.05, bz))
-    bk = bpy.context.object; bk.rotation_euler = (math.radians(90), 0, 0); bk.scale = (1.15, 0.75, 1)
+    pnk = mat('pnk', srgb('#ff9aa8'), 0.6)
+    # body + head
+    sphere((0, 0.04, 0.34), (0.33, 0.36, 0.3), wht_b, root, 64)
+    HC, HR = Vector((0, -0.16, 0.6)), 0.2
+    sphere(tuple(HC), (HR, HR, HR * 1.05), wht_b, root, 64)
+    def on_head(x, z, out=0.0):
+        dy = max(HR * HR - x * x - (z - HC.z) ** 2, 0) ** 0.5
+        return (x, HC.y - dy - out, z)
+    # comb: a row of red bumps from front to back on top of the head
+    for i, (y, z, r) in enumerate([(-0.26, 0.78, .065), (-0.17, 0.83, .085), (-0.07, 0.84, .08), (0.02, 0.8, .065)]):
+        sphere((0, y, z), (r * 0.6, r, r * 1.1), red, root)
+    # beak
+    bz = 0.58
+    bpy.ops.mesh.primitive_cone_add(vertices=24, radius1=0.06, depth=0.13, location=(0, on_head(0, bz)[1] - 0.045, bz))
+    bk = bpy.context.object; bk.rotation_euler = (math.radians(90), 0, 0); bk.scale = (1.1, 0.8, 1)
     for p in bk.data.polygons: p.use_smooth = True
     bk.data.materials.append(ora); bk.parent = root
+    # wattle
+    sphere((0, on_head(0, 0.48)[1] + 0.01, 0.47), (0.04, 0.035, 0.065), red, root)
     for s in (-1, 1):
-        ex, ez = s * 0.13, 0.50
-        sphere((ex, front(ex, ez) + 0.012, ez), (0.05, 0.025, 0.065), blk, root)   # eyes
-        sphere((ex - 0.016, front(ex, ez) - 0.008, ez + 0.025), (0.017, 0.01, 0.017), wht, root)
-        cx, cz = s * 0.22, 0.38
-        sphere((cx, front(cx, cz) + 0.01, cz), (0.055, 0.02, 0.035), pnk, root)    # cheeks
-        w = sphere((s * 0.355, 0.04, 0.33), (0.06, 0.13, 0.1), yel2, root)          # wings
-        w.rotation_euler = (math.radians(-20), math.radians(s * 25), 0)
-        for t in (-1, 0, 1):                                                       # feet
-            bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.022, depth=0.11, location=(s * 0.13 + t * 0.03, -0.1, 0.02))
-            f = bpy.context.object; f.rotation_euler = (math.radians(90), 0, math.radians(t * 30)); f.data.materials.append(ora); f.parent = root
-    tail = sphere((0, 0.34, 0.5), (0.08, 0.07, 0.09), yel2, root)
-    tail.rotation_euler = (math.radians(-35), 0, 0)
+        ex, ez = s * 0.095, 0.66
+        e = on_head(ex, ez)
+        sphere((ex, e[1] + 0.012, ez), (0.043, 0.022, 0.058), blk, root)          # eyes
+        sphere((ex - 0.01, e[1] - 0.006, ez + 0.018), (0.015, 0.009, 0.015), wht, root)
+        c = on_head(s * 0.15, 0.56)
+        sphere((c[0], c[1] + 0.012, c[2]), (0.04, 0.015, 0.026), pnk, root)      # cheeks
+        w = sphere((s * 0.31, 0.08, 0.33), (0.06, 0.2, 0.13), shade, root)       # wings
+        w.rotation_euler = (math.radians(-12), math.radians(s * 18), 0)
+        lx = s * 0.11                                                            # legs + toes
+        bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.024, depth=0.1, location=(lx, 0.0, 0.07))
+        l = bpy.context.object; l.data.materials.append(leg); l.parent = root
+        for t in (-1, 0, 1):
+            bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.02, depth=0.1, location=(lx + t * 0.028, -0.04, 0.02))
+            f = bpy.context.object; f.rotation_euler = (math.radians(90), 0, math.radians(t * 30)); f.data.materials.append(leg); f.parent = root
+    # tail feathers fanning up and back
+    for i, (x, ang, ln) in enumerate([(-0.08, -18, .2), (0, 0, .24), (0.08, 18, .2)]):
+        f = sphere((x, 0.36, 0.52), (0.055, 0.07, ln), wht_b if i == 1 else shade, root)
+        f.rotation_euler = (math.radians(-35), math.radians(ang), 0)
     return root
 
 def chick_sprites():
     sc = reset(); lights(sc)
     root = build_chick()
-    camera(sc, SPRITE_ELEV, 1.1, target=(0, 0, 0.36), res=(256, 256))
+    camera(sc, SPRITE_ELEV, 1.15, target=(0, 0, 0.4), res=(256, 256))
     # dir 0 up(away from camera), 1 right, 2 down(towards camera), 3 left
     for d, rz in [(0, 180), (1, 90), (2, 0), (3, -90)]:
         root.rotation_euler = (0, 0, math.radians(rz))
