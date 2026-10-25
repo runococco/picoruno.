@@ -88,14 +88,14 @@ SPRITE_ELEV = 38
 def build_chick():
     # a round white rooster (ルノコッコ style): forward is -Y, towards the camera when unrotated
     root = bpy.data.objects.new('chick', None); bpy.context.collection.objects.link(root)
-    wht_b = mat('feather', srgb('#f7f4ec'), 0.6, sss=0.12)
-    shade = mat('feather2', srgb('#e4e0d6'), 0.65)
-    red = mat('red', srgb('#e5322b'), 0.4, coat=0.3)
-    ora = mat('ora', srgb('#ffb21e'), 0.35, coat=0.4)
-    leg = mat('leg', srgb('#f39a1c'), 0.45)
-    blk = mat('blk', (0.01, 0.01, 0.012), 0.15, coat=1.0)
+    wht_b = mat('feather', srgb('#f7f4ec'), 0.95, sss=0.12)
+    shade = mat('feather2', srgb('#e4e0d6'), 0.95)
+    red = mat('red', srgb('#e5322b'), 0.9)
+    ora = mat('ora', srgb('#ffb21e'), 0.9)
+    leg = mat('leg', srgb('#f39a1c'), 0.9)
+    blk = mat('blk', (0.0, 0.0, 0.0), 1.0)
     wht = mat('wht', (1, 1, 1), 0.3, emit=((1, 1, 1), 2.0))
-    pnk = mat('pnk', srgb('#ff9aa8'), 0.6)
+    pnk = mat('pnk', srgb('#ff9aa8'), 0.95)
     # body + head
     sphere((0, 0.04, 0.34), (0.33, 0.36, 0.3), wht_b, root, 64)
     HC, HR = Vector((0, -0.16, 0.6)), 0.2
@@ -117,8 +117,7 @@ def build_chick():
     for s in (-1, 1):
         ex, ez = s * 0.095, 0.66
         e = on_head(ex, ez)
-        sphere((ex, e[1] + 0.012, ez), (0.043, 0.022, 0.058), blk, root)          # eyes
-        sphere((ex - 0.01, e[1] - 0.006, ez + 0.018), (0.015, 0.009, 0.015), wht, root)
+        sphere((ex, e[1] + 0.022, ez), (0.042, 0.042, 0.042), blk, root)          # eyes: plain round black dots
         c = on_head(s * 0.15, 0.56)
         sphere((c[0], c[1] + 0.012, c[2]), (0.04, 0.015, 0.026), pnk, root)      # cheeks
         w = sphere((s * 0.31, 0.08, 0.33), (0.06, 0.2, 0.13), shade, root)       # wings
@@ -138,6 +137,8 @@ def build_chick():
 def chick_sprites():
     sc = reset(); lights(sc)
     root = build_chick()
+    for m in bpy.data.materials:
+        m.node_tree.nodes['Principled BSDF'].inputs['Specular IOR Level'].default_value = 0.0
     camera(sc, SPRITE_ELEV, 1.15, target=(0, 0, 0.4), res=(256, 256))
     # dir 0 up(away from camera), 1 right, 2 down(towards camera), 3 left
     for d, rz in [(0, 180), (1, 90), (2, 0), (3, -90)]:
