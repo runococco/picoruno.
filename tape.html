@@ -34,6 +34,11 @@ button{font-family:inherit;color:inherit}
 .mute{position:fixed;top:max(10px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));z-index:30;width:44px;height:44px;border-radius:50%;
   border:2px solid rgba(255,255,255,.55);background:rgba(40,28,18,.55);color:#fff;cursor:pointer;display:grid;place-items:center}
 .mute svg{width:22px;height:22px}
+.hold{position:fixed;left:max(14px,env(safe-area-inset-left));bottom:calc(max(18px,env(safe-area-inset-bottom)) + 104px);z-index:15;width:88px;height:88px;border-radius:50%;
+  border:3px solid rgba(255,255,255,.7);background:rgba(40,28,18,.6);color:#fff;font-family:var(--body);font-weight:700;font-size:.95rem;line-height:1.2;cursor:pointer;
+  touch-action:none;display:grid;place-items:center;box-shadow:0 6px 18px rgba(0,0,0,.35);transition:transform .06s,background .06s}
+.hold small{display:block;font-size:.66rem;font-weight:500;opacity:.8}
+.hold[aria-pressed="true"]{background:rgba(226,170,79,.95);color:#3b2c20;border-color:#fff;transform:scale(.94)}
 .sheet{position:fixed;left:50%;transform:translateX(-50%);z-index:20;width:min(430px,calc(100% - 24px));box-sizing:border-box;background:var(--card);border-radius:18px;
   box-shadow:0 18px 50px rgba(0,0,0,.45);padding:20px;display:flex;flex-direction:column;gap:12px;max-height:calc(100% - 24px);overflow-y:auto}
 .sheet::before{content:"";position:absolute;left:50%;top:-10px;width:120px;height:26px;transform:translateX(-50%) rotate(-2deg);background:rgba(226,170,79,.78);border-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.15)}
@@ -69,6 +74,7 @@ button{font-family:inherit;color:inherit}
 <body>
 <canvas id="cv" aria-label="ゲーム画面"></canvas>
 <button class="mute" id="mute" type="button" aria-label="音のオン・オフ"></button>
+<button class="hold" id="hold" type="button" aria-pressed="false" hidden><span>おさえる<small>回らない</small></span></button>
 
 <section class="sheet" id="title">
   <div class="kicker">picoruno. 新作</div>
@@ -76,7 +82,8 @@ button{font-family:inherit;color:inherit}
   <p>引っ越しの段ボールが5箱。でもガムテープの「はし」が、どこにあるのかわからない。ロールを回して、爪でこすって、見つけたら一気にひっぱろう。</p>
   <div class="how">
     <b>回す</b><span>上下にスワイプ（PCはホイールも）</span>
-    <b>探す</b><span>光る線（はし）をこするか、タップ。「カリッ」としたら近い</span>
+    <b>押さえる</b><span>左下の「おさえる」を押している間、ロールが回らない（PCはShiftキー）</span>
+    <b>探す</b><span>はしをこするか、タップ。「カリッ」としたら近い</span>
     <b>はがす</b><span>めくれたら下へひっぱる。ものすごく速いとちぎれる</span>
   </div>
   <button class="btn" id="start" type="button">箱づめをはじめる</button>
@@ -311,7 +318,7 @@ const PROJ = [[[150.8, 556.2], [297.1, 562.0], [448.6, 568.0]], [[150.6, 530.1],
 let IMG = {};
 const BOXES = 5;
 const PULL_NEED = 220;   // はがす長さ（画面）
-const VIS = [0.95, 0.8, 0.68, 0.56, 0.46];   // はしの見えやすさ
+const VIS = [0.62, 0.45, 0.32, 0.2, 0.12];   // はしの見えやすさ
 const lerp = (a, b, k) => a + (b - a) * k, clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const ease = k => 1 - Math.pow(1 - clamp(k, 0, 1), 3);
 const wrap = d => ((d % 360) + 540) % 360 - 180;       // -180..180
@@ -415,8 +422,8 @@ function drawEdge() {
   const glint = Math.exp(-Math.pow((phi - 40) / 14, 2)) + 0.5 * Math.exp(-Math.pow((phi + 10) / 18, 2));
   const vis = (S.state === "title" ? 0.5 : VIS[S.round]) * (0.35 + glint) * Math.min(1, c * 2);
   cx.lineCap = "round";
-  cx.strokeStyle = `rgba(70,40,10,${0.55 * vis})`; cx.lineWidth = 2.4; edgePath(phi, 2); cx.stroke();
-  cx.strokeStyle = `rgba(255,246,220,${vis})`; cx.lineWidth = 2.2; edgePath(phi, 0); cx.stroke();
+  cx.strokeStyle = `rgba(70,40,10,${0.5 * vis})`; cx.lineWidth = 1.6; edgePath(phi, 1.4); cx.stroke();
+  cx.strokeStyle = `rgba(255,246,220,${vis})`; cx.lineWidth = 1.3; edgePath(phi, 0); cx.stroke();
   // めくれかけ（見つけた直後）
   if (S.flap > 0) {
     const p = proj(phi);
@@ -430,18 +437,56 @@ function drawPull() {
   // ロールの下の接点から指まで、テープの帯を描く
   const p = proj(-90 + 2), x0 = p[0][0], x1 = p[2][0], y0 = (p[0][1] + p[2][1]) / 2 - 6;
   const yEnd = y0 + S.pull, wob = S.pullX;
+  const yB = yEnd + (S.torn ? 18 : 0);
+  const band = () => {
+    cx.beginPath();
+    cx.moveTo(x0, y0); cx.lineTo(x1, y0);
+    cx.quadraticCurveTo(x1 + wob * 0.5, (y0 + yEnd) / 2, x1 + wob, yEnd);
+    cx.lineTo(x0 + wob, yB);
+    cx.quadraticCurveTo(x0 + wob * 0.5, (y0 + yEnd) / 2, x0, y0);
+  };
+  cx.save();
+  // うしろの床が、フィルム越しに少しゆがんで見える（屈折）
+  band(); cx.clip();
+  { const m = cx.getTransform(), L = Math.min(x0, x0 + wob) - 8, T = y0, R = Math.max(x1, x1 + wob) + 8, B = yB + 4;
+    const sx = m.a * L + m.e, sy = m.d * T + m.f, sw = m.a * (R - L), sh = m.d * (B - T);
+    if (sw > 2 && sh > 2) { cx.globalAlpha = 0.55; cx.drawImage(cv, sx, sy, sw, sh, L + 3, T + 2, (R - L) * 1.02, (B - T) * 1.01); cx.globalAlpha = 1; } }
+  // 透明なあめ色フィルム：うしろが透けるよう、色は乗算でうすく重ねる
+  cx.globalCompositeOperation = "multiply";
   const g = cx.createLinearGradient(x0, 0, x1, 0);
-  g.addColorStop(0, "rgba(200,140,60,.85)"); g.addColorStop(0.25, "rgba(245,200,120,.75)"); g.addColorStop(0.45, "rgba(255,240,200,.9)"); g.addColorStop(0.6, "rgba(235,180,95,.75)"); g.addColorStop(1, "rgba(190,130,55,.85)");
-  cx.fillStyle = g;
-  cx.beginPath();
-  cx.moveTo(x0, y0); cx.lineTo(x1, y0);
-  cx.quadraticCurveTo(x1 + wob * 0.5, (y0 + yEnd) / 2, x1 + wob, yEnd);
-  cx.lineTo(x0 + wob, yEnd + (S.torn ? 18 : 0));
-  cx.quadraticCurveTo(x0 + wob * 0.5, (y0 + yEnd) / 2, x0, y0);
-  cx.fill();
-  // ロールの上から接点まで（巻きの表面を回りこむ部分）
-  cx.strokeStyle = "rgba(255,240,205,.5)"; cx.lineWidth = 1.2;
-  cx.beginPath(); cx.moveTo(x0 + wob, yEnd); cx.lineTo(x1 + wob, yEnd); cx.stroke();
+  g.addColorStop(0, "rgba(214,150,62,.34)"); g.addColorStop(0.5, "rgba(245,205,130,.14)"); g.addColorStop(1, "rgba(206,142,58,.34)");
+  cx.fillStyle = g; band(); cx.fill();
+  // 光の照り返し：フィルムがゆるくねじれて、縦にすじ状の光が走る
+  cx.globalCompositeOperation = "screen";
+  const w = x1 - x0, t = S.t;
+  for (const [u, sw, al] of [[0.2, 0.07, 0.22], [0.44 + 0.04 * Math.sin(t * 1.7), 0.14, 0.34], [0.72, 0.05, 0.16], [0.87, 0.02, 0.26]]) {
+    const xa = x0 + w * u, hw = w * sw;
+    const hg = cx.createLinearGradient(xa - hw, 0, xa + hw, 0);
+    hg.addColorStop(0, "rgba(255,250,235,0)"); hg.addColorStop(0.5, `rgba(255,250,235,${al})`); hg.addColorStop(1, "rgba(255,250,235,0)");
+    cx.fillStyle = hg;
+    cx.beginPath();
+    cx.moveTo(xa - hw, y0); cx.lineTo(xa + hw, y0);
+    cx.quadraticCurveTo(xa + hw + wob * 0.5, (y0 + yEnd) / 2, xa + hw + wob, yB + 2);
+    cx.lineTo(xa - hw + wob, yB + 2);
+    cx.quadraticCurveTo(xa - hw + wob * 0.5, (y0 + yEnd) / 2, xa - hw, y0);
+    cx.fill();
+  }
+  // のりの面のこまかいムラ（うすい点）
+  cx.globalCompositeOperation = "source-over";
+  cx.fillStyle = "rgba(255,245,225,.12)";
+  for (let i = 0; i < 28; i++) {
+    const r1 = Math.sin(i * 12.9898) * 43758.5453, r2 = Math.sin(i * 78.233) * 12543.31;
+    const fx = r1 - Math.floor(r1), fy = r2 - Math.floor(r2);
+    if (fy * 240 > S.pull) continue;
+    cx.beginPath(); cx.arc(x0 + w * fx + wob * fy, y0 + fy * 240, 1.4, 0, Math.PI * 2); cx.fill();
+  }
+  cx.restore();
+  // ふちは少し濃く見える（厚みの断面）
+  cx.strokeStyle = "rgba(150,95,32,.75)"; cx.lineWidth = 1.4;
+  cx.beginPath(); cx.moveTo(x1, y0); cx.quadraticCurveTo(x1 + wob * 0.5, (y0 + yEnd) / 2, x1 + wob, yEnd); cx.stroke();
+  cx.beginPath(); cx.moveTo(x0, y0); cx.quadraticCurveTo(x0 + wob * 0.5, (y0 + yEnd) / 2, x0 + wob, yB); cx.stroke();
+  cx.strokeStyle = "rgba(255,240,205,.7)"; cx.lineWidth = 1.2;
+  cx.beginPath(); cx.moveTo(x0 + wob, yB); cx.lineTo(x1 + wob, yEnd); cx.stroke();
   // 目盛り（ひっぱった長さ）
   const need = PULL_NEED, k = clamp(S.pull / need, 0, 1);
   cx.fillStyle = "rgba(35,32,32,.6)"; roundRect(x1 + 26, y0, 14, need, 7); cx.fill();
@@ -500,6 +545,7 @@ function update(dt) {
   if (S.state === "title") { S.theta += dt * 12; return; }
   if (S.state === "hunt" || S.state === "pull") S.roundT += dt;
   if (S.state === "hunt") {
+    if (S.hold) S.omega = 0;
     if (!drag || drag.mode !== "rot") { S.theta += S.omega * dt; S.omega = clamp(S.omega, -240, 240) * Math.pow(0.03, dt); if (Math.abs(S.omega) < 2) S.omega = 0; }
     tickAcc += Math.abs(S.omega * dt);
     if (tickAcc > 14) { tickAcc = 0; KIT.noise({ dur: 0.02, vol: 0.05, f: 900, q: 4, wet: 0 }); }
@@ -527,7 +573,7 @@ cv.addEventListener("pointermove", e => {
   const dx = p.x - drag.x, dy = p.y - drag.y;
   if (!drag.mode) {
     const tx = p.x - drag.x0, ty = p.y - drag.y0;
-    if (Math.hypot(tx, ty) > 8) drag.mode = Math.abs(ty) > Math.abs(tx) * 1.1 ? "rot" : "rub";
+    if (Math.hypot(tx, ty) > 8) drag.mode = !S.hold && Math.abs(ty) > Math.abs(tx) * 1.1 ? "rot" : "rub";
   }
   if (S.state === "hunt" && drag.mode === "rot") {
     const dth = -dy / RPX * 180 / Math.PI;     // 指といっしょに表面が動く
@@ -557,7 +603,7 @@ const endDrag = e => {
   drag = null;
 };
 cv.addEventListener("pointerup", endDrag); cv.addEventListener("pointercancel", endDrag);
-cv.addEventListener("wheel", e => { if (S.state === "hunt") { e.preventDefault(); S.omega += -e.deltaY * 0.9; } }, { passive: false });
+cv.addEventListener("wheel", e => { if (S.state === "hunt" && !S.hold) { e.preventDefault(); S.omega += -e.deltaY * 0.9; } }, { passive: false });
 
 let rubAcc = 0, lastNear = 0;
 function rub(p, dist) {
@@ -576,6 +622,29 @@ function rub(p, dist) {
   }
   if (Math.random() < 0.3) S.parts.push({ x: p.x, y: p.y, vx: (Math.random() - 0.5) * 40, vy: -20, r: 1.2, life: 0.5, dec: 2, c: "rgba(255,248,230,.9)", al: 0.6 });
 }
+/* 左手で押さえる：押している間はロールが止まる。ちょんと押すと押さえっぱなし（もう一度で解除） */
+let holdLatch = false, holdDown = 0;
+function setHold(on) {
+  if (S.hold === on) return;
+  S.hold = on; $("hold").setAttribute("aria-pressed", String(on));
+  if (on) { S.omega = 0; KIT.noise({ dur: 0.05, vol: 0.12, f: 500, type: "lowpass", wet: 0 }); KIT.vibrate(10); }
+  else KIT.tone({ f: 660, dur: 0.04, vol: 0.05, type: "triangle", wet: 0 });
+}
+$("hold").addEventListener("pointerdown", e => {
+  e.preventDefault(); KIT.ensure();
+  try { $("hold").setPointerCapture(e.pointerId); } catch (_) {}
+  holdDown = performance.now();
+  if (holdLatch) { holdLatch = false; setHold(false); holdDown = 0; } else setHold(true);
+});
+const holdUp = () => {
+  if (!holdDown) return;
+  if (performance.now() - holdDown < 250) holdLatch = true; else setHold(false);
+  holdDown = 0;
+};
+$("hold").addEventListener("pointerup", holdUp); $("hold").addEventListener("pointercancel", holdUp);
+$("hold").addEventListener("click", e => e.preventDefault());
+window.addEventListener("keydown", e => { if (e.key === "Shift" && S.state === "hunt") setHold(true); });
+window.addEventListener("keyup", e => { if (e.key === "Shift" && !holdLatch) setHold(false); });
 function tapEdge(p) {
   if (p.x < BAND.x0 - 20 || p.x > BAND.x1 + 20) return;
   const phi = phiAtY(p.y); if (phi === null) return;
@@ -633,9 +702,10 @@ function startRound(i) {
   S.round = i; S.state = "hunt"; S.roundT = 0; S.tears = 0; S.flap = 0; S.pull = 0; S.boxTaped = false; S.boxAnim = 0; S.boxIn = 0;
   // はしは、最初は見えない側にあることが多い
   S.edge = Math.random() * 360; S.theta = 0; S.omega = 0;
+  holdLatch = false; setHold(false); $("hold").hidden = false;
   makeSpecks();
   KIT.noise({ dur: 0.25, vol: 0.12, f: 300, type: "lowpass" }); // 箱をずらす音
-  if (i === 0) say("上下で回して、光る線をこする／タップ", 2.8);
+  if (i === 0) say("上下で回す・おさえてこする", 2.8);
   else if (i === BOXES - 1) say("ラスト1箱！", 1.4);
 }
 function startGame() {
@@ -649,6 +719,7 @@ function startGame() {
 const RANKS = [[12, "テープの達人"], [20, "引っ越しのプロ"], [32, "手ぎわのいい人"], [50, "ふつうの人"], [80, "爪がみじかい人"], [1e9, "テープにきらわれている人"]];
 function finish() {
   S.state = "result";
+  holdLatch = false; setHold(false); $("hold").hidden = true;
   const rank = RANKS.find(r => S.total < r[0])[1];
   S.rank = rank;
   $("rTime").innerHTML = `${S.total.toFixed(1)}<small>秒</small>`;
