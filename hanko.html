@@ -68,6 +68,7 @@ button,input{font-family:inherit;color:inherit}
 .modes button small{display:block;font-size:.7rem;font-weight:500}
 .modes button[aria-pressed="true"]{background:#fbeee9;color:var(--shu-d);box-shadow:0 0 0 2px var(--shu) inset}
 .modes button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.notice{font-size:.7rem;line-height:1.55;color:var(--sub);background:rgba(139,122,108,.08);border-radius:8px;padding:6px 10px;margin-top:-4px}
 .namehint{font-size:.75rem;color:var(--sub);text-align:center;margin-top:-6px}
 .home{display:block;text-align:center;font-size:.82rem;color:var(--shu-d);font-weight:700;text-decoration:none;padding:2px}
 /* 判定 */
@@ -112,6 +113,7 @@ button,input{font-family:inherit;color:inherit}
       <div class="name"><label for="nmB">部長</label><input id="nmB" maxlength="4" autocomplete="off" placeholder="おまかせ"></div>
     </div>
     <div class="namehint">課長・部長は空けておくと、毎回ちがう名前になります</div>
+    <div class="notice">※ゲーム内の印影は実在の印鑑ではありません。実在の人の名前を入れた画像を投稿するときは、相手への配慮をお願いします。</div>
     <div class="modes" role="group" aria-label="むずかしさ">
       <button type="button" data-m="0" aria-pressed="true">ふつう<small>まずはこちら</small></button>
       <button type="button" data-m="1" aria-pressed="false">決算期モード<small>稟議書3枚を立て続けに</small></button>
@@ -502,6 +504,9 @@ function drawForm(g) {
   g.fillStyle = "rgba(61,46,38,.78)"; g.font = '500 16px "Shippori Mincho B1",serif';
   const body = ["標記の件について、下記のとおり実施したく", "ご承認くださいますようお願い申し上げます。", "", "１．目的　職場の空気をすこし明るくするため", "２．費用　ごくわずか（応相談）", "３．期間　承認日より当面のあいだ", "", "以上"];
   body.forEach((l, i) => { if (l) g.fillText(l, L + 16, 58 + i * 34); });
+  // ゲーム画面であることの透かし（紙の右下）
+  g.save(); g.textAlign = "right"; g.fillStyle = "rgba(61,46,38,.38)"; g.font = '700 13px "Zen Maru Gothic",sans-serif';
+  g.fillText("picoruno.「ハンコまっすぐ選手権」ゲーム画面", 300, 446); g.restore();
   g.strokeStyle = "rgba(61,46,38,.15)";
   for (let i = 0; i < 9; i++) { g.beginPath(); g.moveTo(L, 66 + i * 34); g.lineTo(R, 66 + i * 34); g.stroke(); }
 }
@@ -999,7 +1004,12 @@ function closeReview() {
 }
 function paperCanvas() {
   const c = document.createElement("canvas"); c.width = 780; c.height = 1020;
-  drawScene(c.getContext("2d"), { x: S.paper.x, y: S.paper.y, z: 1 }, 780, 1020, { noHanko: true });
+  const g = c.getContext("2d");
+  drawScene(g, { x: S.paper.x, y: S.paper.y, z: 1 }, 780, 1020, { noHanko: true });
+  // 保存画像の下に「ゲーム画面・実在の印鑑ではない」帯
+  g.fillStyle = "rgba(43,31,24,.82)"; g.fillRect(0, 980, 780, 40);
+  g.fillStyle = "#f6f1e6"; g.font = '700 17px "Zen Maru Gothic",sans-serif'; g.textAlign = "center"; g.textBaseline = "middle";
+  g.fillText("picoruno.「ハンコまっすぐ選手権」のゲーム画面です（実在の印鑑ではありません）", 390, 1000);
   return c;
 }
 $("viewBtn").addEventListener("click", openReview);
