@@ -156,6 +156,8 @@ h2 .badge{display:inline-grid;place-items:center;width:46px;height:46px;border-r
 }
 .art .emo:has(.art-img){position:absolute;inset:0;display:block}
 .art .art-img{display:block;width:100%;height:100%;object-fit:cover;border-radius:22px}
+/* サムネ画像（900×487）の文字が見切れないよう、枠を画像と同じ比率にする */
+.card .art:has(.art-img){height:auto;aspect-ratio:900/487;box-sizing:content-box}
 .art .emo{font-size:3.6rem;transition:transform .4s;filter:drop-shadow(3px 3px 0 rgba(74,52,40,.25))}
 .card:hover .emo{animation:jelly .6s}
 @keyframes jelly{30%{transform:scale(1.25,.8)}50%{transform:scale(.85,1.15)}70%{transform:scale(1.08,.95)}100%{transform:scale(1)}}
@@ -278,10 +280,13 @@ footer .walk{display:inline-block;font-size:1.4rem;animation:walk 6s linear infi
 .card .stats{margin:4px 4px 0;padding-right:40px}
 .card .genres{margin:4px 4px 0;padding-right:40px}
 .card .play{right:14px;bottom:14px;width:32px;height:32px}
+/* タグは画像の上に重ねず、画像の下ふちにまたがせて右寄せ（画像内のタイトル文字を隠さない） */
+.card .chip{position:relative;top:auto;right:auto;z-index:1;display:table;margin:-12px 10px -10px auto}
 @media (max-width:640px){
   .grid{grid-template-columns:1fr;gap:22px}
-  .card{display:grid;grid-template-columns:96px minmax(0,1fr);column-gap:12px;align-items:center;padding:12px 12px 12px}
+  .card{display:grid;grid-template-columns:120px minmax(0,1fr);column-gap:12px;align-items:center;padding:12px 12px 12px}
   .card .art{grid-column:1;grid-row:1 / span 4;height:auto;min-height:0;aspect-ratio:4/3;align-self:center;border-radius:14px}
+  .card .art:has(.art-img){aspect-ratio:900/487}
   .card .art .art-img{border-radius:14px}
   .card h3,.card p,.card .genres,.card .stats{grid-column:2;margin:0}
   .card h3{font-size:1rem;line-height:1.4}
