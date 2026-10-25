@@ -91,6 +91,7 @@ button,input{font-family:inherit;color:inherit}
 .chip small{display:block;font-size:.72rem;color:var(--sub)}
 .chip b{font-family:var(--mincho);font-weight:800;font-size:1.25rem;font-variant-numeric:tabular-nums}
 .badge{background:#fbeee9;color:var(--shu-d);border-radius:10px;padding:8px 12px;font-size:.88rem;line-height:1.6;text-align:center}
+.viewbar{position:fixed;left:50%;transform:translateX(-50%);bottom:max(12px,env(safe-area-inset-bottom));z-index:20;width:min(440px,calc(100% - 24px));display:flex;gap:10px}
 .toast{position:fixed;left:50%;top:max(16px,env(safe-area-inset-top));transform:translateX(-50%);z-index:40;background:rgba(43,31,24,.9);color:#fff;border-radius:999px;padding:8px 16px;font-size:.88rem}
 @media (prefers-reduced-motion:reduce){.btn{transition:none}}
 </style>
@@ -132,9 +133,11 @@ button,input{font-family:inherit;color:inherit}
   <div class="chips" id="rChips"></div>
   <div class="badge" id="rBadge" hidden></div>
   <div class="row"><button class="btn x" id="xBtn" type="button">𝕏 にポスト</button><button class="btn sub" id="imgBtn" type="button">画像で保存</button></div>
+  <button class="btn sub" id="viewBtn" type="button">押した稟議書を見る</button>
   <button class="btn" id="again" type="button">もう1枚押す</button>
   <a class="home" href="https://runococco.github.io/picoruno./">← picoruno. のゲーム一覧へ</a>
 </section>
+<div class="viewbar" id="viewbar" hidden><button class="btn sub" id="viewBack" type="button">結果にもどる</button><button class="btn" id="viewSave" type="button">画像で保存</button></div>
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -819,7 +822,7 @@ function startGame() {
   S.date = `令和${d.getFullYear() - 2018}年${d.getMonth() + 1}月${d.getDate()}日`;
   S.stamps = []; S.results = []; S.slam = null; S.shown = false; S.parts = [];
   S.paper = { ...S.paper0 };
-  $("title").hidden = true; $("result").hidden = true; $("judge").hidden = true;
+  $("title").hidden = true; $("result").hidden = true; $("judge").hidden = true; $("viewbar").hidden = true;
   startMusic();
   KIT.countPlay(GAME_TITLE);
   const go = () => startRound(0);
@@ -925,6 +928,31 @@ $("again").addEventListener("click", () => { click(); startGame(); });
 $("xBtn").addEventListener("click", () => KIT.tweet(shareText(), GAME_URL));
 $("imgBtn").addEventListener("click", async () => {
   const r = await KIT.shareImage(shareCanvas(), "hanko.png", shareText());
+  if (r === "downloaded") toast("画像を保存しました");
+});
+/* 押した稟議書を見返す：紙全体が入るまで引いて見せる */
+function openReview() {
+  click();
+  S.camBack = { ...S.camTo };
+  const lw = window.innerWidth / fit, lh = window.innerHeight / fit, bar = 86 / fit;
+  const z = Math.min(lw / 780, (lh - bar) / 1010);
+  S.camTo = { x: S.paper.x, y: S.paper.y + bar / 2 / z, z };
+  $("result").hidden = true; $("viewbar").hidden = false;
+}
+function closeReview() {
+  click();
+  if (S.camBack) S.camTo = S.camBack;
+  $("viewbar").hidden = true; $("result").hidden = false;
+}
+function paperCanvas() {
+  const c = document.createElement("canvas"); c.width = 780; c.height = 1020;
+  drawScene(c.getContext("2d"), { x: S.paper.x, y: S.paper.y, z: 1 }, 780, 1020, { noHanko: true });
+  return c;
+}
+$("viewBtn").addEventListener("click", openReview);
+$("viewBack").addEventListener("click", closeReview);
+$("viewSave").addEventListener("click", async () => {
+  const r = await KIT.shareImage(paperCanvas(), "ringisho.png", shareText());
   if (r === "downloaded") toast("画像を保存しました");
 });
 function toast(m) { const t = $("toast"); t.textContent = m; t.hidden = false; clearTimeout(toast.k); toast.k = setTimeout(() => t.hidden = true, 1800); }
