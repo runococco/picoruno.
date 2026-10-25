@@ -97,7 +97,7 @@ canvas{display:block;touch-action:none}
 
 /* overlays */
 .overlay{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:safe center;gap:14px;
-  padding:24px 20px calc(24px + env(safe-area-inset-bottom));box-sizing:border-box;overflow-y:auto;overscroll-behavior:contain;
+  padding:24px 20px calc(24px + env(safe-area-inset-bottom));box-sizing:border-box;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
   background:#1a1b21;text-align:center;-webkit-overflow-scrolling:touch}
 .logo{display:flex;align-items:center;gap:14px;margin:0}
 .logo .sign{width:74px;height:74px;flex:none;border-radius:50%;background:var(--sign);border:4px solid #fff;display:grid;place-items:center;
@@ -108,6 +108,10 @@ canvas{display:block;touch-action:none}
 .logo span em{font-style:normal;display:inline-block;transform:scaleX(-1)}
 .hero{width:120px;height:120px;margin:-6px 0 -10px;animation:hop 1.1s ease-in-out infinite}
 @keyframes hop{0%,100%{transform:translateY(0) scale(1,1)}45%{transform:translateY(-12px) scale(.96,1.04)}55%{transform:translateY(-12px)}90%{transform:translateY(0) scale(1.06,.94)}}
+.lang{position:absolute;top:calc(14px + env(safe-area-inset-top));right:14px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);
+  border-radius:999px;padding:7px 14px;font-size:.8rem;font-weight:700;cursor:pointer}
+.lang:focus-visible{outline:2px solid var(--yellow);outline-offset:2px}
+.logo span.en.en{font-size:min(1.75rem,8vw);line-height:1.1;white-space:nowrap}
 .lead{margin:0;font-size:1rem;font-weight:700;line-height:1.7}
 .lead mark{background:var(--yellow);color:#1d1f26;padding:0 4px;border-radius:4px}
 .howto{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:8px;width:min(100%,380px)}
@@ -130,7 +134,7 @@ canvas{display:block;touch-action:none}
 .diag b{display:block;font-family:var(--display);font-weight:400;font-size:2.1rem;line-height:1.3}
 .diag p{margin:4px 0 0;font-size:.85rem;font-weight:700;line-height:1.6}
 .rate{font-family:var(--display);font-size:1.1rem}
-.rate span{font-size:3.2rem;color:var(--yellow);font-variant-numeric:tabular-nums}
+.rate #rRate{font-size:3.2rem;color:var(--yellow);font-variant-numeric:tabular-nums}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:0;width:min(100%,380px)}
 .stats div{background:rgba(255,255,255,.06);border-radius:10px;padding:8px 4px}
 .stats dt{font-size:.68rem;color:var(--muted)}
@@ -164,80 +168,81 @@ figcaption{font-size:.72rem;color:var(--muted);margin-top:6px}
 <body>
 <div id="app">
   <header class="hud">
-    <div class="score" id="score" aria-live="off">0<small>点</small></div>
-    <div class="rule"><small>いまのルール</small><b id="ruleName">—</b></div>
+    <div class="score" id="score" aria-live="off">0<small data-i18n="pts">点</small></div>
+    <div class="rule"><small data-i18n="nowRule">いまのルール</small><b id="ruleName">—</b></div>
     <div class="right">
       <span class="time" id="time">60</span>
-      <button class="icon" id="pauseBtn" type="button" aria-label="一時停止">⏸</button>
+      <button class="icon" id="pauseBtn" type="button" data-i18n-aria="pause" aria-label="一時停止">⏸</button>
       <button class="icon" id="muteBtn" type="button" aria-label="音を消す">🔊</button>
     </div>
   </header>
   <div class="segbar" aria-hidden="true"><i id="segbar"></i></div>
 
   <div class="field" id="field">
-    <canvas id="c" aria-label="ゲーム画面"></canvas>
+    <canvas id="c" data-i18n-aria="canvas" aria-label="ゲーム画面"></canvas>
     <div class="warn" id="warn" hidden></div>
     <div class="banner" id="banner" hidden><small id="bSmall">ルール変更</small><b id="bName"></b><span id="bDesc"></span></div>
     <div class="count" id="count" hidden></div>
   </div>
 
   <div class="pad" id="pad">
-    <button type="button" data-d="0" aria-label="上">▲</button>
-    <button type="button" data-d="3" aria-label="左">◀</button>
+    <button type="button" data-d="0" data-i18n-aria="up" aria-label="上">▲</button>
+    <button type="button" data-d="3" data-i18n-aria="left" aria-label="左">◀</button>
     <div class="hub" aria-hidden="true"><i></i></div>
-    <button type="button" data-d="1" aria-label="右">▶</button>
-    <button type="button" data-d="2" aria-label="下">▼</button>
+    <button type="button" data-d="1" data-i18n-aria="right" aria-label="右">▶</button>
+    <button type="button" data-d="2" data-i18n-aria="down" aria-label="下">▼</button>
   </div>
 
   <div class="overlay" id="title">
-    <h1 class="logo"><span class="sign" aria-hidden="true"><i></i></span><span>逆走<br>ボ<em>タ</em>ン</span></h1>
+    <button class="lang" id="langBtn" type="button" lang="en">English</button>
+    <h1 class="logo"><span class="sign" aria-hidden="true"><i></i></span><span data-i18n="logo">逆走<br>ボ<em>タ</em>ン</span></h1>
     <img class="hero" id="hero" alt="" width="120" height="120">
-    <p class="lead">おした方向と、<wbr><mark>逆</mark>に進む。<br>…はずが、<wbr><mark>10秒ごとにルールが変わる</mark>。</p>
+    <p class="lead" data-i18n="lead">おした方向と、<wbr><mark>逆</mark>に進む。<br>…はずが、<wbr><mark>10秒ごとにルールが変わる</mark>。</p>
     <ul class="howto">
-      <li><b>コインをあつめる</b>60秒でいくつ取れるか</li>
-      <li><b>ルールが変わる</b>上下だけ逆、さかさま、勝手に歩く…</li>
-      <li><b>トゲ・壁に注意</b>ぶつかるとコンボが切れる</li>
-      <li><b>最後の10秒</b>カオス。2.5秒ごとに変わる</li>
+      <li data-i18n="h1"><b>コインをあつめる</b>60秒でいくつ取れるか</li>
+      <li data-i18n="h2"><b>ルールが変わる</b>上下だけ逆、さかさま、勝手に歩く…</li>
+      <li data-i18n="h3"><b>トゲ・壁に注意</b>ぶつかるとコンボが切れる</li>
+      <li data-i18n="h4"><b>最後の10秒</b>カオス。2.5秒ごとに変わる</li>
     </ul>
     <div class="modes">
       <button class="mode" id="startDaily" type="button"><b id="dailyLabel">今日のお題</b><small id="dailySub">ルールの順番はみんな同じ。くらべっこしよう</small></button>
-      <button class="mode free" id="startFree" type="button"><b>フリープレイ</b><small id="freeSub">毎回ちがうルールの順番</small></button>
+      <button class="mode free" id="startFree" type="button"><b data-i18n="free">フリープレイ</b><small id="freeSub">毎回ちがうルールの順番</small></button>
     </div>
-    <p class="keys">画面の矢印ボタン ／ キーボードの矢印キー・WASD</p>
-    <p class="back"><a href="https://runococco.github.io/picoruno./">← picoruno. のゲーム一覧へ</a></p>
+    <p class="keys" data-i18n="keys">画面の矢印ボタン ／ キーボードの矢印キー・WASD</p>
+    <p class="back"><a href="https://runococco.github.io/picoruno./" data-i18n="back">← picoruno. のゲーム一覧へ</a></p>
   </div>
 
   <div class="overlay" id="over" hidden>
     <p class="res-head" id="resHead">結果</p>
-    <div class="diag"><small>あなたの脳は…</small><b id="dTitle">—</b><p id="dComment"></p></div>
-    <div class="rate">脳バグ率 <span id="rRate">0</span>%</div>
+    <div class="diag"><small data-i18n="yourBrain">あなたの脳は…</small><b id="dTitle">—</b><p id="dComment"></p></div>
+    <div class="rate"><span data-i18n="bugRate">脳バグ率</span> <span id="rRate">0</span>%</div>
     <dl class="stats">
-      <div><dt>スコア</dt><dd id="sScore">0</dd></div>
-      <div><dt>コイン</dt><dd id="sCoins">0</dd></div>
-      <div><dt>最大コンボ</dt><dd id="sCombo">0</dd></div>
-      <div><dt>ゴツン</dt><dd id="sBump">0</dd></div>
+      <div><dt data-i18n="score">スコア</dt><dd id="sScore">0</dd></div>
+      <div><dt data-i18n="coins">コイン</dt><dd id="sCoins">0</dd></div>
+      <div><dt data-i18n="maxCombo">最大コンボ</dt><dd id="sCombo">0</dd></div>
+      <div><dt data-i18n="bonks">ゴツン</dt><dd id="sBump">0</dd></div>
     </dl>
-    <p class="worst" id="worst" hidden>いちばんバグったルール：<b id="worstName"></b></p>
+    <p class="worst" id="worst" hidden><span data-i18n="worst">いちばんバグったルール：</span><b id="worstName"></b></p>
     <p class="best" id="best" hidden></p>
-    <figure id="cardWrap" hidden><img id="card" alt="結果の画像"><figcaption>画像を長押し（右クリック）で保存して、投稿に添付できます</figcaption></figure>
+    <figure id="cardWrap" hidden><img id="card" data-i18n-alt="cardAlt" alt="結果の画像"><figcaption data-i18n="cardCap">画像を長押し（右クリック）で保存して、投稿に添付できます</figcaption></figure>
     <div class="actions">
-      <button class="btn ghost" id="toTitle" type="button">タイトルへ</button>
-      <button class="btn" id="retry" type="button">もういちど</button>
+      <button class="btn ghost" id="toTitle" type="button" data-i18n="toTitle">タイトルへ</button>
+      <button class="btn" id="retry" type="button" data-i18n="retry">もういちど</button>
     </div>
     <div class="subacts">
-      <button class="textlink" id="shareImg" type="button">画像つきでシェア</button>
-      <a class="textlink" id="share" href="https://twitter.com/intent/tweet" target="_blank" rel="noopener">𝕏 に投稿</a>
+      <button class="textlink" id="shareImg" type="button" data-i18n="shareImg">画像つきでシェア</button>
+      <a class="textlink" id="share" href="https://twitter.com/intent/tweet" target="_blank" rel="noopener" data-i18n="post">𝕏 に投稿</a>
     </div>
-    <p class="back"><a href="https://runococco.github.io/picoruno./">← picoruno. のゲーム一覧へ</a></p>
-    <p class="note" id="shareNote" hidden>この画面では画像を直接わたせません。上の画像を保存してから、投稿に添付してください。</p>
+    <p class="back"><a href="https://runococco.github.io/picoruno./" data-i18n="back">← picoruno. のゲーム一覧へ</a></p>
+    <p class="note" id="shareNote" hidden data-i18n="shareNote">この画面では画像を直接わたせません。上の画像を保存してから、投稿に添付してください。</p>
   </div>
 
   <div class="overlay" id="pause" hidden>
-    <p class="ptitle">ひとやすみ</p>
-    <p class="note">タイマーは止まっています</p>
+    <p class="ptitle" data-i18n="pTitle">ひとやすみ</p>
+    <p class="note" data-i18n="pNote">タイマーは止まっています</p>
     <div class="actions">
-      <button class="btn ghost" id="pauseTitle" type="button">タイトルへ</button>
-      <button class="btn" id="resume" type="button">つづける</button>
+      <button class="btn ghost" id="pauseTitle" type="button" data-i18n="toTitle">タイトルへ</button>
+      <button class="btn" id="resume" type="button" data-i18n="resume">つづける</button>
     </div>
   </div>
 </div>
@@ -368,7 +373,7 @@ function bgmStep(i,d,chaos){
   noise(.03,chaos?.025:.015,d,7000);
   if(m) tone(mtof(m+(chaos?12:0)),.13,'square',.024,0,d);
 }
-function setMute(m){muted=m;store.set('gyakuso-mute',m);$('muteBtn').textContent=m?'🔇':'🔊';$('muteBtn').setAttribute('aria-label',m?'音を出す':'音を消す');
+function setMute(m){muted=m;store.set('gyakuso-mute',m);$('muteBtn').textContent=m?'🔇':'🔊';$('muteBtn').setAttribute('aria-label',m?L.unmute:L.mute);
   if(m) bgmStop(); else { ensureAudio(); if(state==='play'&&!paused) bgmStart() } }
 
 /* ===== state ===== */
@@ -448,7 +453,7 @@ function start(m){
   resetRun(m);
   ['title','over','pause'].forEach(id=>$(id).hidden=true);
   paused=false; state='count'; countT=3; lastCountShown=0;
-  showBanner(sched.segs[0],'さいしょのルール',false);
+  showBanner(sched.segs[0],L.bFirst,false);
 }
 
 /* ===== moves ===== */
@@ -470,12 +475,12 @@ function step(md,rule,byPlayer){
   let bug=false;
   if(!inside(nx,ny)){
     bug=true; bumps++; combo=0; sfx.bump(); shake=.25;
-    popup(px,py,'ゴツン','#ffd23f');
+    popup(px,py,L.bonk,'#ffd23f');
     if(RULES[rule].auto) heading=(heading+2)%4;
   }else if(spikes.has(key(nx,ny))){
     bug=true; combo=0; sfx.spike(); shake=.35; stunUntil=t+.5;
     score=Math.max(0,score-50); updateScore(false);
-    popup(px,py,'いたっ！ -50','#ff6b62');
+    popup(px,py,L.ouch,'#ff6b62');
     if(RULES[rule].auto) heading=(heading+2)%4;
   }else{
     prevX=px; prevY=py; px=nx; py=ny; moveA=0; landT=t+.08;
@@ -486,7 +491,7 @@ function step(md,rule,byPlayer){
   }
   if(byPlayer){
     record(rule,bug);
-    if(bug){ bugMark=t; if(inside(nx,ny)&&!spikes.has(key(nx,ny))&&t-lastBugPop>.7){lastBugPop=t;popup(px,py,'脳バグ！','#c9b6ff')} }
+    if(bug){ bugMark=t; if(inside(nx,ny)&&!spikes.has(key(nx,ny))&&t-lastBugPop>.7){lastBugPop=t;popup(px,py,L.bug,'#c9b6ff')} }
   }
 }
 function collect(){
@@ -501,7 +506,7 @@ function collect(){
   }
   if(egg&&egg.x===px&&egg.y===py){
     score+=300; updateScore(true); sfx.egg();
-    popup(px,py,'金のたまご +300','#fff2a8'); burst(px,py,'#fff2a8',18); egg=null;
+    popup(px,py,L.egg,'#fff2a8'); burst(px,py,'#fff2a8',18); egg=null;
   }
 }
 function popup(x,y,text,color){popups.push({x,y,text,color,a:0})}
@@ -531,8 +536,8 @@ function enterSeg(i){
   if(prev>=0){
     sfx.rule(); flash=seg.chaos?.5:1;
     const firstChaos=seg.chaos&&!sched.segs[prev].chaos;
-    if(firstChaos){ showBanner(seg,'カオス突入！ 2.5秒ごとに変わる',false) }
-    else showBanner(seg,seg.chaos?'チェンジ':'ルール変更',seg.chaos);
+    if(firstChaos){ showBanner(seg,L.bChaos,false) }
+    else showBanner(seg,seg.chaos?L.bSwitch:L.bChange,seg.chaos);
     if(seg.t0>0&&!seg.chaos&&segIdx>=1) addSpikes(2);
     if(firstChaos) addSpikes(1);
   }
@@ -562,7 +567,7 @@ function update(dt){
   if(state==='count'){
     countT-=dt;
     const n=Math.ceil(countT), el=$('count');
-    if(countT<=0){ el.hidden=true; state='play'; enterSeg(0); sfx.go(); bgmStart(); popup(px,py,'スタート！','#fff'); return }
+    if(countT<=0){ el.hidden=true; state='play'; enterSeg(0); sfx.go(); bgmStart(); popup(px,py,L.go,'#fff'); return }
     if(n!==lastCountShown){ lastCountShown=n; el.hidden=false; el.textContent=n; el.className='count'; void el.offsetWidth; el.className='count go'; sfx.tick() }
     return;
   }
@@ -576,7 +581,7 @@ function update(dt){
   const left=seg.t1-t;
   if(!seg.chaos&&seg.t1<TOTAL&&left<=3){
     const n=Math.ceil(left);
-    if(n!==lastWarn){ lastWarn=n; const w=$('warn'); w.hidden=false; w.textContent=(sched.segs[segIdx+1].chaos?'カオスまで ':'ルール変更まで ')+n; sfx.tick() }
+    if(n!==lastWarn){ lastWarn=n; const w=$('warn'); w.hidden=false; w.textContent=(sched.segs[segIdx+1].chaos?L.wChaos:L.wChange)+n; sfx.tick() }
   }
   $('segbar').style.width=(seg.chaos?100:clamp((t-seg.t0)/(seg.t1-seg.t0)*100,0,100))+'%';
   const tl=Math.ceil(TOTAL-t); const te=$('time');
@@ -588,7 +593,7 @@ function update(dt){
 function finish(){
   bgmStop();
   state='end'; $('warn').hidden=true; sfx.end();
-  popup(px,py,'しゅうりょう！','#fff');
+  popup(px,py,L.end,'#fff');
   setTimeout(showResult,900);
 }
 
@@ -620,7 +625,7 @@ function draw(dt){
   }
   // a small arrow on the top edge so the flip reads as a flip
   g.fillStyle='rgba(255,255,255,.25)'; g.font=`900 ${CS*.32}px "Zen Maru Gothic",sans-serif`; g.textAlign='center'; g.textBaseline='middle';
-  g.fillText('▲ うえ',FW/2,CS*.22);
+  g.fillText(L.upMark,FW/2,CS*.22);
   // draw back to front so the spikes' cones and the chick overlap the row behind them
   const e=1-Math.pow(1-moveA,3);
   const cx=prevX+(px-prevX)*e, cy=prevY+(py-prevY)*e;
@@ -744,10 +749,79 @@ const DIAG=[
   {max:.55,title:'正直すぎる脳',c:'おした方向に行きたい気持ちが強すぎる。'},
   {max:1.01,title:'完全バグり脳',c:'脳がルールを全力で拒否しています。'},
 ];
+
+/* ===== language: Japanese or English (browser language, ?lang=, or the toggle on the title) ===== */
+const TXT={
+ja:{pts:'点',nowRule:'いまのルール',pause:'一時停止',mute:'音を消す',unmute:'音を出す',canvas:'ゲーム画面',up:'上',left:'左',right:'右',down:'下',
+  logo:'逆走<br>ボ<em>タ</em>ン',
+  lead:'おした方向と、<wbr><mark>逆</mark>に進む。<br>…はずが、<wbr><mark>10秒ごとにルールが変わる</mark>。',
+  h1:'<b>コインをあつめる</b>60秒でいくつ取れるか',h2:'<b>ルールが変わる</b>上下だけ逆、さかさま、勝手に歩く…',
+  h3:'<b>トゲ・壁に注意</b>ぶつかるとコンボが切れる',h4:'<b>最後の10秒</b>カオス。2.5秒ごとに変わる',
+  daily:n=>`今日のお題 No.${n}`,dailySub:'ルールの順番はみんな同じ。くらべっこしよう',dailySubBest:b=>`今日のじこベスト ${b} 点 ・ ルールの順番はみんな同じ`,
+  free:'フリープレイ',freeSub:'毎回ちがうルールの順番',freeSubBest:b=>`毎回ちがうルールの順番 ・ ベスト ${b} 点`,
+  keys:'画面の矢印ボタン ／ キーボードの矢印キー・WASD',back:'← picoruno. のゲーム一覧へ',
+  yourBrain:'あなたの脳は…',bugRate:'脳バグ率',score:'スコア',coins:'コイン',maxCombo:'最大コンボ',bonks:'ゴツン',worst:'いちばんバグったルール：',
+  cardAlt:'結果の画像',cardCap:'画像を長押し（右クリック）で保存して、投稿に添付できます',toTitle:'タイトルへ',retry:'もういちど',shareImg:'画像つきでシェア',post:'𝕏 に投稿',
+  shareNote:'この画面では画像を直接わたせません。上の画像を保存してから、投稿に添付してください。',pTitle:'ひとやすみ',pNote:'タイマーは止まっています',resume:'つづける',
+  bFirst:'さいしょのルール',bChange:'ルール変更',bSwitch:'チェンジ',bChaos:'カオス突入！ 2.5秒ごとに変わる',wChange:'ルール変更まで ',wChaos:'カオスまで ',
+  bonk:'ゴツン',ouch:'いたっ！ -50',bug:'脳バグ！',egg:'金のたまご +300',go:'スタート！',end:'しゅうりょう！',upMark:'▲ うえ',
+  resHead:l=>`結果 ・ ${l}`,worstPct:(n,p)=>`${n}（${p}%）`,newBest:'じこベスト更新！',best:b=>`じこベスト ${b} 点`,
+  share:(l,sc,best,pct,ti,w)=>`「逆走ボタン」${l}で ${sc}点${best?'（じこベスト）':''}\n脳バグ率 ${pct}%「${ti}」${w?`\nいちばんバグったルール：${w}`:''}\n#逆走ボタン`,
+  cTitle:'逆走ボタン',cPts:n=>`${n}点`,cBest:'じこベスト！',cBars:'ルール別 バグった率',cNoData:'（まだデータがありません）',cTag:'#逆走ボタン  runococco.github.io/picoruno.',
+  docTitle:'逆走ボタン',langBtn:'English',
+  rules:{zenbu:['ぜんぶ逆','おした方向と、ぜんぶ逆に進む'],joge:['上下だけ逆','上と下だけ逆。左右はそのまま'],sayu:['左右だけ逆','左と右だけ逆。上下はそのまま'],
+    kaiten:['90°ずれる','↑で→、→で↓。右回りにずれる'],shojiki:['逆じゃない','…今だけ、おした方向にそのまま進む'],shuffle:['シャッフル','どのボタンがどこへ行くかは、ひみつ'],
+    sakasa:['画面さかさま','画面がひっくり返る。操作はふつう'],auto:['勝手に歩く','止まらない。おすと「逆」を向く']},
+  diag:[['逆走の天才','脳がもう裏返ってます。逆の世界の住人かも。'],['やわらか脳','ルールが変わっても、すぐなじむタイプ。'],['ちょいバグ脳','ときどき体が正直に動いちゃう。'],
+    ['正直すぎる脳','おした方向に行きたい気持ちが強すぎる。'],['完全バグり脳','脳がルールを全力で拒否しています。']],
+  idle:['様子見すぎ脳','ほとんど動いてない…！もっと押してみて。']},
+en:{pts:'pts',nowRule:'RULE',pause:'Pause',mute:'Mute',unmute:'Unmute',canvas:'Game screen',up:'Up',left:'Left',right:'Right',down:'Down',
+  logo:'WRONG-WAY<br>BUTTO<em>N</em>',
+  lead:'Press a direction, go the <mark>opposite</mark> way.<br>…until <mark>the rule changes every 10 seconds</mark>.',
+  h1:'<b>Collect coins</b>How many in 60 seconds?',h2:'<b>Rules change</b>Up/down flip, upside-down, autowalk…',
+  h3:'<b>Mind the spikes</b>Bumping breaks your combo',h4:'<b>Last 10 seconds</b>Chaos. Changes every 2.5 s',
+  daily:n=>`Daily No.${n}`,dailySub:'Same rule order for everyone. Compare scores!',dailySubBest:b=>`Today's best ${b} pts · same order for everyone`,
+  free:'Free play',freeSub:'A new rule order every time',freeSubBest:b=>`A new rule order every time · best ${b} pts`,
+  keys:'On-screen arrows / keyboard arrows or WASD',back:'← More games at picoruno.',
+  yourBrain:'Your brain is…',bugRate:'Brain-bug rate',score:'Score',coins:'Coins',maxCombo:'Max combo',bonks:'Bonks',worst:'Most confusing rule: ',
+  cardAlt:'Result image',cardCap:'Long-press (or right-click) the image to save it and attach it to your post',toTitle:'Title',retry:'Play again',shareImg:'Share with image',post:'Post on 𝕏',
+  shareNote:"The image can't be shared directly here. Save the image above, then attach it to your post.",pTitle:'Take a break',pNote:'The timer is stopped',resume:'Resume',
+  bFirst:'FIRST RULE',bChange:'RULE CHANGE',bSwitch:'SWITCH',bChaos:'CHAOS! Changes every 2.5 s',wChange:'Rule change in ',wChaos:'Chaos in ',
+  bonk:'BONK',ouch:'OUCH! -50',bug:'BRAIN BUG!',egg:'GOLDEN EGG +300',go:'GO!',end:'TIME UP!',upMark:'▲ UP',
+  resHead:l=>`Result · ${l}`,worstPct:(n,p)=>`${n} (${p}%)`,newBest:'New personal best!',best:b=>`Personal best ${b} pts`,
+  share:(l,sc,best,pct,ti,w)=>`"Wrong-Way Button" ${l}: ${sc} pts${best?' (personal best)':''}\nBrain-bug rate ${pct}% "${ti}"${w?`\nMost confusing rule: ${w}`:''}\n#WrongWayButton`,
+  cTitle:'Wrong-Way Button',cPts:n=>`${n} pts`,cBest:'Personal best!',cBars:'Brain-bug rate by rule',cNoData:'(no data yet)',cTag:'#WrongWayButton  runococco.github.io/picoruno.',
+  docTitle:'Wrong-Way Button',langBtn:'日本語',
+  rules:{zenbu:['All reversed','Every direction goes the opposite way'],joge:['Up/Down flip','Only up and down are reversed'],sayu:['Left/Right flip','Only left and right are reversed'],
+    kaiten:['Turned 90°','↑ goes →, → goes ↓. Shifted clockwise'],shojiki:['Not reversed','…just this once, you go where you press'],shuffle:['Shuffle','Which button goes where? A secret'],
+    sakasa:['Upside-down','The screen flips over. Controls stay normal'],auto:['Autowalk','It never stops. Press to face the opposite way']},
+  diag:[['Wrong-Way Genius','Your brain is already flipped. Maybe you live in the reverse world.'],['Flexible Brain','The rules change and you adapt right away.'],['Slightly Buggy Brain','Sometimes your body is a little too honest.'],
+    ['Too-Honest Brain','You really, really want to go where you press.'],['Totally Bugged Brain','Your brain is rejecting the rules with all its might.']],
+  idle:['Too-Cautious Brain','You barely moved…! Press more buttons.']}
+};
+function pickLang(){
+  const q=new URLSearchParams(location.search).get('lang');
+  if(q==='ja'||q==='en') return q;
+  const saved=store.get('gyakuso-lang',null); if(saved==='ja'||saved==='en') return saved;
+  return /^ja\b/i.test(navigator.language||'')?'ja':'en';
+}
+let lang='ja', L=TXT.ja;
+function applyLang(l){
+  lang=l; L=TXT[l]; document.documentElement.lang=l; document.title=L.docTitle;
+  document.querySelectorAll('[data-i18n]').forEach(e=>{e.innerHTML=L[e.dataset.i18n]});
+  document.querySelectorAll('[data-i18n-aria]').forEach(e=>e.setAttribute('aria-label',L[e.dataset.i18nAria]));
+  document.querySelectorAll('[data-i18n-alt]').forEach(e=>e.alt=L[e.dataset.i18nAlt]);
+  document.querySelector('.logo span:not(.sign)').classList.toggle('en',l==='en');
+  Object.entries(L.rules).forEach(([k,[n,d]])=>{RULES[k].name=n;RULES[k].desc=d});
+  DIAG.forEach((d,i)=>{d.title=L.diag[i][0];d.c=L.diag[i][1]});
+  const lb=$('langBtn'); lb.textContent=L.langBtn; lb.lang=l==='ja'?'en':'ja';
+  $('muteBtn').setAttribute('aria-label',muted?L.unmute:L.mute);
+}
+
 function diagnose(){
   let m=0,b=0; Object.values(stats).forEach(s=>{m+=s.m;b+=s.b});
   const rate=m?b/m:0;
-  if(m<10) return{rate,m,title:'様子見すぎ脳',c:'ほとんど動いてない…！もっと押してみて。'};
+  if(m<10) return{rate,m,title:L.idle[0],c:L.idle[1]};
   const d=DIAG.find(d=>rate<d.max);
   return{rate,m,title:d.title,c:d.c};
 }
@@ -759,21 +833,21 @@ function worstRule(){
 async function showResult(){
   if(state!=='end') return;
   const D=diagnose(), W=worstRule(), pct=Math.round(D.rate*100);
-  const label=mode==='daily'?`今日のお題 No.${dailyNo()}`:'フリープレイ';
-  $('resHead').textContent=`結果 ・ ${label}`;
+  const label=mode==='daily'?L.daily(dailyNo()):L.free;
+  $('resHead').textContent=L.resHead(label);
   $('dTitle').textContent=D.title; $('dComment').textContent=D.c; $('rRate').textContent=pct;
   $('sScore').textContent=score; $('sCoins').textContent=coins; $('sCombo').textContent=maxCombo; $('sBump').textContent=bumps;
-  $('worst').hidden=!W; if(W) $('worstName').textContent=`${RULES[W.rule].name}（${Math.round(W.rate*100)}%）`;
+  $('worst').hidden=!W; if(W) $('worstName').textContent=L.worstPct(RULES[W.rule].name,Math.round(W.rate*100));
   const bk=mode==='daily'?'gyakuso-best-'+dayKey():'gyakuso-best-free';
   const prev=+store.get(bk,0)||0, isBest=score>0&&score>prev;
   if(isBest) store.set(bk,score);
-  $('best').hidden=false; $('best').textContent=isBest?'じこベスト更新！':`じこベスト ${prev} 点`;
-  resultText=`「逆走ボタン」${label}で ${score}点${isBest?'（じこベスト）':''}\n脳バグ率 ${pct}%「${D.title}」${W?`\nいちばんバグったルール：${RULES[W.rule].name}`:''}\n#逆走ボタン`;
+  $('best').hidden=false; $('best').textContent=isBest?L.newBest:L.best(prev);
+  resultText=L.share(label,score,isBest,pct,D.title,W&&RULES[W.rule].name);
   $('share').href='https://twitter.com/intent/tweet?text='+encodeURIComponent(resultText)+'&url='+encodeURIComponent(GAME_URL);
   $('over').hidden=false; $('shareNote').hidden=true;
   $('retry').focus({preventScroll:true});
   refreshTitle();
-  try{ await document.fonts.load('40px "Dela Gothic One"','逆走ボタン脳バグ率%0123456789点'+D.title); }catch(e){}
+  try{ await document.fonts.load('40px "Dela Gothic One"',L.cTitle+L.bugRate+'%0123456789'+L.cPts('')+D.title); }catch(e){}
   try{ lastCard=makeCard(D,W,pct,label,isBest); $('card').src=lastCard.toDataURL('image/png'); $('cardWrap').hidden=false; prepareShare() }
   catch(e){ $('cardWrap').hidden=true }
 }
@@ -806,46 +880,53 @@ function makeCard(D,W,pct,label,isBest){
   x.fillStyle='#e8382f'; x.beginPath(); x.arc(110,110,52,0,Math.PI*2); x.fill(); x.lineWidth=7; x.strokeStyle='#fff'; x.stroke();
   x.fillStyle='#fff'; x.fillRect(80,100,60,20);
   x.textBaseline='alphabetic'; x.textAlign='left';
-  x.fillStyle='#f6f3ea'; x.font=`64px ${F}`; x.fillText('逆走ボタン',182,132);
+  x.fillStyle='#f6f3ea'; fit(x,L.cTitle,64,F,800); x.fillText(L.cTitle,182,132);
   x.fillStyle='#a9abb5'; x.font=`700 26px ${B}`; x.fillText(label,186,172);
   // the chick, dizzy when the brain bugged a lot
   const ck=pct>=40?IMG.hurt:IMG.chick[2];
   if(ok(ck)) x.drawImage(ck,1010,20,170,170);
   // diagnosis plate
   x.fillStyle='#e8382f'; rr(x,60,210,600,250,28); x.fill(); x.lineWidth=7; x.strokeStyle='#fff'; x.stroke();
-  x.fillStyle='#fff'; x.font=`700 28px ${B}`; x.fillText('あなたの脳は…',92,262);
-  x.font=`${D.title.length>5?62:74}px ${F}`; x.fillText(D.title,92,350);
+  x.fillStyle='#fff'; x.font=`700 28px ${B}`; x.fillText(L.yourBrain,92,262);
+  fit(x,D.title,lang==='ja'&&D.title.length<=5?74:62,F,536); x.fillText(D.title,92,350);
   x.font=`700 24px ${B}`; wrap(x,D.c,92,400,536,34);
   // numbers
-  x.fillStyle='#f6f3ea'; x.font=`30px ${F}`; x.fillText('脳バグ率',62,548);
+  x.fillStyle='#f6f3ea'; if(lang==='en'){ x.font=`26px ${F}`; wrap(x,L.bugRate,62,524,140,30) } else { x.font=`30px ${F}`; x.fillText(L.bugRate,62,548) }
   x.fillStyle='#ffd23f'; x.font=`96px ${F}`; x.fillText(pct+'%',214,566);
   const sx=214+x.measureText(pct+'%').width+28;
-  x.fillStyle='#f6f3ea'; x.font=`36px ${F}`; x.fillText(`${score}点`,sx,isBest?540:562);
-  if(isBest){ x.fillStyle='#5fe0b7'; x.font=`700 22px ${B}`; x.fillText('じこベスト！',sx+2,574) }
+  x.fillStyle='#f6f3ea'; x.font=`36px ${F}`; x.fillText(L.cPts(score),sx,isBest?540:562);
+  if(isBest){ x.fillStyle='#5fe0b7'; x.font=`700 22px ${B}`; x.fillText(L.cBest,sx+2,574) }
   // per-rule bars
   const rows=Object.keys(RULES).filter(r=>stats[r]&&stats[r].m>0).sort((a,b)=>stats[b].b/stats[b].m-stats[a].b/stats[a].m).slice(0,7);
-  x.fillStyle='#a9abb5'; x.font=`700 24px ${B}`; x.fillText('ルール別 バグった率',712,232);
+  x.fillStyle='#a9abb5'; x.font=`700 24px ${B}`; x.fillText(L.cBars,712,232);
   rows.forEach((r,i)=>{
-    const y=262+i*46, rate=stats[r].b/stats[r].m, isW=W&&W.rule===r;
-    x.fillStyle=isW?'#ffd23f':'#f6f3ea'; x.font=`${isW?'900':'700'} 24px ${B}`; x.fillText(RULES[r].name,712,y+24);
-    x.fillStyle='rgba(255,255,255,.12)'; rr(x,880,y+4,230,24,12); x.fill();
-    x.fillStyle=isW?'#ffd23f':'#5fe0b7'; if(rate>0){ rr(x,880,y+4,Math.max(24,230*rate),24,12); x.fill() }
+    const y=256+i*44, rate=stats[r].b/stats[r].m, isW=W&&W.rule===r;
+    x.fillStyle=isW?'#ffd23f':'#f6f3ea'; fit(x,RULES[r].name,24,B,160,isW?'900 ':'700 '); x.fillText(RULES[r].name,712,y+24);
+    x.fillStyle='rgba(255,255,255,.12)'; rr(x,880,y+4,215,24,12); x.fill();
+    x.fillStyle=isW?'#ffd23f':'#5fe0b7'; if(rate>0){ rr(x,880,y+4,Math.max(24,215*rate),24,12); x.fill() }
     x.fillStyle='#f6f3ea'; x.font=`700 22px ${B}`; x.textAlign='right'; x.fillText(Math.round(rate*100)+'%',1160,y+24); x.textAlign='left';
   });
-  if(!rows.length){ x.fillStyle='#a9abb5'; x.font=`700 24px ${B}`; x.fillText('（まだデータがありません）',712,290) }
-  x.fillStyle='#a9abb5'; x.font=`700 22px ${B}`; x.textAlign='right'; x.fillText('#逆走ボタン  runococco.github.io/picoruno.',1160,588); x.textAlign='left';
+  if(!rows.length){ x.fillStyle='#a9abb5'; x.font=`700 24px ${B}`; x.fillText(L.cNoData,712,290) }
+  x.fillStyle='#a9abb5'; x.font=`700 22px ${B}`; x.textAlign='right'; x.fillText(L.cTag,1160,588); x.textAlign='left';
   return c;
 }
 function rr(x,X,Y,w,h,r){x.beginPath();x.moveTo(X+r,Y);x.arcTo(X+w,Y,X+w,Y+h,r);x.arcTo(X+w,Y+h,X,Y+h,r);x.arcTo(X,Y+h,X,Y,r);x.arcTo(X,Y,X+w,Y,r);x.closePath()}
-function wrap(x,text,X,Y,maxW,lh){let line='',y=Y;for(const ch of text){if(x.measureText(line+ch).width>maxW&&!'。、！？…」'.includes(ch)){x.fillText(line,X,y);line=ch;y+=lh}else line+=ch}if(line)x.fillText(line,X,y)}
+function fit(x,text,size,font,maxW,weight=''){ do{ x.font=`${weight}${size}px ${font}`; size-=2 }while(size>12&&x.measureText(text).width>maxW) }
+function wrap(x,text,X,Y,maxW,lh){
+  if(/ /.test(text)){ // English: break between words
+    let line='',y=Y;
+    for(const w of text.split(' ')){const t=line?line+' '+w:w; if(line&&x.measureText(t).width>maxW){x.fillText(line,X,y);line=w;y+=lh}else line=t}
+    if(line) x.fillText(line,X,y); return;
+  }
+  let line='',y=Y;for(const ch of text){if(x.measureText(line+ch).width>maxW&&!'。、！？…」'.includes(ch)){x.fillText(line,X,y);line=ch;y+=lh}else line+=ch}if(line)x.fillText(line,X,y)}
 
 /* ===== title ===== */
 function refreshTitle(){
-  $('dailyLabel').textContent=`今日のお題 No.${dailyNo()}`;
+  $('dailyLabel').textContent=L.daily(dailyNo());
   const b=+store.get('gyakuso-best-'+dayKey(),0)||0;
-  $('dailySub').textContent=b?`今日のじこベスト ${b} 点 ・ ルールの順番はみんな同じ`:'ルールの順番はみんな同じ。くらべっこしよう';
+  $('dailySub').textContent=b?L.dailySubBest(b):L.dailySub;
   const f=+store.get('gyakuso-best-free',0)||0;
-  $('freeSub').textContent=f?`毎回ちがうルールの順番 ・ ベスト ${f} 点`:'毎回ちがうルールの順番';
+  $('freeSub').textContent=f?L.freeSubBest(f):L.freeSub;
 }
 function toTitle(){
   bgmStop(); state='title'; paused=false;
@@ -892,6 +973,8 @@ $('pauseBtn').addEventListener('click',()=>setPause(!paused));
 $('muteBtn').addEventListener('click',()=>setMute(!muted));
 
 $('hero').src=ART.chick[2];
+applyLang(pickLang());
+$('langBtn').addEventListener('click',()=>{applyLang(lang==='ja'?'en':'ja');store.set('gyakuso-lang',lang);refreshTitle()});
 setMute(muted);
 resetRun('daily'); state='title';
 refreshTitle(); resize();
