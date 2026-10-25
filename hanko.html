@@ -63,6 +63,12 @@ button,input{font-family:inherit;color:inherit}
 .names .name label{font-size:.72rem}
 .names .name input{width:100%;font-size:1.15rem;padding:2px 0;text-align:center}
 .names .name input::placeholder{font-family:var(--body);font-weight:700;font-size:.8rem;color:#b9aba0}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.modes button{border:0;border-radius:12px;padding:8px 6px;cursor:pointer;background:#fff;color:var(--sub);box-shadow:0 0 0 1.5px var(--line) inset;font-family:var(--body);font-weight:700;font-size:.9rem;line-height:1.3}
+.modes button small{display:block;font-size:.7rem;font-weight:500}
+.modes button[aria-pressed="true"]{background:#fbeee9;color:var(--shu-d);box-shadow:0 0 0 2px var(--shu) inset}
+.modes button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.notice{font-size:.7rem;line-height:1.55;color:var(--sub);background:rgba(139,122,108,.08);border-radius:8px;padding:6px 10px;margin-top:-4px}
 .namehint{font-size:.75rem;color:var(--sub);text-align:center;margin-top:-6px}
 .home{display:block;text-align:center;font-size:.82rem;color:var(--shu-d);font-weight:700;text-decoration:none;padding:2px}
 /* 判定 */
@@ -86,6 +92,8 @@ button,input{font-family:inherit;color:inherit}
 .chip small{display:block;font-size:.72rem;color:var(--sub)}
 .chip b{font-family:var(--mincho);font-weight:800;font-size:1.25rem;font-variant-numeric:tabular-nums}
 .badge{background:#fbeee9;color:var(--shu-d);border-radius:10px;padding:8px 12px;font-size:.88rem;line-height:1.6;text-align:center}
+.viewbar .btn[aria-label]{width:54px;flex:none;font-size:1.6rem}
+.viewbar{position:fixed;left:50%;transform:translateX(-50%);bottom:max(12px,env(safe-area-inset-bottom));z-index:20;width:min(440px,calc(100% - 24px));display:flex;gap:10px}
 .toast{position:fixed;left:50%;top:max(16px,env(safe-area-inset-top));transform:translateX(-50%);z-index:40;background:rgba(43,31,24,.9);color:#fff;border-radius:999px;padding:8px 16px;font-size:.88rem}
 @media (prefers-reduced-motion:reduce){.btn{transition:none}}
 </style>
@@ -105,6 +113,11 @@ button,input{font-family:inherit;color:inherit}
       <div class="name"><label for="nmB">部長</label><input id="nmB" maxlength="4" autocomplete="off" placeholder="おまかせ"></div>
     </div>
     <div class="namehint">課長・部長は空けておくと、毎回ちがう名前になります</div>
+    <div class="notice">※ゲーム内の印影は実在の印鑑ではありません。実在の人の名前を入れた画像を投稿するときは、相手への配慮をお願いします。</div>
+    <div class="modes" role="group" aria-label="むずかしさ">
+      <button type="button" data-m="0" aria-pressed="true">ふつう<small>まずはこちら</small></button>
+      <button type="button" data-m="1" aria-pressed="false">決算期モード<small>稟議書3枚を立て続けに</small></button>
+    </div>
     <button class="btn" id="start" type="button">押印をはじめる</button>
     <div class="best" id="best"></div>
     <a class="home" href="https://runococco.github.io/picoruno./">← picoruno. のゲーム一覧へ</a>
@@ -118,14 +131,16 @@ button,input{font-family:inherit;color:inherit}
 </section>
 
 <section class="sheet" id="result" hidden>
-  <div class="rank"><small>あなたの押印力は</small><b id="rRank"></b></div>
-  <div class="total">合計 <span id="rTotal">0</span> / 300点</div>
+  <div class="rank"><small id="rLead">あなたの押印力は</small><b id="rRank"></b></div>
+  <div class="total">合計 <span id="rTotal">0</span> / <span id="rMax">300</span>点</div>
   <div class="chips" id="rChips"></div>
   <div class="badge" id="rBadge" hidden></div>
   <div class="row"><button class="btn x" id="xBtn" type="button">𝕏 にポスト</button><button class="btn sub" id="imgBtn" type="button">画像で保存</button></div>
+  <button class="btn sub" id="viewBtn" type="button">押した稟議書を見る</button>
   <button class="btn" id="again" type="button">もう1枚押す</button>
   <a class="home" href="https://runococco.github.io/picoruno./">← picoruno. のゲーム一覧へ</a>
 </section>
+<div class="viewbar" id="viewbar" hidden><button class="btn sub" id="viewPrev" type="button" hidden aria-label="前の稟議書">‹</button><button class="btn sub" id="viewNext" type="button" hidden aria-label="次の稟議書">›</button><button class="btn sub" id="viewBack" type="button">結果にもどる</button><button class="btn" id="viewSave" type="button">画像で保存</button></div>
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -361,6 +376,12 @@ const ROUND = [ // ゆれの大きさ・速さ・紙の動き
   { amp: 32, rot: 18, sp: 1.05, drift: 9, wind: 0, time: 9 },
   { amp: 40, rot: 22, sp: 1.25, drift: 14, wind: 1, time: 9 }
 ];
+// 決算期モード：ゆれが大きく速く、ときどき緩急がつく。紙は毎回風でずれる。持ち時間も短い
+const ROUND_HARD = [
+  { amp: 34, rot: 20, sp: 1.25, drift: 12, wind: 1, time: 6, jerk: 0.22 },
+  { amp: 44, rot: 26, sp: 1.45, drift: 18, wind: 1, time: 6, jerk: 0.26 },
+  { amp: 52, rot: 30, sp: 1.65, drift: 22, wind: 1, time: 6, jerk: 0.3 }
+];
 
 const S = {
   state: "title", t: 0, round: 0, name: "ぴこ", names: ["部長", "課長", "ぴこ"], subject: SUBJECTS[0], date: "",
@@ -384,6 +405,12 @@ function resize() {
 window.addEventListener("resize", resize);
 
 const lerp = (a, b, k) => a + (b - a) * k;
+const rounds = () => S.hard ? ROUND_HARD : ROUND;
+const DOCS = () => S.hard ? 3 : 1;   // 決算期は稟議書3枚を立て続けに
+function curR() {
+  const R = rounds()[S.round] || rounds()[0];
+  return S.hard && S.doc ? { ...R, sp: R.sp * (1 + 0.08 * S.doc) } : R;
+}
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const ease = k => 1 - Math.pow(1 - clamp(k, 0, 1), 3);
 const rad = d => d * Math.PI / 180;
@@ -477,6 +504,9 @@ function drawForm(g) {
   g.fillStyle = "rgba(61,46,38,.78)"; g.font = '500 16px "Shippori Mincho B1",serif';
   const body = ["標記の件について、下記のとおり実施したく", "ご承認くださいますようお願い申し上げます。", "", "１．目的　職場の空気をすこし明るくするため", "２．費用　ごくわずか（応相談）", "３．期間　承認日より当面のあいだ", "", "以上"];
   body.forEach((l, i) => { if (l) g.fillText(l, L + 16, 58 + i * 34); });
+  // ゲーム画面であることの透かし（紙の右下）
+  g.save(); g.textAlign = "right"; g.fillStyle = "rgba(61,46,38,.38)"; g.font = '700 13px "Zen Maru Gothic",sans-serif';
+  g.fillText("picoruno.「ハンコまっすぐ選手権」ゲーム画面", 300, 446); g.restore();
   g.strokeStyle = "rgba(61,46,38,.15)";
   for (let i = 0; i < 9; i++) { g.beginPath(); g.moveTo(L, 66 + i * 34); g.lineTo(R, 66 + i * 34); g.stroke(); }
 }
@@ -586,7 +616,7 @@ function render() {
 }
 function drawHud(lw, lh) {
   const g = cx; g.save(); g.scale(fit * dpr, fit * dpr);
-  const b = BOXES[ORDER[S.round]], R = ROUND[S.round];
+  const b = BOXES[ORDER[S.round]], R = curR();
   const left = Math.max(0, R.time - S.roundT);
   g.fillStyle = "rgba(43,31,24,.72)";
   const y0 = 18 + KIT.safe().top / fit;
@@ -594,7 +624,7 @@ function drawHud(lw, lh) {
   roundRect(g, 18, y0, hw, 58, 16); g.fill();
   g.fillStyle = "#fff"; g.textBaseline = "middle"; g.textAlign = "left";
   g.font = '800 24px "Shippori Mincho B1",serif';
-  g.fillText(`${S.round + 1}枚目　${b.label}の欄`, 36, y0 + 29);
+  g.fillText(S.hard ? `決算期 ${S.doc + 1}/3枚目　${b.label}の欄` : `${b.label}の欄`, 36, y0 + 29);
   // 残り時間
   const bw = 120, bx = 18 + hw - bw - 18;
   g.fillStyle = "rgba(255,255,255,.2)"; roundRect(g, bx, y0 + 23, bw, 12, 6); g.fill();
@@ -623,7 +653,7 @@ function update(dt) {
   S.parts = S.parts.filter(q => q.life > 0);
   if (S.slam) S.slam.t += dt;
   // 紙のゆれ
-  const R = ROUND[S.round] || ROUND[0];
+  const R = curR();
   const playing = S.state === "aim" || S.state === "press" || S.state === "intro";
   if (playing && R.drift) {
     const tt = S.t;
@@ -648,7 +678,7 @@ function update(dt) {
     // ゆれの中心は「いまの紙」の欄。紙が動いても、真ん中を通る瞬間はちゃんと来る
     const tgt = p2w(BOXES[ORDER[S.round]].x, BOX_CY), ph = S.phi, tt = S.roundT * R.sp;
     // 8の字のゆれ：u が π の倍数になるたびに、位置も傾きも同時にぴったり真ん中を通る（約2〜3秒ごと）
-    const u = 1.3 * tt + ph[0], env = 0.8 + 0.2 * Math.sin(0.45 * tt + ph[1]), dir = ph[2] < 3.14 ? 1 : -1;
+    const u = 1.3 * tt + (R.jerk ? R.jerk * Math.sin(0.9 * tt + ph[5]) : 0) + ph[0], env = 0.8 + 0.2 * Math.sin(0.45 * tt + ph[1]), dir = ph[2] < 3.14 ? 1 : -1;
     const fin = ease(S.roundT / 0.5);   // 着いた直後は小さく、なめらかにゆれはじめる
     const ox = R.amp * env * fin * Math.sin(u) * dir;
     const oy = R.amp * env * fin * 0.55 * Math.sin(2 * u + (ph[3] < 3.14 ? 0 : Math.PI));
@@ -674,10 +704,27 @@ function update(dt) {
     if (S.liftT > 0.55) { S.state = "judge"; showJudge(); }
   } else if (S.state === "judge") {
     hk.y -= dt * 900; hk.x += dt * 500;   // ハンコはわきへ片づける
+  } else if (S.state === "judgeAuto") {
+    // 決算期：判定は見せるだけで、すぐ次へ
+    hk.y -= dt * 900; hk.x += dt * 500;
+    if (S.t - S.judgeAt > 0.85) { S.state = "judge"; S.judgeAt = -9; nextRound(); }
+  } else if (S.state === "swap") {
+    // 1枚押し終えたら承認の判 → 書類を左へ流して、次の稟議書が右から
+    S.swapT += dt;
+    if (S.swapT > 0.25 && !S.swapped && !S.slam) S.slam = { t: 0, ok: docTotal(S.doc) >= 180 };
+    if (S.slam && S.slam.t > 0.16 && !S.slam.hit) { S.slam.hit = true; S.shake = 14; thud(1.1); if (S.slam.ok) [0, 4, 7].forEach((d, i) => KIT.inst.bell(67 + d, 0.05 + i * 0.06, 0.4, 0.1)); else [7, 5, 0].forEach((d, i) => KIT.tone({ f: KIT.mtof(55 + d), t: 0.05 + i * 0.12, dur: 0.18, vol: 0.1, type: "square", lp: 1200 })); }
+    if (S.swapT > 0.95) {
+      if (!S.swapped) { S.swapped = true; saveDoc(); S.doc++; newDoc(); S.paper.x = S.paper0.x + 900; KIT.noise({ dur: 0.35, vol: 0.12, f: 2200, to: 800, q: 0.7 }); }
+      const k = ease((S.swapT - 0.95) / 0.5);
+      S.paper.x = S.paper0.x + 900 * (1 - k);
+    } else if (S.swapT > 0.7) {
+      S.paper.x = S.paper0.x - 900 * ease((S.swapT - 0.7) / 0.25);
+    }
+    if (S.swapT > 1.5) { S.paper.x = S.paper0.x; startRound(0); }
   } else if (S.state === "final") {
     S.finalT += dt;
     if (S.finalT > 0.9 && !S.slam) {
-      S.slam = { t: 0, ok: S.total >= 180 };
+      S.slam = { t: 0, ok: docTotal(S.doc) >= 180 };
     }
     if (S.slam && S.slam.t > 0.16 && !S.slam.hit) {
       S.slam.hit = true; S.shake = 22;
@@ -708,21 +755,28 @@ function pressUp() {
   const lp = w2p(S.lock.x, S.lock.y, S.lock.paper);
   const rel = S.lock.a - S.lock.paper.rot;
   let q, kind;
-  if (pt < 0.08) { q = 0.15; kind = "かすれ"; }
+  const hard = S.hard;
+  if (hard) {   // 決算期：ちょうどいいのは 0.35〜0.6秒
+    if (pt < 0.1) { q = 0.1; kind = "かすれ"; }
+    else if (pt < 0.35) { q = lerp(0.2, 1, (pt - 0.1) / 0.25); kind = q > 0.95 ? "ちょうどいい" : "かすれ"; }
+    else if (pt <= 0.6) { q = 1; kind = "ちょうどいい"; }
+    else { q = lerp(1, 0.25, clamp((pt - 0.6) / 0.7, 0, 1)); kind = q > 0.95 ? "ちょうどいい" : "にじみ"; }
+  } else if (pt < 0.08) { q = 0.15; kind = "かすれ"; }
   else if (pt < 0.3) { q = lerp(0.3, 1, (pt - 0.08) / 0.22); kind = q > 0.92 ? "ちょうどいい" : "かすれ"; }
   else if (pt <= 0.8) { q = 1; kind = "ちょうどいい"; }
   else { q = lerp(1, 0.35, clamp((pt - 0.8) / 1.0, 0, 1)); kind = q > 0.92 ? "ちょうどいい" : "にじみ"; }
   const bi = ORDER[S.round], b = BOXES[bi];
   const dmm = Math.hypot(lp.x - b.x, lp.y - BOX_CY) / PX_MM;
   // ズレ0.4mm・傾き0.8°までは満点あつかい
-  const sPos = 40 * clamp(1 - Math.max(0, dmm - 0.4) / 4, 0, 1);
-  const sAng = 40 * clamp(1 - Math.max(0, Math.abs(rel) - 0.8) / 12, 0, 1);
+  // 決算期は ズレ0.3mm・傾き0.6°まで満点、そこからの減りも速い
+  const sPos = 40 * clamp(1 - Math.max(0, dmm - (hard ? 0.3 : 0.4)) / (hard ? 2.5 : 4), 0, 1);
+  const sAng = 40 * clamp(1 - Math.max(0, Math.abs(rel) - (hard ? 0.6 : 0.8)) / (hard ? 7 : 12), 0, 1);
   const sInk = 20 * q;
   let score = Math.round(sPos + sAng + sInk);
-  if (S.timeout) score = Math.max(0, score - 10);
+  if (S.timeout) score = Math.max(0, score - (hard ? 20 : 10));
   const st = { x: lp.x, y: lp.y, a: rel, q, kind, alpha: 0, img: sealCanvas(S.names[bi], q, kind, (Math.random() * 1e9) | 0) };
   S.stamps.push(st);
-  S.results.push({ label: b.label, score, dmm, ang: rel, kind, timeout: !!S.timeout });
+  S.results.push({ doc: S.doc, label: b.label, score, dmm, ang: rel, kind, timeout: !!S.timeout });
   S.timeout = false;
   S.state = "lift"; S.liftT = 0;
   // ぽん
@@ -754,15 +808,18 @@ function showJudge() {
   const dir = Math.abs(r.ang) < 0.05 ? "" : r.ang < 0 ? "（左）" : "（右）";
   $("jDl").innerHTML = `<dt>ズレ</dt><dd>${r.dmm.toFixed(1)} mm</dd><dt>傾き</dt><dd>${Math.abs(r.ang).toFixed(1)}°${dir}${bow ? "　お辞儀ハンコ？" : ""}</dd><dt>押しかげん</dt><dd>${r.kind}</dd>`;
   $("judge").hidden = false;
+  if (S.hard) S.state = "judgeAuto";
   const notes = r.score >= 95 ? [0, 4, 7, 12, 16] : r.score >= 80 ? [0, 4, 7, 12] : r.score >= 60 ? [0, 4, 7] : [0, 3];
   notes.forEach((d, i) => KIT.inst.marimba(72 + d, 0.05 + i * 0.07, 0.2, 0.16));
   S.judgeAt = S.t;
 }
 function nextRound() {
+  if (S.state === "judgeAuto") { S.state = "judge"; S.judgeAt = -9; }
   if (S.state !== "judge" || S.t - S.judgeAt < 0.35) return;
   $("judge").hidden = true;
   click();
   if (S.round < 2) startRound(S.round + 1);
+  else if (S.doc + 1 < DOCS()) { S.state = "swap"; S.swapT = 0; S.swapped = false; S.slam = null; S.hk.x = 2000; }
   else finish();
 }
 
@@ -777,6 +834,13 @@ function startRound(i) {
   KIT.noise({ t: 0.16, dur: 0.06, vol: 0.14, f: 380, type: "lowpass" });
   KIT.tone({ f: 300, to: 620, t: 0.35, dur: 0.25, vol: 0.06, type: "sine" });
 }
+function docTotal(d) { return S.results.filter(r => r.doc === d).reduce((a, r) => a + r.score, 0); }
+function newDoc() {
+  const used = S.docs.map(d => d.subject), pool = SUBJECTS.filter(x => !used.includes(x));
+  S.subject = pool[(Math.random() * pool.length) | 0];
+  S.stamps = []; S.slam = null;
+}
+function saveDoc() { S.docs[S.doc] = { subject: S.subject, stamps: S.stamps, slam: S.slam ? { ...S.slam, t: 9, hit: true } : null }; }
 function startGame() {
   KIT.ensure();
   const nm = ($("nm").value || "").replace(/\s/g, "").slice(0, 4) || "ぴこ";
@@ -791,12 +855,12 @@ function startGame() {
   const kacho = pickName("nmK", [nm]), bucho = pickName("nmB", [nm, kacho]);
   KIT.store.set("hanko-boss", [$("nmK").value || "", $("nmB").value || ""]);
   S.names = [bucho, kacho, nm];   // BOXES の順（部長・課長・担当）
-  S.subject = SUBJECTS[(Math.random() * SUBJECTS.length) | 0];
+  S.docs = []; S.doc = 0; newDoc();
   const d = new Date();
   S.date = `令和${d.getFullYear() - 2018}年${d.getMonth() + 1}月${d.getDate()}日`;
-  S.stamps = []; S.results = []; S.slam = null; S.shown = false; S.parts = [];
+  S.results = []; S.shown = false; S.parts = [];
   S.paper = { ...S.paper0 };
-  $("title").hidden = true; $("result").hidden = true; $("judge").hidden = true;
+  $("title").hidden = true; $("result").hidden = true; $("judge").hidden = true; $("viewbar").hidden = true;
   startMusic();
   KIT.countPlay(GAME_TITLE);
   const go = () => startRound(0);
@@ -813,27 +877,38 @@ function finish() {
   S.camTo = { x: top.x, y: top.y + 120, z: 1.1 };
   S.hk.x = 2000;
 }
+const MAXPT = () => DOCS() * 300;
 const RANKS = [[290, "ハンコの神"], [270, "印鑑マイスター"], [240, "できる課長"], [200, "頼れる係長"], [150, "期待の新人"], [0, "ハンコ見習い"]];
 function showResult() {
-  const rank = RANKS.find(r => S.total >= r[0])[1];
+  saveDoc();
+  const per = S.total / DOCS();   // 1枚あたりで段位を決める
+  const rank = RANKS.find(r => per >= r[0])[1];
   S.rank = rank;
+  $("rMax").textContent = MAXPT();
   $("rRank").textContent = rank;
   $("rTotal").textContent = S.total;
-  $("rChips").innerHTML = S.results.map(r => `<div class="chip"><small>${r.label}</small><b>${r.score}</b><small>${r.dmm.toFixed(1)}mm・${Math.abs(r.ang).toFixed(1)}°</small></div>`).join("");
+  $("rChips").innerHTML = S.hard
+    ? S.docs.map((d, i) => `<div class="chip"><small>${i + 1}枚目</small><b>${docTotal(i)}</b><small>${d.slam && d.slam.ok ? "承認" : "差し戻し"}</small></div>`).join("")
+    : S.results.map(r => `<div class="chip"><small>${r.label}</small><b>${r.score}</b><small>${r.dmm.toFixed(1)}mm・${Math.abs(r.ang).toFixed(1)}°</small></div>`).join("");
   const bows = S.results.filter(r => r.ang <= -5 && r.ang >= -28 && r.label !== "部長").length;
   const badge = $("rBadge");
-  if (!S.slam.ok) { badge.hidden = false; badge.textContent = "稟議は差し戻されました。社長「もう少しまっすぐ押してね」"; }
+  const back = S.docs.filter(d => !(d.slam && d.slam.ok)).length;
+  if (S.hard && back) { badge.hidden = false; badge.textContent = `${S.docs.length}枚中${back}枚が差し戻し。社長「決算期こそ、まっすぐね」`; }
+  else if (!S.slam.ok) { badge.hidden = false; badge.textContent = "稟議は差し戻されました。社長「もう少しまっすぐ押してね」"; }
   else if (bows >= 2) { badge.hidden = false; badge.textContent = "お辞儀ハンコ認定。社長「上の人の欄に向かって傾けるとは、気がきくね」"; }
-  else if (S.results.every(r => r.score >= 90)) { badge.hidden = false; badge.textContent = "3つとも90点以上。社長「この稟議書は額に入れて飾ろう」"; }
+  else if (S.results.every(r => r.score >= 90)) { badge.hidden = false; badge.textContent = S.hard ? "9つすべて90点以上。社長「決算期にこの仕事ぶり、額に入れて飾ろう」" : "3つとも90点以上。社長「この稟議書は額に入れて飾ろう」"; }
+  else if (S.hard) { badge.hidden = false; badge.textContent = "3枚とも承認されました。社長「決算期、おつかれさま」"; }
   else { badge.hidden = false; badge.textContent = "承認されました。社長「うん、次もこの調子で」"; }
-  const best = KIT.store.get("hanko-best", 0);
-  if (S.total > best) KIT.store.set("hanko-best", S.total);
+  const bk = S.hard ? "hanko-best-hard9" : "hanko-best", best = KIT.store.get(bk, 0);
+  if (S.total > best) KIT.store.set(bk, S.total);
+  $("rLead").textContent = S.hard ? "決算期モードの押印力は" : "あなたの押印力は";
   $("result").hidden = false;
   KIT.music.stop();
   setTimeout(() => startMusic(true), 600);
 }
 function shareText() {
-  return `ハンコまっすぐ選手権で ${S.total}/300点\n押印力は「${S.rank}」でした\n${S.results.map(r => `${r.label}${r.score}`).join("・")}\n#ハンコまっすぐ選手権`;
+  const parts = S.hard ? S.docs.map((d, i) => `${i + 1}枚目${docTotal(i)}`) : S.results.map(r => `${r.label}${r.score}`);
+  return `ハンコまっすぐ選手権${S.hard ? "【決算期モード】" : ""}で ${S.total}/${MAXPT()}点\n押印力は「${S.rank}」でした\n${parts.join("・")}\n#ハンコまっすぐ選手権`;
 }
 
 /* シェア画像 1200x630 */
@@ -849,16 +924,19 @@ function shareCanvas() {
   g.fillStyle = "#c4372b"; g.fillRect(700, 0, 8, 630);
   g.textAlign = "left"; g.textBaseline = "alphabetic";
   g.fillStyle = "#c4372b"; g.font = '800 28px "Shippori Mincho B1",serif'; g.fillText("ハンコまっすぐ選手権", 748, 92);
+  if (S.hard) { g.fillStyle = "#8b7a6c"; g.font = '700 20px "Zen Maru Gothic",sans-serif'; g.fillText("決算期モード", 748, 124); }
   g.fillStyle = "#8b7a6c"; g.font = '700 24px "Zen Maru Gothic",sans-serif'; g.fillText("わたしの押印力は", 748, 168);
   g.fillStyle = "#3d2e26"; g.font = '800 64px "Shippori Mincho B1",serif'; g.fillText(S.rank, 748, 246);
   g.font = '800 40px "Shippori Mincho B1",serif'; g.fillText(`${S.total}`, 748, 322);
-  const tw = g.measureText(`${S.total}`).width; g.font = '700 26px "Zen Maru Gothic",sans-serif'; g.fillStyle = "#8b7a6c"; g.fillText(" / 300点", 748 + tw, 322);
-  S.results.forEach((r, i) => {
+  const tw = g.measureText(`${S.total}`).width; g.font = '700 26px "Zen Maru Gothic",sans-serif'; g.fillStyle = "#8b7a6c"; g.fillText(` / ${MAXPT()}点`, 748 + tw, 322);
+  const rows = S.hard ? S.docs.map((d, i) => ({ label: `${i + 1}枚目`, score: docTotal(i), sub: d.slam && d.slam.ok ? "承認" : "差し戻し" }))
+    : S.results.map(r => ({ label: r.label, score: r.score, sub: `${r.dmm.toFixed(1)}mm・${Math.abs(r.ang).toFixed(1)}°・${r.kind}` }));
+  rows.forEach((r, i) => {
     const y = 392 + i * 58;
     g.fillStyle = "#fff"; roundRect(g, 748, y - 38, 404, 48, 12); g.fill();
     g.fillStyle = "#8b7a6c"; g.font = '700 22px "Zen Maru Gothic",sans-serif'; g.fillText(r.label, 768, y - 6);
     g.fillStyle = "#3d2e26"; g.font = '800 28px "Shippori Mincho B1",serif'; g.fillText(`${r.score}点`, 852, y - 4);
-    g.fillStyle = "#8b7a6c"; g.font = '700 17px "Zen Maru Gothic",sans-serif'; g.fillText(`${r.dmm.toFixed(1)}mm・${Math.abs(r.ang).toFixed(1)}°・${r.kind}`, 950, y - 6);
+    g.fillStyle = "#8b7a6c"; g.font = '700 17px "Zen Maru Gothic",sans-serif'; g.fillText(r.sub, 960, y - 6);
   });
   g.fillStyle = "#8b7a6c"; g.font = '700 20px "Zen Maru Gothic",sans-serif'; g.fillText("#ハンコまっすぐ選手権 ・ picoruno.", 748, 598);
   return c;
@@ -873,7 +951,7 @@ function startMusic(calm) {
 function click() { KIT.tone({ f: 880, dur: 0.05, vol: 0.08, type: "triangle", wet: 0 }); }
 
 /* ---------- 入力 ---------- */
-cv.addEventListener("pointerdown", e => { e.preventDefault(); if (S.state === "aim") pressDown(); else if (S.state === "judge") nextRound(); });
+cv.addEventListener("pointerdown", e => { e.preventDefault(); if (S.state === "aim") pressDown(); else if (S.state === "judge" || S.state === "judgeAuto") nextRound(); });
 window.addEventListener("pointerup", () => pressUp());
 window.addEventListener("pointercancel", () => pressUp());
 $("judge").addEventListener("click", nextRound);
@@ -881,16 +959,63 @@ window.addEventListener("keydown", e => {
   if (e.repeat) return;
   if ((e.code === "Space" || e.code === "Enter") && document.activeElement.tagName !== "INPUT") {
     if (S.state === "aim") { e.preventDefault(); pressDown(); }
-    else if (S.state === "judge") { e.preventDefault(); nextRound(); }
+    else if (S.state === "judge" || S.state === "judgeAuto") { e.preventDefault(); nextRound(); }
   }
 });
 window.addEventListener("keyup", e => { if (e.code === "Space" || e.code === "Enter") pressUp(); });
 $("start").addEventListener("click", startGame);
+function setMode(m, quiet) {
+  S.hard = m === 1;
+  document.querySelectorAll(".modes button").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.m === m)));
+  const best = KIT.store.get(S.hard ? "hanko-best-hard9" : "hanko-best", 0);
+  $("best").textContent = best ? `${S.hard ? "決算期の" : ""}自己ベスト ${best} / ${S.hard ? 900 : 300}点` : "";
+  KIT.store.set("hanko-mode", m);
+  if (!quiet) click();
+}
+document.querySelectorAll(".modes button").forEach(b => b.addEventListener("click", () => setMode(+b.dataset.m)));
 $("nm").addEventListener("keydown", e => { if (e.key === "Enter" && !e.isComposing) startGame(); });
 $("again").addEventListener("click", () => { click(); startGame(); });
 $("xBtn").addEventListener("click", () => KIT.tweet(shareText(), GAME_URL));
 $("imgBtn").addEventListener("click", async () => {
   const r = await KIT.shareImage(shareCanvas(), "hanko.png", shareText());
+  if (r === "downloaded") toast("画像を保存しました");
+});
+/* 押した稟議書を見返す：紙全体が入るまで引いて見せる */
+function openReview() {
+  click();
+  S.camBack = { ...S.camTo };
+  const lw = window.innerWidth / fit, lh = window.innerHeight / fit, bar = 86 / fit;
+  const z = Math.min(lw / 780, (lh - bar) / 1010);
+  S.camTo = { x: S.paper.x, y: S.paper.y + bar / 2 / z, z };
+  $("result").hidden = true; $("viewbar").hidden = false;
+  $("viewPrev").hidden = $("viewNext").hidden = !S.hard;
+  showDoc(S.docs.length - 1);
+}
+function showDoc(i) {
+  S.viewDoc = (i + S.docs.length) % S.docs.length;
+  const d = S.docs[S.viewDoc]; S.subject = d.subject; S.stamps = d.stamps; S.slam = d.slam;
+}
+$("viewPrev").addEventListener("click", () => { click(); showDoc(S.viewDoc - 1); });
+$("viewNext").addEventListener("click", () => { click(); showDoc(S.viewDoc + 1); });
+function closeReview() {
+  click();
+  if (S.camBack) S.camTo = S.camBack;
+  $("viewbar").hidden = true; $("result").hidden = false;
+}
+function paperCanvas() {
+  const c = document.createElement("canvas"); c.width = 780; c.height = 1020;
+  const g = c.getContext("2d");
+  drawScene(g, { x: S.paper.x, y: S.paper.y, z: 1 }, 780, 1020, { noHanko: true });
+  // 保存画像の下に「ゲーム画面・実在の印鑑ではない」帯
+  g.fillStyle = "rgba(43,31,24,.82)"; g.fillRect(0, 980, 780, 40);
+  g.fillStyle = "#f6f1e6"; g.font = '700 17px "Zen Maru Gothic",sans-serif'; g.textAlign = "center"; g.textBaseline = "middle";
+  g.fillText("picoruno.「ハンコまっすぐ選手権」のゲーム画面です（実在の印鑑ではありません）", 390, 1000);
+  return c;
+}
+$("viewBtn").addEventListener("click", openReview);
+$("viewBack").addEventListener("click", closeReview);
+$("viewSave").addEventListener("click", async () => {
+  const r = await KIT.shareImage(paperCanvas(), "ringisho.png", shareText());
   if (r === "downloaded") toast("画像を保存しました");
 });
 function toast(m) { const t = $("toast"); t.textContent = m; t.hidden = false; clearTimeout(toast.k); toast.k = setTimeout(() => t.hidden = true, 1800); }
@@ -905,8 +1030,7 @@ document.addEventListener("visibilitychange", () => { if (document.hidden && S.s
   resize(); muteIcon();
   $("nm").value = KIT.store.get("hanko-name", "");
   const boss = KIT.store.get("hanko-boss", ["", ""]); $("nmK").value = boss[0] || ""; $("nmB").value = boss[1] || "";
-  const best = KIT.store.get("hanko-best", 0);
-  $("best").textContent = best ? `自己ベスト ${best} / 300点` : "3枚押して300点満点";
+  setMode(KIT.store.get("hanko-mode", 0) ? 1 : 0, true);
   const d = new Date(); S.date = `令和${d.getFullYear() - 2018}年${d.getMonth() + 1}月${d.getDate()}日`;
   S.cam = { x: 360, y: 560, z: 1.02 }; S.camTo = { ...S.cam };
   IMG = await KIT.loadImages(SRC);
