@@ -291,20 +291,27 @@ footer .walk{display:inline-block;font-size:1.4rem;animation:walk 6s linear infi
   .card::before{width:54px;height:18px;top:-10px}
 }
 /* カテゴリで探す */
-.finder{position:relative;z-index:3;margin:-8px 0 26px;padding:14px 16px 12px;background:#fff;border:var(--line);border-radius:22px;box-shadow:5px 5px 0 var(--ink)}
-.search{display:flex;align-items:center;gap:8px;padding:6px 8px 6px 14px;border:2.5px solid var(--ink);border-radius:999px;background:var(--cream)}
+/* ゲームカード（白・太枠・影）と見分けがつくよう、影なし・点線枠のうすい台にする */
+.finder{position:relative;z-index:3;margin:-8px 0 30px;padding:12px 14px 10px;background:rgba(255,226,122,.28);border:2px dashed rgba(74,52,40,.35);border-radius:18px}
+.search{display:flex;align-items:center;gap:8px;padding:6px 8px 6px 14px;border:2.5px solid var(--ink);border-radius:999px;background:#fff}
 .search:focus-within{background:#fff;box-shadow:0 0 0 4px var(--yellow)}
 .search input{flex:1;min-width:0;border:0;background:none;font:inherit;font-size:16px;font-weight:700;color:var(--ink);outline:none}
 .search input::placeholder{color:var(--sub);opacity:.75;font-weight:500}
 .search input::-webkit-search-cancel-button{display:none}
 .search .clear{flex:none;width:28px;height:28px;border-radius:50%;border:2px solid var(--ink);background:#fff;color:var(--ink);font:inherit;font-weight:800;line-height:1;cursor:pointer}
-.cats{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:12px 0 2px;padding:0}
-.cat{display:inline-flex;align-items:center;gap:4px;padding:3px 12px 3px 9px;border:2px solid var(--ink);border-radius:999px;background:var(--g,#fff);color:var(--ink);font:inherit;font-size:.82rem;font-weight:800;line-height:1.5;white-space:nowrap;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.catrow{display:flex;align-items:flex-start;gap:10px;margin-top:10px}
+.catlabel{flex:none;margin-top:3px;font-size:.72rem;font-weight:800;color:var(--sub);letter-spacing:.05em}
+.cats{display:flex;flex-wrap:wrap;gap:6px;flex:1;min-width:0}
+/* カードのジャンル（色つき）とちがって、白くて小さい「スイッチ」 */
+.cat{display:inline-flex;align-items:center;gap:3px;padding:2px 10px 2px 7px;border:1.5px solid var(--ink);border-radius:999px;background:#fff;color:var(--ink);font:inherit;font-size:.76rem;font-weight:700;line-height:1.5;white-space:nowrap;cursor:pointer;transition:transform .15s,background .15s}
 .cat i{font-style:normal}
-.cat b{font-size:.7rem;color:var(--sub);font-weight:800}
-.cat:hover{transform:translateY(-2px)}
-.cat[aria-pressed="true"]{background:var(--ink);color:#fff;box-shadow:2px 2px 0 var(--coral)}
+.cat b{font-size:.66rem;color:var(--sub);font-weight:800;margin-left:1px}
+.cat:hover{background:var(--g,#fff);transform:translateY(-1px)}
+.cat[aria-pressed="true"]{background:var(--ink);color:#fff}
 .cat[aria-pressed="true"] b{color:var(--yellow)}
+.cats:not(.open) .cat.more{display:none}
+.cat.toggle{border-style:dashed;background:none;color:var(--sub)}
+.cat.toggle:hover{background:#fff;color:var(--ink)}
 .found{margin-top:8px;font-size:.8rem;font-weight:800;color:var(--sub)}
 .found button{margin-left:8px;font:inherit;color:var(--ink);background:none;border:0;text-decoration:underline;cursor:pointer}
 .card[hidden]{display:none}
@@ -313,10 +320,10 @@ footer .walk{display:inline-block;font-size:1.4rem;animation:walk 6s linear infi
 .empty p{color:var(--sub);font-size:.85rem;font-weight:500}
 @media (max-width:640px){
   .finder{margin:-10px 0 22px;padding:12px 12px 10px;border-radius:18px}
-  /* スマホはカテゴリを横スクロールの1列に */
-  .cats{flex-wrap:nowrap;overflow-x:auto;margin:10px -12px 0;padding:2px 12px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-  .cats::-webkit-scrollbar{display:none}
-  .cat{font-size:.78rem;padding:4px 11px 4px 8px}
+  .catrow{margin-top:8px}
+  .catlabel{display:none}
+  .cats{gap:5px}
+  .cat{font-size:.72rem;padding:3px 9px 3px 6px}
 }
 </style>
 </head>
@@ -350,7 +357,7 @@ footer .walk{display:inline-block;font-size:1.4rem;animation:walk 6s linear infi
   <h2 id="games"><span class="badge">🎮</span>ゲームいちらん</h2>
   <div class="finder" role="search">
     <label class="search"><span aria-hidden="true">🔍</span><input id="q" type="search" placeholder="ゲームをさがす（例：パン）" aria-label="ゲームをキーワードでさがす" autocomplete="off" enterkeyhint="search"><button class="clear" id="qClear" type="button" aria-label="キーワードを消す" hidden>×</button></label>
-    <div class="cats" id="cats" aria-label="カテゴリでしぼりこむ"></div>
+    <div class="catrow"><span class="catlabel" aria-hidden="true">カテゴリ</span><div class="cats" id="cats" role="group" aria-label="カテゴリでしぼりこむ"></div></div>
     <p class="found" id="found" aria-live="polite"></p>
   </div>
   <div class="grid" id="grid"></div>
@@ -439,11 +446,22 @@ GAMES.forEach((g,i)=>{
 const FILTER = { genre:"", q:"" };
 const catsEl=document.getElementById("cats"), qEl=document.getElementById("q"), qClear=document.getElementById("qClear");
 const foundEl=document.getElementById("found"), emptyEl=document.getElementById("empty");
-/* 実際にゲームがあるカテゴリだけ、GENRES の順に並べる */
+/* 実際にゲームがあるカテゴリだけ、ゲームの多い順に並べる（同じ数なら GENRES の順） */
 const counts={}; GAMES.forEach(g=>(g.genres||[]).forEach(k=>counts[k]=(counts[k]||0)+1));
-const catKeys=Object.keys(GENRES).filter(k=>counts[k]);
+const catKeys=Object.keys(GENRES).filter(k=>counts[k]).sort((a,b)=>counts[b]-counts[a]);
+/* 多すぎると見づらいので、最初は上から CAT_SHOW こだけ見せて、残りは「もっと見る」で開く */
+const CAT_SHOW = matchMedia("(max-width:640px)").matches ? 4 : 6;
+const catMore = Math.max(0, catKeys.length-CAT_SHOW);
 catsEl.innerHTML=[`<button class="cat" type="button" data-genre="" style="--g:var(--yellow)"><i aria-hidden="true">✨</i>ぜんぶ<b>${GAMES.length}</b></button>`]
-  .concat(catKeys.map(k=>`<button class="cat" type="button" data-genre="${k}" style="--g:${GENRES[k].bg}"><i aria-hidden="true">${GENRES[k].icon}</i>${GENRES[k].label}<b>${counts[k]}</b></button>`)).join("");
+  .concat(catKeys.map((k,i)=>`<button class="cat${i>=CAT_SHOW?" more":""}" type="button" data-genre="${k}" style="--g:${GENRES[k].bg}"><i aria-hidden="true">${GENRES[k].icon}</i>${GENRES[k].label}<b>${counts[k]}</b></button>`))
+  .concat(catMore ? [`<button class="cat toggle" type="button" aria-expanded="false">＋ もっと見る<b>${catMore}</b></button>`] : []).join("");
+const catToggle=catsEl.querySelector(".toggle");
+function openCats(open){
+  catsEl.classList.toggle("open",open);
+  if(!catToggle) return;
+  catToggle.setAttribute("aria-expanded",open);
+  catToggle.innerHTML = open ? "－ とじる" : `＋ もっと見る<b>${catMore}</b>`;
+}
 
 function applyFilter(){
   const words=kana(FILTER.q).split(/\s+/).filter(Boolean);
@@ -455,9 +473,10 @@ function applyFilter(){
     if(show){ n++; if(on) cards[i].classList.add("in"); }
   });
   catsEl.querySelectorAll(".cat").forEach(b=>{
+    if(b===catToggle) return;
     const sel=b.dataset.genre===FILTER.genre; b.setAttribute("aria-pressed", sel);
-    /* スマホの横スクロールで、選んだカテゴリが見えるように */
-    if(sel && catsEl.scrollWidth>catsEl.clientWidth) catsEl.scrollLeft=b.offsetLeft-(catsEl.clientWidth-b.offsetWidth)/2;
+    /* とじた中のカテゴリを選んでいるときは、開いて見えるように */
+    if(sel && b.classList.contains("more")) openCats(true);
   });
   qClear.hidden=!FILTER.q;
   foundEl.innerHTML = on ? `${n}こ 見つかったよ<button type="button" id="reset">しぼりこみを解除</button>` : "";
@@ -470,6 +489,7 @@ function applyFilter(){
 }
 catsEl.addEventListener("click",e=>{
   const b=e.target.closest(".cat"); if(!b) return;
+  if(b===catToggle){ openCats(!catsEl.classList.contains("open")); return; }
   FILTER.genre = (b.dataset.genre===FILTER.genre) ? "" : b.dataset.genre;
   applyFilter();
 });
