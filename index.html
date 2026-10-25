@@ -312,6 +312,11 @@ footer .walk{display:inline-block;font-size:1.4rem;animation:walk 6s linear infi
 .cats:not(.open) .cat.more{display:none}
 .cat.toggle{border-style:dashed;background:none;color:var(--sub)}
 .cat.toggle:hover{background:#fff;color:var(--ink)}
+.sortrow{display:flex;align-items:center;gap:10px;margin-top:8px}
+.sorts{display:inline-flex;border:1.5px solid var(--ink);border-radius:999px;overflow:hidden;background:#fff}
+.sort{font:inherit;font-size:.74rem;font-weight:700;color:var(--ink);background:none;border:0;padding:2px 12px;line-height:1.5;cursor:pointer;white-space:nowrap}
+.sort+.sort{border-left:1.5px solid var(--ink)}
+.sort[aria-pressed="true"]{background:var(--ink);color:#fff}
 .found{margin-top:8px;font-size:.8rem;font-weight:800;color:var(--sub)}
 .found button{margin-left:8px;font:inherit;color:var(--ink);background:none;border:0;text-decoration:underline;cursor:pointer}
 .card[hidden]{display:none}
@@ -322,6 +327,7 @@ footer .walk{display:inline-block;font-size:1.4rem;animation:walk 6s linear infi
   .finder{margin:-10px 0 22px;padding:12px 12px 10px;border-radius:18px}
   .catrow{margin-top:8px}
   .catlabel{display:none}
+  .sortrow .catlabel{display:inline}
   .cats{gap:5px}
   .cat{font-size:.72rem;padding:3px 9px 3px 6px}
 }
@@ -358,6 +364,7 @@ footer .walk{display:inline-block;font-size:1.4rem;animation:walk 6s linear infi
   <div class="finder" role="search">
     <label class="search"><span aria-hidden="true">🔍</span><input id="q" type="search" placeholder="ゲームをさがす（例：パン）" aria-label="ゲームをキーワードでさがす" autocomplete="off" enterkeyhint="search"><button class="clear" id="qClear" type="button" aria-label="キーワードを消す" hidden>×</button></label>
     <div class="catrow"><span class="catlabel" aria-hidden="true">カテゴリ</span><div class="cats" id="cats" role="group" aria-label="カテゴリでしぼりこむ"></div></div>
+    <div class="sortrow"><span class="catlabel" id="sortLabel">ならびかえ</span><div class="sorts" id="sorts" role="group" aria-labelledby="sortLabel"><button class="sort" type="button" data-sort="">あたらしい順</button><button class="sort" type="button" data-sort="popular">▶ 遊ばれている順</button></div></div>
     <p class="found" id="found" aria-live="polite"></p>
   </div>
   <div class="grid" id="grid"></div>
@@ -443,7 +450,7 @@ const cards = [...grid.children];
 GAMES.forEach((g,i)=>{
   cards[i].dataset.text = kana([g.title,g.tag,g.desc,...(g.genres||[]).map(k=>GENRES[k]?.label)].join(" "));
 });
-const FILTER = { genre:"", q:"" };
+const FILTER = { genre:"", q:"", sort:"" };
 const catsEl=document.getElementById("cats"), qEl=document.getElementById("q"), qClear=document.getElementById("qClear");
 const foundEl=document.getElementById("found"), emptyEl=document.getElementById("empty");
 /* 実際にゲームがあるカテゴリだけ、ゲームの多い順に並べる（同じ数なら GENRES の順） */
@@ -485,6 +492,7 @@ function applyFilter(){
   const u=new URL(location.href);
   FILTER.genre ? u.searchParams.set("genre",FILTER.genre) : u.searchParams.delete("genre");
   FILTER.q ? u.searchParams.set("q",FILTER.q) : u.searchParams.delete("q");
+  FILTER.sort ? u.searchParams.set("sort",FILTER.sort) : u.searchParams.delete("sort");
   try{ history.replaceState(null,"",u); }catch(e){}
 }
 catsEl.addEventListener("click",e=>{
@@ -500,8 +508,24 @@ foundEl.addEventListener("click",e=>{
   if(e.target.id!=="reset") return;
   qEl.value=""; FILTER.q=""; FILTER.genre=""; applyFilter();
 });
+/* ===== ならびかえ（遊んだ回数は Supabase から読みこんだあとで反映） ===== */
+const PLAYS={};
+const sortsEl=document.getElementById("sorts");
+function applySort(){
+  const order = FILTER.sort==="popular"
+    ? cards.map((c,i)=>[c,i]).sort((a,b)=>(PLAYS[b[0].dataset.id]||0)-(PLAYS[a[0].dataset.id]||0) || a[1]-b[1]).map(x=>x[0])
+    : cards;
+  order.forEach(c=>grid.appendChild(c));
+  sortsEl.querySelectorAll(".sort").forEach(b=>b.setAttribute("aria-pressed", b.dataset.sort===FILTER.sort));
+}
+sortsEl.addEventListener("click",e=>{
+  const b=e.target.closest(".sort"); if(!b || b.dataset.sort===FILTER.sort) return;
+  FILTER.sort=b.dataset.sort; applySort(); applyFilter();
+});
 {
   const p=new URLSearchParams(location.search);
+  if(p.get("sort")==="popular") FILTER.sort="popular";
+  applySort();
   if(GENRES[p.get("genre")] && counts[p.get("genre")]) FILTER.genre=p.get("genre");
   if(p.get("q")){ FILTER.q=p.get("q").trim(); qEl.value=FILTER.q; }
   applyFilter();
@@ -575,6 +599,8 @@ function burst(btn){
 
 (async ()=>{
   const data = await STORE.load(), liked = likedSet();
+  Object.keys(data).forEach(k=>PLAYS[k]=data[k].plays||0);
+  if(FILTER.sort) applySort();
   document.querySelectorAll(".card[data-id]").forEach(card=>{
     const id=card.dataset.id, s=data[id]||{plays:0,likes:0};
     const pEl=card.querySelector(".n-play"), lEl=card.querySelector(".n-like"), btn=card.querySelector(".like");
