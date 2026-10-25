@@ -265,7 +265,7 @@ function play(buf,p,gain,rate,when=0){
   const g=AC.createGain();g.gain.value=gain;s.connect(g);g.connect(out(p*.6));s.start(AC.currentTime+.002+when);
 }
 function voice(f,t,amp,dur,parts,o){
-  const n=busy();if(n>70)return;if(n>36)parts=parts.slice(0,1);
+  const n=busy();if(n>48)return;if(n>24)parts=parts.slice(0,1);
   for(const [r,a,d] of parts){ACT.push(t+dur*d);
     const fr=f*r;if(fr>16000)continue;
     const os=AC.createOscillator();os.type='sine';os.frequency.value=fr*(1+(R()-.5)*.004);
@@ -322,8 +322,19 @@ const sfx={
     const o=AC.createOscillator();o.type='sine';o.frequency.setValueAtTime(f*2,t);o.frequency.exponentialRampToValueAtTime(f*4,t+.25);
     const g=AC.createGain();g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.035,t+.08);g.gain.exponentialRampToValueAtTime(.0001,t+.7);
     o.connect(g);g.connect(out(p));o.start(t);o.stop(t+.75);},
-  crit(p){if(!this.ok())return;play(pick(SAMP.heavy),p,.55,1.15);const t=AC.currentTime+.01;
-    voice(1174.66,t,.06,1.8,GLASS,out(p));voice(1760,t+.04,.04,1.5,GLASS,out(p));},
+  crit(p,f=880){if(!this.ok())return;duckMusic(.6,1.2);
+    // 会心：「カッ」という鋭い一撃 → 低い「ドン」 → その色の音で澄んだ和音が長く響き、きらきらと駆け上がる
+    const t=AC.currentTime+.005,o=out(p);
+    play(pick(SAMP.crack),p,.7,1.35);play(pick(SAMP.thin),p,.55,1.25);
+    const th=AC.createOscillator(),tg=AC.createGain();th.type='sine';
+    th.frequency.setValueAtTime(220,t);th.frequency.exponentialRampToValueAtTime(70,t+.12);
+    tg.gain.setValueAtTime(.0001,t);tg.gain.exponentialRampToValueAtTime(.32,t+.004);tg.gain.exponentialRampToValueAtTime(.0001,t+.3);
+    th.connect(tg);tg.connect(o);th.start(t);th.stop(t+.32);
+    const r=f>700?f:f*2;
+    for(const [m,a,d] of [[1,.11,2.6],[1.5,.07,2.2],[2,.06,2.0],[3,.025,1.4]]){
+      voice(r*m,t+.01,a,d,[[1,1,1],[2.76,.18,.4]],o);voice(r*m*1.004,t+.012,a*.5,d*.9,[[1,1,1]],o);}
+    [0,2,4,5,7,9].forEach((k,i)=>voice(arpF(5+k),t+.06+i*.045,.05,.7,[[1,1,1],[2.71,.25,.5]],out(p-.5+i*.2)));
+  },
   pierce(){if(!this.ok())return;const t=AC.currentTime+.01;for(let i=0;i<7;i++)voice(arpF(5+i),t+i*.045,.045,.9,[[1,1,1],[2.71,.3,.5]],out(-.6+i*.2));},
   bloom(){if(!this.ok())return;const t=AC.currentTime+.02;
     [293.66,369.99,440,659.25,880,987.77].forEach((f,i)=>voice(f,t+i*.07,.035,3.2,[[1,1,1],[2,.2,.6]],out(-.5+i*.2)));},
@@ -376,9 +387,9 @@ function setMusicVol(v){
   MUSIC.vol=v;try{localStorage.setItem('hibiki-music-vol',v);}catch(e){}
   if(MUSIC.node){const t=AC.currentTime;MUSIC.node.gain.cancelScheduledValues(t);MUSIC.node.gain.setValueAtTime(MUSIC.node.gain.value,t);MUSIC.node.gain.linearRampToValueAtTime(musicGain(),t+.25);}
 }
-function duckMusic(){ // 玉を落としたとき、曲がふっと遠のいて戻る
+function duckMusic(to=.35,back=3){ // 玉を落としたとき、曲がふっと遠のいて戻る
   if(!MUSIC.duck)return;const t=AC.currentTime,g=MUSIC.duck.gain;
-  g.cancelScheduledValues(t);g.setValueAtTime(g.value,t);g.linearRampToValueAtTime(.35,t+.35);g.linearRampToValueAtTime(1,t+3);
+  g.cancelScheduledValues(t);g.setValueAtTime(g.value,t);g.linearRampToValueAtTime(to,t+.06+(to<.5?.29:0));g.linearRampToValueAtTime(1,t+back);
 }
 function scheduleMusic(){
   if(!AC||AC.state!=='running')return;
@@ -703,7 +714,7 @@ const KAN=['一','二','三','四','五','六','七','八','九','十'];
 function mvName(i){const n=i+1,t=Math.floor(n/10),o=n%10;let k='';if(n<10)k=KAN[n-1];else if(n<100)k=(t>1?KAN[t-1]:'')+'十'+(o?KAN[o-1]:'');else k=String(n);return'第'+k+'楽章';}
 
 const BW=26,BH=14,GAP=3,OX=(W-(12*BW+11*GAP))/2,BOTTOM=236,RES_R=44;
-let blocks=[],shards=[],rings=[],floats=[],queue=[],dust=[],flashes=[],bolts=[],slowT=0,hitstop=0;
+let lastStop=-9,lastSlow=-9,blocks=[],shards=[],rings=[],floats=[],queue=[],dust=[],flashes=[],bolts=[],slowT=0,hitstop=0;
 let paddle={x:W/2,y:H-104,w:66,h:11,tx:W/2,root:0,glow:0,hue:170,charge:0};
 let ball={x:W/2,y:0,vx:0,vy:0,r:5,sp:300,trail:[],hue:205,pulse:0};
 let stageScore=0,state='title',stage=0,score=0,lives=3,best=0,maxChain=0,time=0,shake=0,banner=0,keys={};
@@ -723,7 +734,7 @@ function buildStage(i){
       if(deco&&((c+r)%2===0))dc=deco;}
     blocks.push({x:OX+c*(BW+GAP),y:oy+r*(BH+GAP),w:BW,h:BH,note,cf,deco:dc,oct:r<2?2:1,hp,max:hp,cracks:[],dead:false,queued:false,wob:0,flash:0,glow:0,seed:R()});
   });});
-  queue=[];shards=[];rings=[];floats=[];dust=[];flashes=[];bolts=[];
+  queue=[];shards=[];rings=[];floats=[];dust=[];flashes=[];bolts=[];layerFull=true;
   const lap=Math.floor(i/STAGES.length);
   ball.sp=Math.min(540,345*(1+(i%STAGES.length)*.05+lap*.15));
   resetBall();banner=2.2;
@@ -810,12 +821,13 @@ function shatter(b,ix,iy,depth,crit){
     else floats.push({x:cx,y:cy,text:'共鳴 ×'+chain,life:1,h:nt.h,chain});}}
   if(!calm)shake=Math.min(7,1.6+depth*1.1+kind*1.2);
   rings.push({x:cx,y:cy,r:4,max:crit?RES_R*1.7:RES_R,life:1,h:nt.h});
-  if(crit){score+=300;floats.push({x:cx,y:cy-12,text:'会心',life:1.2,h:50});sfx.crit(panOf(cx));if(!calm)shake=8;
+  if(crit){score+=300;floats.push({x:cx,y:cy-12,text:'会心',life:1.2,h:50});sfx.crit(panOf(cx),freqOf(b));if(!calm)shake=8;
     flashes.push({x:b.x+lx,y:b.y+ly,life:1,r:30});}
   // ④ 大連鎖だけの特別な間：5連鎖以上で一瞬の静止、8連鎖以上で0.2秒ほどのスロー。最後の1枚もすこしだけゆっくり
   if(!calm){
-    if(chain>=5)hitstop=Math.max(hitstop,.03);
-    if(chain>=8)slowT=Math.max(slowT,.22);
+    // 静止・スローは連鎖ごとに1回だけ（何枚も続けて割れるたびにかけ直すと、ずっと止まって重く感じるため）
+    if(chain===5&&time-lastStop>1.5){hitstop=.03;lastStop=time;}
+    if(chain===10&&time-lastSlow>2){slowT=.18;lastSlow=time;}
     if(blocks.every(o=>o.dead))slowT=Math.max(slowT,.45);
   }
   if(chain===5)sfx.bloom();
@@ -849,7 +861,7 @@ function spawnShards(b){
       rot:0,vr:(R()-.5)*(10/size+2),flip:0,vf:(R()-.5)*(16/size+3),
       h:k.h,sat:k.s,f:freqOf(b),thick:b.max,gloss:k.chain>=3?1.4:1,life:1,landed:false,caught:false,rest:0});
   }
-  const cap=quality<2?90:150;if(shards.length>cap)shards.splice(0,shards.length-cap);
+  const cap=quality<2?70:120;if(shards.length>cap)shards.splice(0,shards.length-cap);
   const nd=(quality<2?8:14)*(heavyLoad?.5:1);
   for(let i=0;i<nd;i++)dust.push({x:b.x+k.lx+(R()-.5)*14,y:b.y+k.ly+(R()-.5)*10,vx:(R()-.5)*150*spread,vy:(R()-.5)*120-40,life:.5+R()*.5,tw:R()*6});
   k.spawned=true;
@@ -871,6 +883,9 @@ function drawBreaking(b){
   ctx.restore();
 }
 
+// 光のにじみ（毎回グラデーションを作らず、1枚の絵を使いまわす）
+const GLOW=(()=>{const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d'),r=g.createRadialGradient(32,32,0,32,32,32);
+  r.addColorStop(0,'rgba(255,255,255,1)');r.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=r;g.fillRect(0,0,64,64);return c;})();
 function makeBolt(x1,y1,x2,y2,h,delay){
   const pts=[[x1,y1]],n=6,dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy)||1,nx=-dy/len,ny=dx/len;
   for(let i=1;i<n;i++){const t=i/n,j=(R()-.5)*len*.22;pts.push([x1+dx*t+nx*j,y1+dy*t+ny*j]);}
@@ -1155,14 +1170,41 @@ function paintClear(b){
   ctx.beginPath();ctx.moveTo(x+1,y+.6);ctx.lineTo(x+w*.6,y+.6);ctx.strokeStyle='rgba(255,255,255,.18)';ctx.stroke();
 }
 const PADX=3,PADT=5,PADB=11;
-function drawBlock(b){
+function ensureCache(b){
   const k=scale*dpr,key=b.cracks.length+'|'+k;
   if(!b.cache||b.cacheKey!==key){
     const c=b.cache||document.createElement('canvas');
     c.width=Math.ceil((b.w+PADX*2)*k);c.height=Math.ceil((b.h+PADT+PADB)*k);
     const g=c.getContext('2d');g.setTransform(k,0,0,k,0,0);g.clearRect(0,0,c.width,c.height);g.translate(PADX-b.x,PADT-b.y);
-    ctx=g;paintGlass(b);ctx=mainCtx;b.cache=c;b.cacheKey=key;
+    const prev=ctx;ctx=g;paintGlass(b);ctx=prev;b.cache=c;b.cacheKey=key;
   }
+}
+/* 止まっている板は1枚の層にまとめて描いておき、毎フレームはその層を1回貼るだけにする。
+   変わった板（割れた・ヒビが入った・揺れはじめた）のまわりだけ描きなおす */
+let layer=null,lctx=null,layerFull=true;
+const isStatic=b=>!b.dead&&!b.brk&&b.wob<=0&&!b.queued&&b.flash<=0&&b.glow<=0;
+function padRect(b){return[b.x-PADX-1,b.y-PADT-1,b.w+PADX*2+2,b.h+PADT+PADB+2];}
+function updateLayer(){
+  const k=scale*dpr;
+  if(!layer||layer.width!==cv.width||layer.height!==cv.height){layer=document.createElement('canvas');layer.width=cv.width;layer.height=cv.height;lctx=layer.getContext('2d');layerFull=true;}
+  const dirty=[];
+  for(const b of blocks){const st=isStatic(b)?(ensureCache(b),b.cacheKey):null;if(st!==b._lst){b._lst=st;dirty.push(padRect(b));}}
+  if(!layerFull&&!dirty.length)return;
+  lctx.setTransform(k,0,0,k,0,0);
+  if(layerFull||dirty.length>24){
+    lctx.clearRect(0,0,W,H);
+    for(const b of blocks)if(b._lst)lctx.drawImage(b.cache,b.x-PADX,b.y-PADT,b.w+PADX*2,b.h+PADT+PADB);
+    layerFull=false;return;
+  }
+  for(const [rx,ry,rw,rh] of dirty){
+    lctx.save();lctx.beginPath();lctx.rect(rx,ry,rw,rh);lctx.clip();lctx.clearRect(rx,ry,rw,rh);
+    for(const b of blocks){if(!b._lst)continue;const [bx,by,bw,bh]=padRect(b);
+      if(bx<rx+rw&&bx+bw>rx&&by<ry+rh&&by+bh>ry)lctx.drawImage(b.cache,b.x-PADX,b.y-PADT,b.w+PADX*2,b.h+PADT+PADB);}
+    lctx.restore();
+  }
+}
+function drawBlock(b){
+  ensureCache(b);
   let x=b.x;
   if(b.wob>0)x+=Math.sin(time*70)*b.wob*1.2;
   if(b.queued)x+=Math.sin(time*95)*.8;
@@ -1186,7 +1228,7 @@ function drawShard(s){
   const sy=Math.abs(cf)<.08?.08*Math.sign(cf||1):cf;
   const path=()=>{ctx.beginPath();ctx.moveTo(s.pts[0][0],s.pts[0][1]);for(let i=1;i<s.pts.length;i++)ctx.lineTo(s.pts[i][0],s.pts[i][1]);ctx.closePath();};
   // 断面：傾いたとき、板の厚みぶん奥にずれた面が見える
-  if(s.size>4.5){const d=sf*s.thick*.9;
+  if(s.size>6&&shards.length<70){const d=sf*s.thick*.9;
     ctx.save();ctx.translate(0,d);ctx.scale(1,sy);path();
     ctx.fillStyle=`hsla(${(s.h+160)/2},45%,${30+s.thick*6}%,${.55*a})`;ctx.fill();ctx.restore();}
   ctx.scale(1,sy);path();
@@ -1194,7 +1236,7 @@ function drawShard(s){
   ctx.fillStyle=`hsla(${s.h},${s.sat}%,${lit}%,${(.3+s.thick*.08)*a})`;ctx.fill();
   if(spec>.02){ctx.fillStyle=`rgba(255,255,255,${Math.min(1,spec)*.9*a})`;ctx.fill();}
   if(s.caught){ctx.fillStyle=`hsla(${s.h},90%,82%,${.75*Math.min(1,s.absorb*1.5)})`;ctx.fill();}
-  ctx.lineWidth=.6+s.thick*.2;ctx.strokeStyle=`hsla(${(s.h+160)/2},40%,80%,${.55*a})`;ctx.stroke();
+  if(shards.length<70){ctx.lineWidth=.6+s.thick*.2;ctx.strokeStyle=`hsla(${(s.h+160)/2},40%,80%,${.55*a})`;ctx.stroke();}
   ctx.lineWidth=.45;ctx.strokeStyle=`rgba(255,255,255,${(.45+spec*.5)*a})`;ctx.stroke();
   ctx.restore();
 }
@@ -1203,7 +1245,8 @@ function draw(){
   ctx.drawImage(bg,0,0,W,H);
   ctx.save();
   if(shake>0)ctx.translate((R()-.5)*shake,(R()-.5)*shake);
-  for(const b of blocks){if(!b.dead)drawBlock(b);else if(b.brk&&!b.brk.spawned)drawBreaking(b);}
+  updateLayer();ctx.drawImage(layer,0,0,W,H);
+  for(const b of blocks){if(!b.dead){if(!b._lst)drawBlock(b);}else if(b.brk&&!b.brk.spawned)drawBreaking(b);}
 
   for(const s of shards)drawShard(s);
 
@@ -1217,7 +1260,7 @@ function draw(){
   }
   for(const r of rings){ctx.beginPath();ctx.arc(r.x,r.y,r.r,0,6.283);ctx.strokeStyle=`hsla(${r.h},90%,75%,${r.life*.35})`;ctx.lineWidth=1+r.life*1.6;ctx.stroke();}
   for(const d of dust){const tw=.5+.5*Math.sin(time*30+d.tw);ctx.fillStyle=`rgba(255,255,255,${Math.min(1,d.life)*tw})`;ctx.fillRect(d.x,d.y,1.1,1.1);}
-  for(const f of flashes){const g=ctx.createRadialGradient(f.x,f.y,0,f.x,f.y,f.r);g.addColorStop(0,`rgba(255,255,255,${f.life*(calm?.35:.9)})`);g.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=g;ctx.fillRect(f.x-f.r,f.y-f.r,f.r*2,f.r*2);
+  for(const f of flashes){ctx.globalAlpha=Math.max(0,f.life)*(calm?.35:.9);ctx.drawImage(GLOW,f.x-f.r,f.y-f.r,f.r*2,f.r*2);ctx.globalAlpha=1;
     ctx.strokeStyle=`rgba(255,255,255,${f.life*.6})`;ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(f.x-f.r*1.4,f.y);ctx.lineTo(f.x+f.r*1.4,f.y);ctx.moveTo(f.x,f.y-f.r*.9);ctx.lineTo(f.x,f.y+f.r*.9);ctx.stroke();}
   ctx.restore();
 
@@ -1288,7 +1331,7 @@ function resize(){
   dpr=Math.min(quality<2?1.25:2,window.devicePixelRatio||1);
   cv.style.width=Math.floor(W*scale)+'px';cv.style.height=Math.floor(H*scale)+'px';
   cv.width=Math.round(W*scale*dpr);cv.height=Math.round(H*scale*dpr);
-  makeBg();
+  makeBg();layerFull=true;for(const b of blocks)b._lst=undefined;
 }
 addEventListener('resize',resize);
 
