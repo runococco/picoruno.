@@ -258,6 +258,8 @@ footer .walk{display:inline-block;font-size:1.4rem;animation:walk 6s linear infi
 .card .stat,.card .like{background:#fff;color:var(--ink);border:2px solid var(--ink)}
 .card .like.on{background:var(--pink)}
 .card .like.on .hrt{color:#e0335f}
+/* 知名度が上がるまで、遊んだ回数・いいねの数は隠しておく（数えるのは裏で続けます）。戻すときはこの1行を消す */
+.stat,.like .n-like{display:none}
 
 /* ジャンルアイコン */
 .genres{position:relative;display:flex;flex-wrap:wrap;gap:4px;list-style:none;margin:4px 4px 2px;padding:0}
