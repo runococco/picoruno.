@@ -86,37 +86,37 @@ button{font-family:inherit;color:inherit}
 .foot a{color:var(--sub)}
 
 /* ---- プレイ ---- */
-#play{gap:8px}
+#play{gap:8px;margin-inline:-8px;--box:clamp(256px,min(calc(100vw - 16px),calc(100svh - 270px)),520px)}
 .hud{display:flex;align-items:center;gap:8px;width:var(--box);max-width:100%}
-.stage{font-family:var(--pop);font-size:.85rem;background:var(--ink);color:var(--card);border-radius:999px;padding:4px 12px;white-space:nowrap}
-.score{font-family:var(--pop);font-size:1.35rem;margin-left:auto;font-variant-numeric:tabular-nums}
-.timebar{position:relative;width:var(--box);max-width:100%;height:16px;border:2.5px solid var(--ink);border-radius:999px;background:var(--card);overflow:hidden;box-sizing:border-box}
+.stage{font-family:var(--pop);font-size:1rem;background:var(--ink);color:var(--card);border-radius:999px;padding:4px 12px;white-space:nowrap}
+.score{font-family:var(--pop);font-size:1.7rem;margin-left:auto;font-variant-numeric:tabular-nums}
+.timebar{position:relative;width:var(--box);max-width:100%;height:20px;border:2.5px solid var(--ink);border-radius:999px;background:var(--card);overflow:hidden;box-sizing:border-box}
 .timebar i{position:absolute;inset:0;transform-origin:left;background:var(--leaf);border-radius:999px}
 .timebar.warn i{background:var(--accent);animation:blink .5s steps(2) infinite}
 .timebar.frozen i{background:var(--fever)}
-.timebar b{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:.7rem;font-family:var(--pop);font-weight:400;font-variant-numeric:tabular-nums}
+.timebar b{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:.8rem;font-family:var(--pop);font-weight:400;font-variant-numeric:tabular-nums}
 @keyframes blink{50%{opacity:.55}}
 .order{display:flex;align-items:center;gap:8px;width:var(--box);max-width:100%;background:var(--card);border:2px dashed #d6c9b6;border-radius:14px;padding:4px 8px;box-sizing:border-box}
 .order>span{font-family:var(--pop);font-size:.72rem;color:var(--sub);writing-mode:vertical-rl;letter-spacing:.1em}
 .quota{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:4px;flex:1;min-width:0}
 .q{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-width:0;border-radius:10px;padding:3px 2px;transition:background .2s}
-.q svg{width:min(36px,8.5vw);aspect-ratio:1;display:block;flex:none}
-.q b{font-family:var(--pop);font-weight:400;font-size:.85rem;line-height:1.1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.q svg{width:min(46px,10.5vw);aspect-ratio:1;display:block;flex:none}
+.q b{font-family:var(--pop);font-weight:400;font-size:1rem;line-height:1.1;font-variant-numeric:tabular-nums;white-space:nowrap}
 .q b small{font-size:.65em;color:var(--sub)}
 .q.done{background:#e6f1dc}
 .q.done b{color:#5f8c50}
 .q.bump{animation:bump .25s}
 @keyframes bump{50%{transform:scale(1.12)}}
 .meters{display:flex;align-items:center;gap:8px;width:var(--box);max-width:100%;min-height:26px}
-.combo{font-family:var(--pop);font-size:1rem;min-width:7.5em;white-space:nowrap;font-variant-numeric:tabular-nums;opacity:.25;transition:opacity .15s}
+.combo{font-family:var(--pop);font-size:1.2rem;min-width:7.5em;white-space:nowrap;font-variant-numeric:tabular-nums;opacity:.25;transition:opacity .15s}
 .combo.on{opacity:1}
 .combo small{font-size:.65em;margin-left:2px}
-.fever{position:relative;flex:1;height:12px;border:2px solid var(--ink);border-radius:999px;background:var(--card);overflow:hidden}
+.fever{position:relative;flex:1;height:16px;border:2px solid var(--ink);border-radius:999px;background:var(--card);overflow:hidden}
 .fever i{position:absolute;inset:0;transform-origin:left;transform:scaleX(0);background:linear-gradient(90deg,#f6d48a,var(--fever),#ec9b86)}
 .fever.on i{animation:shine .6s linear infinite}
 @keyframes shine{50%{filter:brightness(1.15)}}
-.fevlabel{font-family:var(--pop);font-size:.7rem;color:var(--sub)}
-.board{position:relative;width:var(--box);height:var(--box);max-width:100%;border:3px solid var(--ink);border-radius:18px;box-shadow:4px 4px 0 var(--ink);background:var(--card);overflow:hidden;box-sizing:content-box}
+.fevlabel{font-family:var(--pop);font-size:.8rem;color:var(--sub)}
+.board{position:relative;width:var(--box);height:var(--box);max-width:100%;border:3px solid var(--ink);border-radius:18px;box-shadow:4px 4px 0 var(--ink);background:var(--card);overflow:hidden;box-sizing:border-box}
 .board.fev{box-shadow:4px 4px 0 var(--ink),0 0 0 4px var(--fever)}
 .board.shake{animation:shake .25s}
 @keyframes shake{25%{transform:translate(-3px,2px)}50%{transform:translate(3px,-2px)}75%{transform:translate(-2px,-1px)}}
@@ -711,7 +711,7 @@ function drawFlies(dt){
     fxc.globalAlpha=Math.max(0,Math.min(1,(f.life-f.t)/(f.life*.35)));
     if(f.drop){fxc.fillStyle=f.col;fxc.beginPath();fxc.arc(f.x,f.y,f.r,0,7);fxc.fill();continue}
     f.rot+=f.vr*dt; f.s=1+.25*Math.min(1,f.t*4);
-    const sp=f.typ<0?eggSprite:sprites[f.typ], w=cell*.9*f.s;
+    const sp=f.typ<0?eggSprite:sprites[f.typ], w=cell*1.04*f.s;
     fxc.save();fxc.translate(f.x,f.y);fxc.rotate(f.rot);
     if(sp&&sp.width) fxc.drawImage(sp,-w/2,-w/2,w,w);
     fxc.restore();
@@ -740,7 +740,7 @@ const eggImg=toImg(svgOf(-1,'width="200" height="200"')), badgeImg=toImg(BOMB_BA
 function bake(im,px){const c=document.createElement('canvas');c.width=c.height=px;
   try{if(im.complete&&im.naturalWidth)c.getContext('2d').drawImage(im,0,0,px,px)}catch(e){} return c}
 function bakeSprites(){
-  const px=Math.max(8,Math.round(cell*.9*dpr));
+  const px=Math.max(8,Math.round(cell*1.04*dpr));
   sprites=svgImgs.map(im=>bake(im,px)); eggSprite=bake(eggImg,px); badgeSprite=bake(badgeImg,Math.round(cell*dpr));
 }
 [...svgImgs,eggImg,badgeImg].forEach(im=>im.addEventListener('load',bakeSprites));
@@ -770,8 +770,8 @@ function draw(){
     let oy=0;
     if(hintOn&&G.hint.some(([r,c])=>r===t.r&&c===t.c)){s+=wob*.06;oy=wob*cell*.04}
     const sq=t.sq>0?t.sq:0;
-    const w=cell*.9*s*(1+sq*.12), h=cell*.9*s*(1-sq*.12);
-    const cx=(t.x+.5)*cell, cy=(t.y+.5)*cell+oy+(cell*.9*s-h)/2;
+    const w=cell*1.04*s*(1+sq*.12), h=cell*1.04*s*(1-sq*.12);
+    const cx=(t.x+.5)*cell, cy=(t.y+.5)*cell+oy+(cell*1.04*s-h)/2;
     ctx.globalAlpha=a;
     if(t.sp===2&&t.pop<0){ // ほしクッキー：まわる光と、ふわっと大きくなる動きで目立たせる
       ctx.save();ctx.translate(cx,cy);ctx.rotate(G.clock*1.2);
