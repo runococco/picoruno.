@@ -305,9 +305,9 @@ const SWEETS=[
 ];
 const NT=SWEETS.length;
 // ほしクッキー：入れかえた相手と同じおやつを全部消す
-const EGG_SVG=`<path d="M50.0 15.0 L61.2 39.6 L88.0 42.6 L68.1 60.9 L73.5 87.4 L50.0 74.0 L26.5 87.4 L31.9 60.9 L12.0 42.6 L38.8 39.6 Z" fill="#f3c24f" stroke="#f3c24f" stroke-width="9" stroke-linejoin="round"/>
-  <circle cx="50" cy="55" r="15" fill="#f7d77e"/>
-  ${face(52,8,'#ef9f7f')}`;
+const EGG_SVG=`<path d="M50.0 15.0 L61.2 39.6 L88.0 42.6 L68.1 60.9 L73.5 87.4 L50.0 74.0 L26.5 87.4 L31.9 60.9 L12.0 42.6 L38.8 39.6 Z" fill="#dda35c" stroke="#dda35c" stroke-width="9" stroke-linejoin="round"/>
+  <g fill="#c4874a"><circle cx="34" cy="49" r="2.2"/><circle cx="66" cy="49" r="2.2"/><circle cx="40" cy="74" r="2"/><circle cx="60" cy="74" r="2"/><circle cx="50" cy="30" r="2"/></g>
+  ${face(53,8,'#ef9a86')}`;
 // ふち線：形の外側をふくらませて、こげ茶でぐるっと囲む
 const OUTLINE=`<filter id="ol" x="-15%" y="-15%" width="130%" height="130%"><feMorphology in="SourceAlpha" operator="dilate" radius="5" result="d"/><feFlood flood-color="${INK}"/><feComposite in2="d" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
 const svgOf=(i,extra='')=>`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-7 -7 114 114" ${extra}><defs>${OUTLINE}</defs><g filter="url(#ol)">${i<0?EGG_SVG:SWEETS[i].svg}</g></svg>`;
@@ -766,12 +766,22 @@ function draw(){
     let s=t.s, a=1;
     if(t.pop>=0){const p=Math.min(1,t.pop/.2);s=1+.35*p;a=1-p}
     if(t.grow>0) s+=t.grow*.3;
+    if(t.sp===2&&t.pop<0) s+=.07+.05*Math.sin(G.clock*5);
     let oy=0;
     if(hintOn&&G.hint.some(([r,c])=>r===t.r&&c===t.c)){s+=wob*.06;oy=wob*cell*.04}
     const sq=t.sq>0?t.sq:0;
     const w=cell*.9*s*(1+sq*.12), h=cell*.9*s*(1-sq*.12);
     const cx=(t.x+.5)*cell, cy=(t.y+.5)*cell+oy+(cell*.9*s-h)/2;
     ctx.globalAlpha=a;
+    if(t.sp===2&&t.pop<0){ // ほしクッキー：まわる光と、ふわっと大きくなる動きで目立たせる
+      ctx.save();ctx.translate(cx,cy);ctx.rotate(G.clock*1.2);
+      const gl=ctx.createRadialGradient(0,0,cell*.1,0,0,cell*.66);
+      gl.addColorStop(0,'rgba(245,184,72,1)');gl.addColorStop(.55,'rgba(248,204,110,.75)');gl.addColorStop(1,'rgba(250,214,130,0)');
+      ctx.fillStyle=gl;
+      for(let i=0;i<8;i++){ctx.rotate(Math.PI/4);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(-cell*.16,-cell*.66);ctx.lineTo(cell*.16,-cell*.66);ctx.closePath();ctx.fill()}
+      ctx.beginPath();ctx.arc(0,0,cell*.42,0,7);ctx.fill();
+      ctx.restore();
+    }
     if(t.gold&&t.pop<0){ // キラキラおやつ
       const gr=ctx.createRadialGradient(cx,cy,cell*.1,cx,cy,cell*.55);
       gr.addColorStop(0,'rgba(255,236,160,.95)');gr.addColorStop(1,'rgba(255,236,160,0)');
@@ -867,7 +877,7 @@ function step(dt){
   if(G.banner>0) G.banner-=dt;
   // コンボは消しつづけている間はつながる
   if(!G.busy&&G.comboT>0){G.comboT-=dt;if(G.comboT<=0){G.comboT=0;G.combo=0}}
-  if(!G.busy){G.idle+=dt;if(G.idle>5&&!G.hint)G.hint=findMove()}
+  if(!G.busy){G.idle+=dt;if(G.idle>3&&!G.hint)G.hint=findMove()}
   if(G.time<=0&&!G.busy) endGame();
   renderHud();
 }
