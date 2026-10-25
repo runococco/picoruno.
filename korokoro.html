@@ -98,10 +98,10 @@ button{font-family:inherit;color:inherit}
 @keyframes blink{50%{opacity:.55}}
 .order{display:flex;align-items:center;gap:8px;width:var(--box);max-width:100%;background:var(--card);border:2px dashed #d6c9b6;border-radius:14px;padding:4px 8px;box-sizing:border-box}
 .order>span{font-family:var(--pop);font-size:.72rem;color:var(--sub);writing-mode:vertical-rl;letter-spacing:.1em}
-.quota{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px;flex:1;min-width:0}
-.q{position:relative;display:flex;align-items:center;justify-content:center;gap:2px;border-radius:10px;padding:2px;transition:background .2s}
-.q svg{width:min(40px,9vw);aspect-ratio:1;display:block;flex:none}
-.q b{font-family:var(--pop);font-weight:400;font-size:.95rem;line-height:1;font-variant-numeric:tabular-nums}
+.quota{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:4px;flex:1;min-width:0}
+.q{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-width:0;border-radius:10px;padding:3px 2px;transition:background .2s}
+.q svg{width:min(36px,8.5vw);aspect-ratio:1;display:block;flex:none}
+.q b{font-family:var(--pop);font-weight:400;font-size:.85rem;line-height:1.1;font-variant-numeric:tabular-nums;white-space:nowrap}
 .q b small{font-size:.65em;color:var(--sub)}
 .q.done{background:#e6f1dc}
 .q.done b{color:#5f8c50}
@@ -309,8 +309,8 @@ const EGG_SVG=`<path d="M50.0 15.0 L61.2 39.6 L88.0 42.6 L68.1 60.9 L73.5 87.4 L
   <circle cx="50" cy="55" r="15" fill="#f7d77e"/>
   ${face(52,8,'#ef9f7f')}`;
 // ふち線：形の外側をふくらませて、こげ茶でぐるっと囲む
-const OUTLINE=`<filter id="ol" x="-10%" y="-10%" width="120%" height="120%"><feMorphology in="SourceAlpha" operator="dilate" radius="3" result="d"/><feFlood flood-color="${INK}"/><feComposite in2="d" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
-const svgOf=(i,extra='')=>`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 108 108" ${extra}><defs>${OUTLINE}</defs><g filter="url(#ol)">${i<0?EGG_SVG:SWEETS[i].svg}</g></svg>`;
+const OUTLINE=`<filter id="ol" x="-15%" y="-15%" width="130%" height="130%"><feMorphology in="SourceAlpha" operator="dilate" radius="5" result="d"/><feFlood flood-color="${INK}"/><feComposite in2="d" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+const svgOf=(i,extra='')=>`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-7 -7 114 114" ${extra}><defs>${OUTLINE}</defs><g filter="url(#ol)">${i<0?EGG_SVG:SWEETS[i].svg}</g></svg>`;
 const BOMB_RING=`<circle cx="50" cy="50" r="44" fill="none" stroke="#e3c26b" stroke-width="7" stroke-dasharray="12 8"/>`;
 const BOMB_STAR=`<path d="M82 14 q4 -9 11 -8" stroke="#9a7a5f" stroke-width="3.5" stroke-linecap="round" fill="none"/><circle cx="78" cy="22" r="10" fill="${INK}"/><circle cx="94" cy="6" r="5" fill="#f2a65a"/>`;
 const BOMB_BADGE=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${BOMB_RING}</svg>`;
