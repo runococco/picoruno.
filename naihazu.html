@@ -211,6 +211,14 @@ button,input{font-family:inherit;color:inherit}
   </form>
 </div>
 
+<div class="modal" id="ask" hidden role="alertdialog" aria-modal="true" aria-labelledby="askTtl">
+  <div class="box">
+    <h4 id="askTtl"></h4>
+    <p>もとには戻せません。</p>
+    <div class="row"><button class="btn" type="button" id="askNo">やめる</button><button class="btn solid" type="button" id="askYes">消す</button></div>
+  </div>
+</div>
+
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -701,7 +709,7 @@ function openFile(k){
 }
 function closeSheet(){ $('sheet').hidden=true; tapeStop=true; renderDesk(); }
 $('closeSheet').onclick=closeSheet;
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(!$('pw').hidden) $('pw').hidden=true; else if(!$('sheet').hidden) closeSheet(); } });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(!$('ask').hidden) $('ask').hidden=true; else if(!$('pw').hidden) $('pw').hidden=true; else if(!$('sheet').hidden) closeSheet(); } });
 
 function hintBlock(id,list){
   const n=S.hints[id]||0;
@@ -796,7 +804,13 @@ function toast(t){ const el=$('toast'); el.textContent=t; el.hidden=false; clear
 /* ===== 名前を消す → エンディング ===== */
 function delRow(i){
   const r=roster().rows[i]; if(!r) return;
-  if(!confirm(`「${r.nm}」を名簿から消しますか？\nもとには戻せません。`)) return;
+  /* 確認はページ内のダイアログで（confirm() は埋めこみ表示などで止められて、押しても何も起きないことがある） */
+  $('askTtl').textContent=`「${r.nm}」を名簿から消しますか？`;
+  $('ask').hidden=false; blip(200,.1,.03); setTimeout(()=>$('askNo').focus(),50);
+  $('askNo').onclick=()=>{ $('ask').hidden=true; };
+  $('askYes').onclick=()=>{ $('ask').hidden=true; eraseRow(r); };
+}
+function eraseRow(r){
   let end;
   if(r.key==='oono') end='A';
   else if(r.key==='me') end='B';
