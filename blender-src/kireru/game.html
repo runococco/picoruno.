@@ -83,7 +83,7 @@ button{font-family:inherit;color:inherit}
   <h1><small>こちら側の</small>どこからでも切れます</h1>
   <p>その言葉、本当かどうか。しょうゆ・からし・ケチャップ・ごまドレ・液体スープの5袋を、こぼさず、まっすぐ開けよう。</p>
   <div class="how">
-    <b>トントン</b><span>袋をタップして、中身を下に落とす</span>
+    <b>トントン</b><span>袋をタップして、中身を下に落とす。足りないと、切った瞬間に飛び散る</span>
     <b>切る</b><span>袋の左はしの ▶ から右へ、指でなぞる</span>
     <b>満点</b><span>▶◀ の高さを、一定の速さでまっすぐ。ゆっくりすぎると伸び、速すぎると曲がる</span>
   </div>
@@ -177,8 +177,9 @@ function render() {
   for (const s of S.splats) {
     cx.globalAlpha = clamp(s.life, 0, 1) * 0.9; cx.fillStyle = s.c;
     const sy = s.y + (1 - s.life) * (s.sl || 40);
-    if (s.sl > 100) { cx.beginPath(); cx.moveTo(s.x - s.r * 0.4, s.y); cx.lineTo(s.x + s.r * 0.4, s.y); cx.lineTo(s.x + s.r * 0.7, sy); cx.lineTo(s.x - s.r * 0.7, sy); cx.closePath(); cx.fill(); }   // ねばいのは、たれたすじが残る
-    cx.beginPath(); cx.ellipse(s.x, sy, s.r, s.r * 1.15, 0, 0, 6.283); cx.fill();
+    // ねばいのは、たてに長いしずくでゆっくりたれる
+    cx.globalAlpha = clamp(s.life, 0, 1) * 0.9;
+    cx.beginPath(); cx.ellipse(s.x, sy, s.r, s.r * (s.sl > 100 ? 1.45 : 1.15), 0, 0, 6.283); cx.fill();
     cx.globalAlpha *= 0.5; cx.fillStyle = "rgba(255,255,255,.7)"; cx.beginPath(); cx.arc(s.x - s.r * 0.35, sy - s.r * 0.3, s.r * 0.2, 0, 6.283); cx.fill();
   }
   cx.globalAlpha = 1;
@@ -199,6 +200,7 @@ function drawLiquid(g) {
   const p = P(), I = PK.in;
   if (S.drain >= 1) return;
   g.save(); liquidPath(g); g.clip();
+  if (S.state === "pour" && S.tilt) { drawTiltedLiquid(g, p, I); g.restore(); return; }
   const lv = lerp(S.level, I.y1 + 4, S.drain || 0), v = p.visc;
   // 表面：さらさらは細かい波、ぼってりは山のまま残るでこぼこ＋壁にはりつく
   const surf = x => {
@@ -253,6 +255,41 @@ function drawLiquid(g) {
     g.fillStyle = rgba(p.hi, 0.5 * d.a); g.beginPath(); g.arc(d.x - d.r * 0.3, d.y - d.r * 0.4, d.r * 0.28, 0, 6.283); g.fill();
   }
   g.restore(); g.globalAlpha = 1;
+}
+// 傾けたとき：水面は画面に対して水平。中身は低い側（切り口側）に寄って、そこから出ていく
+function drawTiltedLiquid(g, p, I) {
+  const a = S.tilt, v = p.visc, c = Math.cos(a), sn = Math.sin(a);
+  const wy = (x, y) => PCY + (x - PCX) * sn + (y - PCY) * c;
+  const ys = [[I.x0, I.y0], [I.x1, I.y0], [I.x0, I.y1], [I.x1, I.y1]].map(q => wy(q[0], q[1]));
+  const ymin = Math.min(...ys), ymax = Math.max(...ys);
+  const fl = S.fill0 * (1 - (S.drain || 0));
+  if (fl <= 0.002) return;
+  const Lw = ymax - fl * (ymax - ymin);
+  g.save(); g.translate(PCX, PCY); g.rotate(-a); g.translate(-PCX, -PCY);   // ここから画面の向き
+  const top = Lw;
+  g.beginPath(); g.moveTo(PCX - 900, PCY + 900);
+  for (let x = PCX - 900; x <= PCX + 900; x += 12) g.lineTo(x, top + Math.sin(x * 0.05 + S.t * lerp(9, 2, v)) * lerp(2.5, 0.6, v));
+  g.lineTo(PCX + 900, PCY + 900); g.closePath();
+  const gr = g.createLinearGradient(0, top, 0, top + 200);
+  gr.addColorStop(0, rgba(p.hi, p.col[3])); gr.addColorStop(0.25, rgba(p.col)); gr.addColorStop(1, rgba(p.col.map((x, i) => i < 3 ? x * 0.7 : x)));
+  g.fillStyle = gr; g.fill();
+  g.restore();
+  // ぼってりは、出ていったあとの壁にべったり残る
+  if (v > 0.3) {
+    g.fillStyle = rgba(p.col, 0.28 * v);
+    for (const d of S.smear) { g.beginPath(); g.ellipse(d.x, d.y, d.r, d.r * 0.7, d.a, 0, 6.283); g.fill(); }
+  }
+}
+// 切り口のうち、いまいちばん低い点（画面の下）＝注ぎ口
+function lowestMouth() {
+  const tr = S.tear, a = S.tilt, c = Math.cos(a), sn = Math.sin(a);
+  let best = null, by = -1e9;
+  for (const q of tr.pts) {
+    if (q.x < PK.in.x0 + 6 || q.x > PK.in.x1 - 6) continue;
+    const dx = q.x - PCX, dy = q.y - PCY, X = PCX + dx * c - dy * sn, Y = PCY + dx * sn + dy * c;
+    if (Y > by) { by = Y; best = { x: X, y: Y }; }
+  }
+  return best || { x: PCX, y: PCY };
 }
 function packetSprite(g) {
   const im = IMG[P().id];
@@ -424,9 +461,7 @@ function update(dt) {
       if (vs < 0.3) KIT.noise({ dur: 0.08, vol: 0.05, f: 900 + Math.random() * 600, q: 3, wet: 0.2 });
       else KIT.noise({ dur: 0.18, vol: 0.07, f: 260 + Math.random() * 120, q: 5, wet: 0.1 });   // むにゅ…
     }
-    // 注ぎ口：切り口の右はしを、傾きに合わせて回す
-    const tr = S.tear, e = tr.pts[tr.pts.length - 1], a = S.tilt, dx = e.x - PCX, dy = e.y - PCY;
-    S.mouth = { x: PCX + dx * Math.cos(a) - dy * Math.sin(a), y: PCY + dx * Math.sin(a) + dy * Math.cos(a) };
+    S.mouth = lowestMouth();
     if (S.pourT > S.pourEnd + 0.6 && !S.judged) { S.judged = true; showJudge(); }
   }
 }
@@ -522,9 +557,35 @@ function finishTear() {
   KIT.noise({ dur: 0.1, vol: 0.25, f: 4000, to: 2000, q: 2 });
   S.top = { dx: 0, dy: -6, rot: -0.05, alpha: 1, vx: 240, vy: -520, vr: 4 };
   S.state = "pour"; S.pourT = 0; S.judged = false;
-  S.pourStart = lerp(0.45, 0.8, P().visc); S.pourEnd = S.pourStart + lerp(1.1, 1.7, P().visc);
+  const pk = P();
+  S.pourStart = lerp(0.45, 0.8, pk.visc); S.pourEnd = S.pourStart + lerp(1.1, 1.7, pk.visc);
+  S.fill0 = clamp((PK.in.y1 - S.level) / (PK.in.y1 - PK.in.y0), 0.05, 1);
+  const r0 = KIT.rng((Math.random() * 1e9) | 0);
+  S.smear = Array.from({ length: 14 }, () => ({ x: PK.in.x0 + 20 + r0() * (PK.in.x1 - PK.in.x0 - 40), y: PK.in.y0 + 20 + r0() * (PK.in.y1 - PK.in.y0 - 40), r: 10 + r0() * 26, a: r0() * 3 }));
   KIT.tone({ f: 660, to: 990, dur: 0.12, vol: 0.12, type: "triangle" });
+  splash();
   score(false);
+}
+/* トントン不足：上にのこった中身（しずく・高い水面）が、切った瞬間に飛び散る */
+function splash() {
+  const p = P(), I = PK.in, tr = S.tear;
+  const left = S.drops.filter(d => d.a > 0.2 && !d.fall).length;
+  const high = Math.max(0, (I.y0 + 110) - S.level) / PX_MM;      // 中身が上に来すぎている（mm）
+  const loss = Math.round(Math.min(35, left * 2 + high * 3));
+  S.splashLoss = loss;
+  if (!loss) return;
+  const v = p.visc, n = Math.round(Math.min(60, loss * 2) * lerp(1, 0.4, v));
+  for (let i = 0; i < n; i++) {
+    const q = tr.pts[(Math.random() * tr.pts.length) | 0];
+    const a = -Math.PI / 2 + (Math.random() - 0.5) * 1.6, sp = (250 + Math.random() * 500) * lerp(1, 0.5, v);
+    S.parts.push({ x: q.x, y: q.y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, r: (1.5 + Math.random() * 3) * lerp(1, 2.2, v), life: 1.2, dec: 0.9, c: rgba(p.col, 1) });
+  }
+  const w = cv.width / dpr, h = cv.height / dpr;
+  for (let i = 0; i < Math.round(loss / 6); i++) S.splats.push({ x: Math.random() * w, y: Math.random() * h * 0.6, r: (6 + Math.random() * 18) * lerp(1, 1.6, v), life: 1.4 + Math.random(), c: rgba(p.col, 0.95), sl: lerp(60, 160, v) });
+  S.drops.forEach(d => { if (!d.fall) d.a = 0; });
+  KIT.noise({ dur: 0.12, vol: 0.25, f: 2600, to: 900, q: 1.5 }); KIT.vibrate([20, 20, 20]);
+  S.shake = Math.min(10, 3 + loss / 4);
+  say(v > 0.5 ? "ぶちゅっ…トントンが足りない" : "ピッ…上に残ってた！", 1.4);
 }
 function spill(x, y) {
   const tr = S.tear, p = P();
@@ -551,9 +612,10 @@ function score(spilled) {
   const sd = Math.sqrt(ys.reduce((a, b) => a + (b - avg) * (b - avg), 0) / ys.length) / PX_MM;
   // ▶◀ の高さから 1mm 以内・ガタガタ 0.4mm 以内なら満点。そこから減点
   const lossH = Math.round(Math.max(0, dev - 1) * 5), lossJ = Math.round(Math.max(0, sd - 0.4) * 9), lossS = Math.round(Math.min(20, tr.stretch * 0.08));
-  let pt = clamp(100 - lossH - lossJ - lossS, 5, 100);
+  const lossX = spilled ? 0 : (S.splashLoss || 0);
+  let pt = clamp(100 - lossH - lossJ - lossS - lossX, 5, 100);
   if (spilled) pt = 0;
-  S.results.push({ name: P().name, pt, dev, sd, spill: spilled, taps: S.taps, lossH, lossJ, lossS, above: avg < IDEAL });
+  S.results.push({ name: P().name, pt, dev, sd, spill: spilled, taps: S.taps, lossH, lossJ, lossS, lossX, above: avg < IDEAL });
 }
 
 /* ---------- 進行 ---------- */
@@ -569,6 +631,7 @@ function showJudge() {
     if (r.lossH) parts.push(`高さ −${r.lossH}（${r.above ? "上" : "下"}に${r.dev.toFixed(1)}mm）`);
     if (r.lossJ) parts.push(`ガタガタ −${r.lossJ}`);
     if (r.lossS) parts.push(`のびた −${r.lossS}`);
+    if (r.lossX) parts.push(`飛び散り −${r.lossX}（トントン不足）`);
     $("jDetail").textContent = parts.length ? parts.join("・") + (r.lossS ? "。もう少し速く" : r.lossJ ? "。一定の速さで" : "") : "▶◀の高さで、まっすぐ。満点です";
   }
   $("judge").hidden = false;
@@ -582,6 +645,7 @@ function nextRound() {
   if (S.round < 4) startRound(S.round + 1); else finish();
 }
 function startRound(i) {
+  S.splashLoss = 0;
   S.round = i; S.state = "play"; S.tear = null; S.top = null; S.tilt = 0; S.drain = 0; S.pool = 0; S.taps = 0; S.splats = [];
   const p = P();
   S.level = p.start; S.levelTo = null; S.coat = p.start; S.wave = 10 * (1 - p.visc * 0.8);
