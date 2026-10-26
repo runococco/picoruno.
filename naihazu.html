@@ -1,0 +1,917 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#141614">
+<title>ないはずの部屋</title>
+<meta name="description" content="1998年に行方不明になった調査員のUSBメモリ。名簿、間取り図、録音、写真を読み解いて、団地にある「ないはずの部屋」の正体にたどりつく、ホラー謎解き。驚かせる演出はありません。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ないはずの部屋">
+<meta property="og:description" content="行方不明になった調査員の記録を読み解くホラー謎解き。気づいたとき、いちばん怖い。">
+<meta property="og:url" content="https://runococco.github.io/picoruno./naihazu.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://runococco.github.io/picoruno./og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://runococco.github.io/picoruno./og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23141614'/%3E%3Crect x='10' y='6' width='12' height='22' fill='%23545a52' stroke='%23c9c4b2' stroke-width='1.4'/%3E%3Ccircle cx='19' cy='18' r='1.2' fill='%23c9c4b2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Old+Mincho:wght@400;700&display=swap">
+<style>
+/* Layout: one phone column. Title → an old USB drive "desktop" (folders) → file viewer sheet. Documents use mincho on paper; the drive UI uses a dot font on a dark CRT. */
+:root{
+  --bg:#141614;
+  --panel:#1d201d;
+  --line:#343a34;
+  --ink:#d9d6c8;
+  --sub:#8d9187;
+  --dim:#5d625a;
+  --paper:#ebe6d6;
+  --paper-ink:#2c2a25;
+  --red:#b5483f;
+  --amber:#e0a14a;
+  --ui:"DotGothic16","Hiragino Sans",monospace;
+  --doc:"Zen Old Mincho","Hiragino Mincho ProN","Yu Mincho",serif;
+  color-scheme:dark;
+}
+html,body{margin:0;min-height:100%}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--ui);
+  -webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%;overscroll-behavior:none}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 1px,transparent 1px 3px),
+    radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55) 100%)}
+button,input{font-family:inherit;color:inherit}
+.wrap{max-width:520px;margin:0 auto;padding-block:max(12px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-bottom));
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  box-sizing:border-box;min-height:100svh;display:flex;flex-direction:column}
+.screen{display:flex;flex-direction:column;flex:1;gap:14px}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;box-sizing:border-box;
+  border:2px solid var(--ink);background:transparent;font-size:1rem;letter-spacing:.08em;cursor:pointer;padding:10px 16px}
+.btn:hover{background:rgba(217,214,200,.08)}
+.btn:active{transform:translateY(1px)}
+.btn.solid{background:var(--ink);color:var(--bg)}
+.btn.small{min-height:40px;font-size:.85rem;width:auto}
+.btn:focus-visible,.icon:focus-visible,.file:focus-visible,input:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.row{display:flex;gap:10px}
+.row .btn{flex:1}
+.iconbtn{border:1px solid var(--line);background:transparent;padding:6px 10px;font-size:.78rem;cursor:pointer;color:var(--sub)}
+
+/* ---- タイトル ---- */
+#title{justify-content:center;text-align:center}
+.logo{font-family:var(--doc);font-weight:700;font-size:clamp(2.2rem,11vw,3.2rem);letter-spacing:.12em;margin:0;line-height:1.2}
+.logo .x{display:inline-block;animation:flick 6s infinite}
+@keyframes flick{0%,92%,100%{opacity:1;transform:none}93%{opacity:.2;transform:translateX(2px)}95%{opacity:1}96%{opacity:.4;transform:translateX(-1px)}}
+.subt{color:var(--sub);font-size:.85rem;letter-spacing:.2em;margin:4px 0 18px}
+.note{border:1px solid var(--line);padding:12px 14px;font-size:.8rem;line-height:1.8;color:var(--sub);text-align:left}
+.field{display:flex;flex-direction:column;gap:6px;text-align:left;font-size:.85rem;color:var(--sub)}
+.field input{background:var(--panel);border:1px solid var(--line);font-size:1.05rem;padding:12px;color:var(--ink);min-height:48px;box-sizing:border-box}
+.ends{font-size:.78rem;color:var(--dim);letter-spacing:.1em}
+.foot{display:flex;justify-content:space-between;align-items:center;font-size:.78rem;color:var(--dim);margin-top:auto;padding-top:12px}
+.foot a{color:var(--sub)}
+
+/* ---- ドライブ ---- */
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line);padding-bottom:10px;font-size:.85rem}
+.bar b{font-weight:400;letter-spacing:.06em}
+.crumb{color:var(--sub);font-size:.8rem;min-height:1.2em}
+.icons{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.icon{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 8px;border:1px solid var(--line);background:var(--panel);cursor:pointer;font-size:.9rem;position:relative}
+.icon svg{width:56px;height:44px}
+.icon .lk{position:absolute;top:8px;right:10px;font-size:.75rem;color:var(--amber)}
+.icon.locked{color:var(--sub)}
+.icon.new::before{content:"NEW";position:absolute;top:8px;left:10px;font-size:.65rem;color:var(--red)}
+.files{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.file{display:flex;align-items:center;gap:12px;padding:14px 6px;border:0;border-bottom:1px solid var(--line);background:transparent;cursor:pointer;text-align:left;font-size:.95rem;width:100%}
+.file small{margin-left:auto;color:var(--dim);font-size:.72rem;white-space:nowrap}
+.file .ext{width:34px;flex:none;font-size:.68rem;color:var(--bg);background:var(--sub);text-align:center;padding:2px 0}
+.file.upd small{color:var(--red)}
+.back{align-self:flex-start}
+.status{font-size:.8rem;color:var(--sub);line-height:1.7;border-left:2px solid var(--line);padding-left:10px}
+
+/* ---- ビューア ---- */
+.sheet{position:fixed;inset:0;z-index:20;background:rgba(8,9,8,.92);display:flex;flex-direction:column;align-items:center;overflow:auto;-webkit-overflow-scrolling:touch}
+.sheet .in{width:100%;max-width:520px;box-sizing:border-box;padding:max(12px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inset-bottom))}
+.sheet .top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;font-size:.85rem;position:sticky;top:0;background:rgba(8,9,8,.92);padding:6px 0;z-index:2}
+.paper{background:var(--paper);color:var(--paper-ink);font-family:var(--doc);padding:20px 18px;line-height:1.95;font-size:.98rem;box-shadow:0 0 0 1px #000,6px 6px 0 rgba(0,0,0,.35);
+  -webkit-user-select:text;user-select:text}
+.paper h3{margin:0 0 6px;font-size:1.05rem}
+.paper .meta{font-size:.75rem;color:#6d685c;margin-bottom:12px;font-family:var(--ui)}
+.paper p{margin:0 0 1em}
+.paper .hand{color:#8c2f28;font-style:normal}
+.paper table{border-collapse:collapse;width:100%;font-size:.92rem}
+.paper th,.paper td{border:1px solid #9c9584;padding:6px 6px;text-align:left;vertical-align:middle}
+.paper th{background:#ddd6c2;font-weight:700;font-size:.8rem}
+.paper td.no{width:3.2em;text-align:center}
+.paper tr.flick td{animation:rowflick 1.3s steps(2) 2}
+@keyframes rowflick{0%{opacity:1}25%{opacity:.15;transform:translateX(3px)}50%{opacity:1}75%{opacity:.4}}
+.del{font-family:var(--ui);font-size:.75rem;border:1px solid var(--red);color:var(--red);background:transparent;padding:4px 8px;cursor:pointer;white-space:nowrap}
+.tape .ln{display:grid;grid-template-columns:2.6em 1fr;gap:6px;padding:3px 0;transition:background .2s}
+.tape .sp{font-family:var(--ui);font-size:.78rem;color:#6d685c;padding-top:.25em}
+.tape .ln.unk .sp{color:var(--red)}
+.tape .ln.unk .tx{color:#5a2a25;letter-spacing:.18em}
+.tape .ln.on{background:rgba(224,161,74,.25)}
+.tape .ln.unk.on .tx{animation:jit .12s infinite}
+.tape .tx.kn{letter-spacing:0;white-space:nowrap;font-size:.74rem}
+@keyframes jit{50%{transform:translate(1px,-1px)}}
+.figure{background:#0e0f0e;padding:8px;box-shadow:0 0 0 1px #000}
+.figure svg{display:block;width:100%;height:auto}
+.cap{font-size:.78rem;color:var(--sub);margin:8px 0 14px;line-height:1.6}
+.found{font-size:.85rem;color:var(--amber);margin:8px 0;text-align:center;min-height:1.4em}
+.tap{cursor:crosshair;touch-action:manipulation}
+.hint{margin-top:14px;font-size:.82rem;color:var(--sub);line-height:1.7}
+.hint p{margin:6px 0;border-left:2px solid var(--amber);padding-left:8px}
+
+/* ---- パスワード ---- */
+.modal{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;padding:16px}
+.box{width:100%;max-width:420px;background:var(--panel);border:1px solid var(--ink);padding:18px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box}
+.box h4{margin:0;font-weight:400;font-size:1rem;letter-spacing:.06em}
+.box p{margin:0;font-size:.85rem;color:var(--sub);line-height:1.7}
+.box input{background:var(--bg);border:1px solid var(--line);font-size:1.1rem;padding:12px;color:var(--ink);min-height:48px;box-sizing:border-box;width:100%}
+.err{color:var(--red);font-size:.82rem;min-height:1.2em}
+.shake{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+.toast{position:fixed;left:50%;bottom:max(20px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:40;background:var(--panel);border:1px solid var(--red);
+  color:var(--ink);font-size:.82rem;padding:10px 14px;max-width:calc(100vw - 48px);box-sizing:border-box;line-height:1.6;animation:tin .3s}
+@keyframes tin{from{opacity:0;transform:translate(-50%,10px)}}
+
+/* ---- エンディング ---- */
+#ending{justify-content:center}
+.endtag{font-size:.8rem;color:var(--sub);letter-spacing:.3em;text-align:center}
+.endttl{font-family:var(--doc);font-size:2rem;text-align:center;margin:4px 0 10px;letter-spacing:.1em}
+.endtx{font-family:var(--doc);line-height:2.1;font-size:1rem}
+.endtx p{margin:0 0 .4em;opacity:0;animation:fade 1.2s forwards}
+@keyframes fade{to{opacity:1}}
+.glitch{animation:gl .5s steps(3) 1}
+@keyframes gl{0%{filter:none}33%{filter:invert(1) hue-rotate(90deg);transform:translateX(4px)}66%{filter:contrast(3);transform:translateX(-3px)}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- タイトル -->
+<section class="screen" id="title">
+  <h1 class="logo">ないはずの<span class="x">部</span>屋</h1>
+  <p class="subt">ひばりヶ丘第二団地 調査記録</p>
+  <div class="note">1998年、ひとりの調査員が団地の調査中に行方不明になりました。のこされたUSBメモリには、名簿、間取り図、録音、写真が入っています。<br>読み解いて、「ないはずの部屋」の正体をたしかめてください。（クリアまで30分ほど）<br><br>※ 大きな音や、急に驚かせる演出はありません。音が出ます（イヤホン推奨）。</div>
+  <label class="field">記録を引き継ぐ人の名前
+    <input id="nameIn" maxlength="8" placeholder="例：しろ" autocomplete="off" enterkeyhint="go">
+  </label>
+  <button class="btn solid" id="startBtn" type="button">USBメモリを開く</button>
+  <button class="btn" id="contBtn" type="button" hidden>つづきから</button>
+  <p class="ends" id="endsLine"></p>
+  <p class="foot"><a href="https://runococco.github.io/picoruno./">別のゲーム</a><button class="iconbtn" id="muteBtn" type="button" aria-pressed="false">おと：オン</button></p>
+</section>
+
+<!-- ドライブ -->
+<section class="screen" id="desk" hidden>
+  <div class="bar"><b id="drive">USB_DRIVE (E:)</b><button class="iconbtn" id="muteBtn2" type="button">おと：オン</button></div>
+  <p class="crumb" id="crumb"></p>
+  <div class="icons" id="icons"></div>
+  <button class="btn small back" id="backBtn" type="button" hidden>← もどる</button>
+  <div class="files" id="files" hidden></div>
+  <p class="status" id="status"></p>
+  <p class="foot"><button class="iconbtn" id="toTitle" type="button">タイトルへ</button><span>ないはずの部屋</span></p>
+</section>
+
+<!-- エンディング -->
+<section class="screen" id="ending" hidden>
+  <p class="endtag" id="endTag"></p>
+  <h2 class="endttl" id="endTtl"></h2>
+  <div class="endtx" id="endTx"></div>
+  <div id="endBtns" hidden style="display:flex;flex-direction:column;gap:10px;margin-top:18px">
+    <button class="btn solid" id="epiBtn" type="button" hidden>USBの中を、もう一度見る</button>
+    <button class="btn" id="retryBtn" type="button">名簿を開いたところからやり直す</button>
+    <div class="row"><button class="btn" id="shareBtn" type="button">シェアする</button><button class="btn" id="endTitle" type="button">タイトルへ</button></div>
+    <p class="ends" id="endsLine2" style="text-align:center"></p>
+  </div>
+</section>
+</div>
+
+<div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheetTtl">
+  <div class="in">
+    <div class="top"><span id="sheetTtl"></span><button class="iconbtn" id="closeSheet" type="button">とじる ×</button></div>
+    <div id="sheetBody"></div>
+  </div>
+</div>
+
+<div class="modal" id="pw" hidden role="dialog" aria-modal="true" aria-labelledby="pwTtl">
+  <form class="box" id="pwForm">
+    <h4 id="pwTtl">パスワード</h4>
+    <p id="pwMsg"></p>
+    <input id="pwIn" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done">
+    <p class="err" id="pwErr" aria-live="polite"></p>
+    <div class="row"><button class="btn" type="button" id="pwCancel">とじる</button><button class="btn solid" type="submit">ひらく</button></div>
+    <button class="iconbtn" type="button" id="pwHint">ヒントを見る</button>
+    <div class="hint" id="pwHints"></div>
+  </form>
+</div>
+
+<div class="modal" id="ask" hidden role="alertdialog" aria-modal="true" aria-labelledby="askTtl">
+  <div class="box">
+    <h4 id="askTtl"></h4>
+    <p>もとには戻せません。</p>
+    <div class="row"><button class="btn" type="button" id="askNo">やめる</button><button class="btn solid" type="button" id="askYes">消す</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const GAME_URL='https://runococco.github.io/picoruno./naihazu.html';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ===== 進みぐあい =====
+   stage 0: 01だけ開いている / 1: 02録音 / 2: 03管理人室 / 3: 04夜間録音（鍵箱が開いた） / 4: 05写真 / 5: 06最後（写真のちがいを3つ見つけた）
+   final: 04のメモを読んだ（名簿に自分の名前が出て、消せるようになる） / epi: END A のあと */
+const SAVE_KEY='picoruno-naihazu2';
+let S={name:'',stage:0,final:false,epi:false,found:[],seen:{},hints:{},ends:[]};
+function load(){ try{ const d=JSON.parse(localStorage.getItem(SAVE_KEY)||'null'); if(d) S=Object.assign(S,d); }catch(e){} }
+function save(){ try{ localStorage.setItem(SAVE_KEY,JSON.stringify(S)); }catch(e){} }
+const who=()=>S.name||'あなた';
+
+/* ===== おと（Web Audio）：低いうなりと、ノイズ ===== */
+let AC=null, master=null, muted=false, drone=null;
+try{ muted=localStorage.getItem(SAVE_KEY+'-mute')==='1'; }catch(e){}
+function audio(){
+  if(AC) return AC;
+  try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; }
+  master=AC.createGain(); master.gain.value=muted?0:1; master.connect(AC.destination);
+  return AC;
+}
+function startDrone(){
+  if(!audio()||drone) return;
+  const g=AC.createGain(); g.gain.value=0; g.connect(master);
+  const lp=AC.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=220; lp.connect(g);
+  [55,55.6,82.4].forEach((f,i)=>{ const o=AC.createOscillator(); o.type=i===2?'triangle':'sine'; o.frequency.value=f; const og=AC.createGain(); og.gain.value=i===2?.25:.5; o.connect(og); og.connect(lp); o.start(); });
+  const lfo=AC.createOscillator(), lg=AC.createGain(); lfo.frequency.value=.07; lg.gain.value=.012; lfo.connect(lg); lg.connect(g.gain); lfo.start();
+  g.gain.linearRampToValueAtTime(.035,AC.currentTime+4);
+  drone=g;
+}
+function noise(dur=.5,vol=.07,freq=1800){
+  if(!audio()) return;
+  const n=Math.floor(AC.sampleRate*dur), b=AC.createBuffer(1,n,AC.sampleRate), d=b.getChannelData(0);
+  for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*(1-i/n);
+  const s=AC.createBufferSource(); s.buffer=b;
+  const bp=AC.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=freq; bp.Q.value=.8;
+  const g=AC.createGain(); g.gain.value=vol; s.connect(bp); bp.connect(g); g.connect(master); s.start();
+}
+function blip(f=660,dur=.08,vol=.05,type='square'){
+  if(!audio()) return;
+  const o=AC.createOscillator(), g=AC.createGain(); o.type=type; o.frequency.value=f;
+  g.gain.setValueAtTime(vol,AC.currentTime); g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+dur);
+  o.connect(g); g.connect(master); o.start(); o.stop(AC.currentTime+dur+.02);
+}
+function setMute(m){
+  muted=m; try{ localStorage.setItem(SAVE_KEY+'-mute',m?'1':'0'); }catch(e){}
+  if(master) master.gain.value=m?0:1;
+  ['muteBtn','muteBtn2'].forEach(id=>{ $(id).textContent=m?'おと：オフ':'おと：オン'; $(id).setAttribute('aria-pressed',m?'true':'false'); });
+}
+$('muteBtn').onclick=()=>{ audio(); setMute(!muted); };
+$('muteBtn2').onclick=()=>{ audio(); setMute(!muted); };
+
+/* ===== 名簿：進みぐあいで中身が書きかわる ===== */
+function roster(){
+  const R=[
+    {no:'301',nm:'田村 和子',since:'1971'},
+    {no:'302',nm:'三浦 孝',since:'1984'},
+    {no:'303',nm:'空室',since:'（1997年3月〜）',empty:true},
+    {no:'305',nm:'木下 恵美',since:'1990'},
+  ];
+  if(S.epi) return {rows:R,upd:'1998/10/02 14:10',changed:[]};
+  const changed=[];
+  if(S.stage>=1){ R[2]={no:'303',nm:'大野 正一',since:'1968',key:'oono'}; changed.push('303'); }
+  if(S.stage>=5){ R.splice(3,0,{no:'304',nm:'三枝 浩一',since:'1998',key:'saegusa'}); changed.push('304'); }
+  if(S.final){ R.splice(4,0,{no:'304',nm:who(),since:'（同居）',key:'me'}); changed.push('304b'); }
+  return {rows:R,upd:S.stage>=1?'1998/10/17 03:04':'1998/10/02 14:10',changed};
+}
+function rosterVer(){ return S.epi?'e':[S.stage>=1,S.stage>=5,S.final].map(Number).join(''); }
+
+/* ===== 写真（SVG） ===== */
+function photoSVG(v,opts={}){
+  const bays=[301,302,303,304,305];
+  let g='';
+  bays.forEach((n,i)=>{
+    const x=i*120;
+    g+=`<rect x="${x+46}" y="22" width="28" height="8" fill="${v.dark?'#d9d0a0':'#f4ecc0'}" opacity=".85"/>`;
+    if(n===304){
+      g+=`<path d="M${x+30} 70 l8 22 l-5 18 M${x+80} 200 l10 14" stroke="#4c504a" stroke-width="1" fill="none"/>`;
+      if(v.door304>0){
+        const o=v.door304;
+        g+=`<g opacity="${o}"><rect x="${x+20}" y="96" width="50" height="160" fill="${o<1?'#3d413b':'#545a52'}" stroke="#262825" stroke-width="2"/>`+
+          `<circle cx="${x+62}" cy="182" r="3" fill="#c9c4b2"/>`+
+          `<rect x="${x+26}" y="80" width="38" height="12" fill="#cfcab8"/><text x="${x+45}" y="90" font-size="10" text-anchor="middle" fill="#222" font-family="sans-serif">304</text>`;
+        if(v.plate304) g+=`<rect x="${x+28}" y="120" width="34" height="13" fill="#e8e2cc"/><text x="${x+45}" y="130.5" font-size="10" text-anchor="middle" fill="#111" font-family="serif">${v.plate304}</text>`;
+        g+=`</g>`;
+      }
+      if(v.shoes) g+=`<ellipse cx="${x+38}" cy="266" rx="9" ry="4" fill="#1b1c1a"/><ellipse cx="${x+54}" cy="268" rx="9" ry="4" fill="#1b1c1a"/>`;
+      return;
+    }
+    g+=`<rect x="${x+20}" y="96" width="50" height="160" fill="#7c8279" stroke="#3a3d38" stroke-width="2"/>`+
+      `<circle cx="${x+62}" cy="182" r="3" fill="#d8d3c2"/>`+
+      `<rect x="${x+26}" y="80" width="38" height="12" fill="#d8d3c2"/><text x="${x+45}" y="90" font-size="10" text-anchor="middle" fill="#222" font-family="sans-serif">${n}</text>`+
+      `<rect x="${x+80}" y="124" width="30" height="34" fill="${v.win&&v.win[n]?v.win[n]:'#2d322f'}" stroke="#3a3d38" stroke-width="2"/>`+
+      `<path d="M${x+86} 124v34M${x+92} 124v34M${x+98} 124v34M${x+104} 124v34" stroke="#555a54" stroke-width="1.5"/>`;
+    if(n===303){
+      if(v.p303==='sticker') g+=`<rect x="${x+25}" y="138" width="40" height="22" fill="#f6f3ea" transform="rotate(-3 ${x+45} 149)"/><text x="${x+45}" y="154" font-size="12" text-anchor="middle" fill="#b5352c" font-family="serif" transform="rotate(-3 ${x+45} 149)">空室</text>`;
+      else g+=`<rect x="${x+28}" y="120" width="34" height="13" fill="#e8e2cc"/><text x="${x+45}" y="130.5" font-size="10" text-anchor="middle" fill="#111" font-family="serif">大野</text>`;
+    }else{
+      const nm={301:'田村',302:'三浦',305:'木下'}[n];
+      g+=`<rect x="${x+28}" y="120" width="34" height="13" fill="#e8e2cc"/><text x="${x+45}" y="130.5" font-size="10" text-anchor="middle" fill="#111" font-family="serif">${nm}</text>`;
+    }
+    if(n===302) g+=`<path d="M${x+76} 256 l6 -34 l4 0 l4 34z" fill="#6b4b3c"/>`;
+  });
+  const id='p'+Math.random().toString(36).slice(2,7);
+  return `<svg viewBox="0 0 600 330" role="img" aria-label="${esc(opts.label||'団地3階の外廊下の写真')}" ${opts.tap?'class="tap"':''}>
+    <defs>
+      <filter id="${id}g"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="${v.seed||3}"/><feColorMatrix values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .45  0 0 0 .55 0"/></filter>
+      <radialGradient id="${id}v" cx=".5" cy=".5" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".7"/></radialGradient>
+      <linearGradient id="${id}w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8f948a"/><stop offset="1" stop-color="#6f746b"/></linearGradient>
+    </defs>
+    <rect width="600" height="330" fill="url(#${id}w)"/>
+    <rect width="600" height="16" fill="#5a5e57"/>
+    <rect y="258" width="600" height="72" fill="#4d504a"/>
+    <path d="M0 258H600" stroke="#33352f" stroke-width="3"/>
+    <path d="M120 16V258M240 16V258M360 16V258M480 16V258" stroke="#62665e" stroke-width="2"/>
+    ${g}
+    ${v.dark?`<rect width="600" height="330" fill="#000" opacity="${v.dark}"/>`:''}
+    <rect width="600" height="330" filter="url(#${id}g)" opacity=".35"/>
+    <rect width="600" height="330" fill="url(#${id}v)"/>
+    <text x="580" y="316" font-size="18" text-anchor="end" fill="#ff8a3c" font-family="monospace" opacity=".9">${v.date}</text>
+    <g class="marks"></g>
+  </svg>`;
+}
+const PHOTOS={
+  p1:()=>({date:"'98 10 02",door304:0,p303:'sticker',seed:3}),
+  p2:()=>({date:"'98 10 09",door304:.16,p303:'sticker',seed:7,dark:.08}),
+  p3:()=>S.epi?({date:"'98 10 16",door304:0,p303:'sticker',shoes:true,seed:11,dark:.16})
+             :({date:"'98 10 16",door304:1,plate304:S.stage>=5?'三枝':'',p303:'oono',shoes:true,seed:11,dark:.16,win:{305:'#20211f'}}),
+};
+/* ちがい（写真1→写真3）。タップの当たり判定は SVG 座標 */
+const DIFFS=[
+  {id:'door',x:405,y:176,r:52,label:'303と305のあいだに、ドアがある'},
+  {id:'plate',x:285,y:146,r:34,label:'303の「空室」の貼り紙が、表札になっている'},
+  {id:'shoes',x:406,y:267,r:30,label:'ドアの前に、靴がそろえて置いてある'},
+];
+
+/* ===== 間取り図（SVG） ===== */
+function planSVG(){
+  const units=[301,302,303,null,305];
+  let g='';
+  units.forEach((n,i)=>{
+    const x=20+i*112;
+    if(n===null){
+      if(S.stage>=5&&!S.epi) g+=`<text x="${x+56}" y="98" font-size="22" text-anchor="middle" fill="#8c2f28" font-family="serif" transform="rotate(-6 ${x+56} 98)">304？</text><text x="${x+56}" y="128" font-size="13" text-anchor="middle" fill="#8c2f28" font-family="serif">三枝</text>`;
+      return;
+    }
+    g+=`<rect x="${x}" y="30" width="112" height="140" fill="none" stroke="#2c2a25" stroke-width="2"/>`+
+      `<path d="M${x} 90h70v80M${x+70} 30v40M${x+70} 120h42" stroke="#2c2a25" stroke-width="1" fill="none"/>`+
+      `<text x="${x+34}" y="64" font-size="10" text-anchor="middle" fill="#2c2a25" font-family="serif">和室</text>`+
+      `<text x="${x+34}" y="134" font-size="10" text-anchor="middle" fill="#2c2a25" font-family="serif">DK</text>`+
+      `<text x="${x+91}" y="100" font-size="9" text-anchor="middle" fill="#2c2a25" font-family="serif">浴</text>`+
+      `<rect x="${x+38}" y="166" width="24" height="8" fill="#ebe6d6" stroke="#2c2a25"/>`+
+      `<text x="${x+56}" y="196" font-size="13" text-anchor="middle" fill="#2c2a25" font-family="serif">${n}</text>`;
+  });
+  return `<svg viewBox="0 0 600 250" role="img" aria-label="3階の間取り図。左から301、302、303、何も書かれていない区画、305。">
+    <rect width="600" height="250" fill="#ebe6d6"/>
+    <rect x="20" y="30" width="560" height="140" fill="none" stroke="#2c2a25" stroke-width="3"/>
+    <path d="M20 14H580M20 8v12M580 8v12" stroke="#2c2a25"/>
+    <text x="300" y="11" font-size="10" text-anchor="middle" fill="#2c2a25" font-family="serif">外寸 30.0m（1区画 6.0m）</text>
+    ${g}
+    <rect x="20" y="206" width="560" height="26" fill="#ddd6c2" stroke="#2c2a25"/>
+    <text x="300" y="223" font-size="11" text-anchor="middle" fill="#2c2a25" font-family="serif">外廊下</text>
+  </svg>`;
+}
+
+/* ===== 録音（文字起こし） ===== */
+const TAPE=[
+  ['三枝','本日はありがとうございます。この階には、長くお住まいなんですか。'],
+  ['大野','ええ。もう三十年になりますかな。'],
+  ['？','かえして'],
+  ['三枝','……すみません、今なにか？'],
+  ['大野','いや、何も言うとりませんよ。'],
+  ['三枝','303と305のあいだの壁のことなんですが。'],
+  ['大野','ああ、あそこは昔から、ただの壁ですわ。'],
+  ['？','べつのへやに いる'],
+  ['三枝','夜中に物音がする、という話を聞きまして。'],
+  ['大野','古い団地ですからな。配管でしょう。'],
+  ['？','のぞいてる'],
+  ['大野','……三枝さん、でしたかな。あんた、もう帰ったほうがええ。'],
+  ['？','なまえを かいて'],
+  ['三枝','え？'],
+  ['？','かぞえて'],
+  ['大野','あんたの部屋も、ちゃんと用意しとるから。'],
+];
+
+/* ===== 夜間録音：ノック（行・段） =====  な(5,1) か(2,1) に(5,2) い(1,2) れ(9,4) て(4,4) */
+const KNOCKS=[[5,1],[2,1],[5,2],[1,2],[9,4],[4,4]];
+const dots=n=>'●'.repeat(n);
+const NIGHT=[
+  ['02:58','（廊下の換気扇の音。人の気配はない）'],
+  ['03:01','（遠くで、ドアの閉まる音）'],
+  ...KNOCKS.map((k,i)=>['03:04',`ノック ${dots(k[0])}　${dots(k[1])}`,true,k]),
+  ['03:07','（しばらく、何も聞こえない）'],
+  ['03:09','三枝「……返事、しちゃだめなんだよな」'],
+  ['03:10','ノック ●　●',true,[1,1]],
+  ['03:11','三枝「はい」'],
+  ['03:12','（ドアの開く音。録音はここで切れている）'],
+];
+function knock(t){
+  if(!AC) return;
+  const n=Math.floor(AC.sampleRate*.12), b=AC.createBuffer(1,n,AC.sampleRate), d=b.getChannelData(0);
+  for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/n,4);
+  const s=AC.createBufferSource(); s.buffer=b;
+  const lp=AC.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=380;
+  const g=AC.createGain(); g.gain.value=.55; s.connect(lp); lp.connect(g); g.connect(master); s.start(t);
+}
+function playNight(){
+  audio(); startDrone(); tapeStop=false;
+  const lines=[...document.querySelectorAll('.tape .ln')]; let i=0;
+  $('playTape').disabled=true; $('playTape').textContent='再生中…';
+  (function step(){
+    lines.forEach(l=>l.classList.remove('on'));
+    if(tapeStop||i>=lines.length||!$('playTape')){ if($('playTape')){ $('playTape').disabled=false; $('playTape').textContent='▶ もう一度再生'; } return; }
+    const l=lines[i], k=NIGHT[i][3]; l.classList.add('on'); l.scrollIntoView({block:'center',behavior:'smooth'});
+    let dur=1500;
+    if(k&&AC){ const t0=AC.currentTime+.15; let t=t0;
+      for(let a=0;a<k[0];a++){ knock(t); t+=.26; } t+=.55; for(let a=0;a<k[1];a++){ knock(t); t+=.26; }
+      dur=(t-t0)*1000+900; }
+    else if(k) dur=2600;
+    else if(NIGHT[i][1][0]==='（') noise(.5,.02,400);
+    i++; setTimeout(step,dur);
+  })();
+}
+
+/* ===== 外観写真・鍵箱（SVG） ===== */
+function extSVG(){
+  let g='';
+  for(let f=0;f<4;f++){ const y=40+f*62;
+    for(let w=0;w<5;w++){ const x=60+w*100;
+      const fl=4-f, me=fl===3&&w===3;
+      g+=`<rect x="${x}" y="${y}" width="64" height="38" fill="${me?'#1a1b19':'#3b403c'}" stroke="#22241f" stroke-width="2"/>`+
+        `<path d="M${x+32} ${y}v38" stroke="#22241f" stroke-width="1.5"/>`+
+        `<rect x="${x-10}" y="${y+40}" width="84" height="12" fill="#9ea197" stroke="#55584f"/>`;
+      if(me&&!S.epi) g+=`<path d="M${x+40} ${y+38}v-22q4-8 8 0v22z" fill="#0b0b0a" opacity=".9"/>`;
+    }
+    g+=`<text x="34" y="${y+26}" font-size="12" fill="#2c2e29" font-family="sans-serif">${4-f}F</text>`;
+  }
+  return `<svg viewBox="0 0 600 330" role="img" aria-label="団地の外観。各階に窓が5つ。3階の左から4つめの窓は真っ暗。">
+    <rect width="600" height="330" fill="#7d8a93"/><rect x="20" y="20" width="560" height="270" fill="#b9b7ab" stroke="#6b6a61" stroke-width="2"/>
+    ${g}<rect y="290" width="600" height="40" fill="#545a4e"/>
+    <text x="580" y="316" font-size="18" text-anchor="end" fill="#ff8a3c" font-family="monospace" opacity=".9">'98 10 02</text></svg>`;
+}
+function keyboxSVG(){
+  const open=S.stage>=3;
+  let g='';
+  [301,302,303,304,305].forEach((n,i)=>{ const x=90+i*90;
+    g+=`<circle cx="${x}" cy="110" r="5" fill="#bbb5a0"/><text x="${x}" y="92" font-size="14" text-anchor="middle" fill="#e6e0cc" font-family="sans-serif">${n}</text>`;
+    const has=n===301||n===302||n===305||n===304;
+    if(has) g+=`<path d="M${x} 115v30" stroke="#c8b46a" stroke-width="4"/><circle cx="${x}" cy="150" r="8" fill="none" stroke="#c8b46a" stroke-width="3"/>`+
+      `<rect x="${x-14}" y="160" width="28" height="18" fill="${n===304?'#6e2a24':'#e6e0cc'}"/><text x="${x}" y="173" font-size="10" text-anchor="middle" fill="${n===304?'#f3e6d6':'#222'}" font-family="sans-serif">${n}</text>`;
+  });
+  return `<svg viewBox="0 0 540 300" role="img" aria-label="鍵箱。301、302、304、305のフックに鍵。303のフックだけ空いている。">
+    <rect width="540" height="300" fill="#2a2b28"/><rect x="40" y="40" width="460" height="230" fill="#4f5249" stroke="#1c1d1b" stroke-width="4"/>
+    <rect x="52" y="60" width="436" height="196" fill="#3a3c36"/>${g}
+    ${open?'<rect x="380" y="200" width="70" height="40" fill="#1b1b1a" stroke="#888"/><circle cx="400" cy="220" r="8" fill="none" stroke="#888"/><circle cx="430" cy="220" r="8" fill="none" stroke="#888"/>'
+      :'<rect x="230" y="232" width="80" height="30" fill="#8a8a82" stroke="#222"/><text x="270" y="253" font-size="16" text-anchor="middle" fill="#111" font-family="monospace">＊＊＊＊</text>'}
+    <text x="520" y="290" font-size="16" text-anchor="end" fill="#ff8a3c" font-family="monospace" opacity=".9">'98 10 12</text></svg>`;
+}
+
+/* ===== フォルダとファイル ===== */
+const FOLDERS=[
+  {id:'a',name:'01_調査',files:['readme','memo1','roster','plan','ext','log']},
+  {id:'b',name:'02_録音',need:1,files:['memo2','tape']},
+  {id:'c',name:'03_管理人室',need:2,files:['kmemo','diary','survey','keylog','keybox']},
+  {id:'d',name:'04_夜間録音',need:3,files:['nmemo','night']},
+  {id:'e',name:'05_写真',need:4,files:['memo3','p1','p2','p3','cmp']},
+  {id:'f',name:'06_最後',need:5,files:['memo4']},
+];
+const LOCKS={
+  1:{title:'02_録音 のパスワード',msg:'調査メモ_01 に、パスワードのことが書いてあります。',ok:['304'],
+     hints:['間取り図の部屋番号を、左から順に読んでみよう。','301、302、303、そのつぎは……？']},
+  2:{title:'03_管理人室 のパスワード',msg:'調査メモ_02 に、パスワードのことが書いてあります。（ひらがな）',ok:['かべのなか'],
+     hints:['文字起こしで、話している人が「？」の行だけを見よう。','「？」の行の最初の1文字を、上から順に並べてみよう。']},
+  3:{title:'鍵箱のダイヤル錠（4桁）',msg:'「04_夜間録音」は、鍵箱の中にしまってあります。番号の決め方は、管理日誌に書いてあります。',ok:['1019'],
+     hints:['管理日誌の 1997/10/24 を読もう。貸出簿の「その日の終わりに、外に出たままの鍵があるか」を1日ずつ確かめよう。','返却が次の日以降になっている鍵や、返却が「—」の鍵に気をつけて。全部の鍵がその日のうちに戻った日は、1日だけ。']},
+  4:{title:'05_写真 のパスワード',msg:'調査メモ_04 に、パスワードのことが書いてあります。（ひらがな）',ok:['なかにいれて'],
+     hints:['1組のノックは、2つの数でできている。最初の数が「行」（あ行=1、か行=2、さ行=3…）、次の数が「段」（あ・い・う・え・お=1〜5）。','1組目は 5回・1回 → な行の1つ目 → 「な」。ら行は9番目。']},
+};
+const FILES={
+  readme:{nm:'はじめに',ext:'TXT',date:'2026/10/25',show:()=>true},
+  memo1:{nm:'調査メモ_01',ext:'TXT',date:'1998/10/02',show:()=>true},
+  roster:{nm:'入居者名簿_3階',ext:'DOC',date:()=>roster().upd,show:()=>true},
+  plan:{nm:'3階間取り図',ext:'IMG',date:'1998/10/02',show:()=>true},
+  log:{nm:()=>'調査記録_'+who(),ext:'TXT',date:'1998/10/17 03:04',show:()=>S.epi},
+  memo2:{nm:'調査メモ_02',ext:'TXT',date:'1998/10/09',show:()=>true},
+  tape:{nm:'録音_303号室',ext:'WAV',date:'1998/10/09',show:()=>true},
+  ext:{nm:'外観写真',ext:'JPG',date:'1998/10/02',show:()=>true},
+  kmemo:{nm:'調査メモ_03',ext:'TXT',date:'1998/10/12',show:()=>true},
+  diary:{nm:'管理日誌_1997',ext:'TXT',date:'1997/12/28',show:()=>true},
+  survey:{nm:'住民アンケート',ext:'DOC',date:'1998/10/05',show:()=>true},
+  keylog:{nm:'鍵の貸出簿',ext:'DOC',date:'1997/10/23',show:()=>true},
+  keybox:{nm:'鍵箱の写真',ext:'JPG',date:'1998/10/12',show:()=>true},
+  nmemo:{nm:'調査メモ_04',ext:'TXT',date:'1998/10/14',show:()=>true},
+  night:{nm:'夜間録音_3階廊下',ext:'WAV',date:'1998/10/14 03:04',show:()=>true},
+  memo3:{nm:'調査メモ_05',ext:'TXT',date:'1998/10/16',show:()=>true},
+  p1:{nm:'写真1',ext:'JPG',date:'1998/10/02',show:()=>true},
+  p2:{nm:'写真2',ext:'JPG',date:'1998/10/09',show:()=>true},
+  p3:{nm:'写真3',ext:'JPG',date:'1998/10/16',show:()=>true},
+  cmp:{nm:'見くらべ（1と3）',ext:'',date:'',show:()=>!S.epi},
+  memo4:{nm:'最後のメモ',ext:'TXT',date:'1998/10/17 03:04',show:()=>true},
+};
+const val=(v)=>typeof v==='function'?v():v;
+
+let cur=null; // 開いているフォルダ
+function renderDesk(){
+  const f=cur&&FOLDERS.find(x=>x.id===cur);
+  $('icons').hidden=!!f; $('files').hidden=!f; $('backBtn').hidden=!f;
+  $('crumb').textContent=f?`E:\\${f.name}\\`:'E:\\';
+  if(!f){
+    $('icons').innerHTML=FOLDERS.map(x=>{
+      const locked=(x.need||0)>S.stage;
+      const isNew=!locked&&x.need&&!S.seen['f'+x.id];
+      return `<button class="icon${locked?' locked':''}${isNew?' new':''}" type="button" data-f="${x.id}">
+        <svg viewBox="0 0 56 44" aria-hidden="true"><path d="M2 8h18l4 5h30v29H2z" fill="${locked?'#3a3f39':'#8d8566'}" stroke="#d9d6c8" stroke-width="1.5"/></svg>
+        ${esc(x.name)}${locked?'<span class="lk">🔒</span>':''}</button>`;
+    }).join('');
+  }else{
+    $('files').innerHTML=f.files.filter(k=>FILES[k].show()).map(k=>{
+      const F=FILES[k];
+      const upd=k==='roster'&&!!S.seen.roster&&S.seen.roster!==rosterVer();
+      return `<button class="file${upd?' upd':''}" type="button" data-k="${k}"><span class="ext">${F.ext||'▶'}</span>${esc(val(F.nm))}<small>${upd?'更新 ':''}${esc(val(F.date))}</small></button>`;
+    }).join('');
+  }
+  $('status').innerHTML=statusText();
+}
+function statusText(){
+  if(S.epi) return '調査は終わりました。……終わったはずです。';
+  if(S.final) return '名簿を開いて、まぎれこんだ名前を消してください。';
+  return ['まずは「01_調査」の中を読んでみよう。','「02_録音」が開いた。','「03_管理人室」が開いた。','鍵箱が開いた。「04_夜間録音」が聞けるようになった。','「05_写真」が開いた。','「06_最後」が開いた。'][S.stage];
+}
+$('icons').onclick=e=>{
+  const b=e.target.closest('[data-f]'); if(!b) return;
+  const f=FOLDERS.find(x=>x.id===b.dataset.f);
+  if((f.need||0)>S.stage){
+    blip(180,.12,.04);
+    if(LOCKS[f.need]&&f.need===S.stage+1) openPw(f.need);
+    else if(f.need===5) toast('「05_写真」の中の「見くらべ」で、ちがいを3つ見つけると開きます。');
+    else toast('まだ開けません。');
+    return;
+  }
+  blip(520,.05,.03); cur=f.id; S.seen['f'+f.id]=1; save(); renderDesk();
+};
+$('backBtn').onclick=()=>{ cur=null; renderDesk(); };
+$('files').onclick=e=>{ const b=e.target.closest('[data-k]'); if(b){ blip(700,.04,.025); openFile(b.dataset.k); } };
+
+/* ===== ファイルの中身 ===== */
+function openFile(k){
+  const F=FILES[k];
+  $('sheetTtl').textContent=val(F.nm)+(F.ext?'.'+F.ext.toLowerCase():'');
+  let h='';
+  if(k==='readme'){
+    h=`<div class="paper"><h3>はじめに</h3><div class="meta">作成：2026/10/25</div>
+      <p>このUSBメモリは、ひばりヶ丘第二団地の取りこわし工事のとき、3階の壁の中から見つかったものです。</p>
+      <p>持ち主は、1998年10月に行方不明になった住宅調査員、三枝 浩一（さえぐさ こういち）さんだと思われます。</p>
+      <p>中を見るのは、${esc(who())}さんが最初です。ファイルは三枝さんが残したときのまま、手を加えていません。</p>
+      <p>……のはずなのですが、ときどき、ファイルの更新日時が変わっていることがあります。</p></div>`;
+  }else if(k==='memo1'){
+    h=`<div class="paper"><h3>調査メモ_01</h3><div class="meta">1998/10/02</div>
+      <p>管理組合からの依頼。「3階の廊下で、夜中にドアの開け閉めの音がする」。</p>
+      <p>外から3階の窓を数えた。5部屋分ある。<br>なのに、間取り図にも名簿にも、部屋は4つしかない。</p>
+      <p>303と305のあいだ。ドアもない、ただのコンクリートの壁。</p>
+      <p>録音データは別のフォルダに分けて、鍵をかけておく。<br>パスワードは、<span class="hand">この階にないはずの部屋の番号</span>。</p></div>`;
+  }else if(k==='roster'){
+    const r=roster(), ver=rosterVer(), flick=S.seen.roster&&S.seen.roster!==ver;
+    const canDel=S.final&&!S.epi;
+    h=`<div class="paper"><h3>入居者名簿（3階）</h3><div class="meta">ひばりヶ丘第二団地 管理組合 ／ 最終更新：${r.upd}</div>
+      <table><thead><tr><th>号室</th><th>入居者</th><th>入居</th>${canDel?'<th></th>':''}</tr></thead><tbody>
+      ${r.rows.map((x,i)=>`<tr class="${flick&&x.key&&r.changed.length?'flick':''}"><td class="no">${x.no}</td><td>${x.empty?'<span style="color:#8c2f28">'+x.nm+'</span>':esc(x.nm)}</td><td>${esc(x.since)}</td>${canDel?`<td><button class="del" type="button" data-del="${i}">消す</button></td>`:''}</tr>`).join('')}
+      </tbody></table>
+      ${canDel?'<p style="margin-top:14px;font-size:.85rem">まぎれこんだ名前を、ひとつだけ消してください。もとには戻せません。</p>':''}</div>`;
+    if(flick){ noise(.7,.06,900); }
+    S.seen.roster=ver; save();
+    if(canDel) h+=hintBlock('final',['写真1の303号室のドアに、何が貼ってあった？','管理日誌の1997年3月を思い出して。もう、そこにいるはずのない人は誰？']);
+  }else if(k==='plan'){
+    h=`<div class="figure">${planSVG()}</div><p class="cap">ひばりヶ丘第二団地 3階 平面図（1967年 竣工時）。</p>`;
+  }else if(k==='log'){
+    h=`<div class="paper"><h3>調査記録_${esc(who())}</h3><div class="meta">1998/10/17 03:04</div>
+      <p>${esc(who())}さん、調査の引き継ぎ、ありがとうございました。</p>
+      <p>303号室は、空室に戻りました。<br>304号室は、名簿からも写真からも、なくなりました。</p>
+      <p>三枝さんの行方は、今もわかっていません。</p>
+      <p>写真3のドアの前に置いてあった靴は、そのままです。</p>
+      <p class="hand">あれは、${esc(who())}さんの靴と、同じ大きさでした。</p></div>`;
+  }else if(k==='memo2'){
+    h=`<div class="paper"><h3>調査メモ_02</h3><div class="meta">1998/10/09</div>
+      <p>303号室の大野さんに話を聞いた。三十年住んでいるという、気さくなおじいさん。</p>
+      <p>あとで録音を聞きかえしたら、知らない声がまざっていた。部屋には二人しかいなかった。</p>
+      <p>文字起こしでは、その声を「？」にしてある。<br><span class="hand">「？」の行だけ、最初の一文字を上から拾って読んでみた。</span></p>
+      <p>それを、管理人室で借りてきた資料のフォルダのパスワードにした。<br>見たくない。でも、確かめないといけない。</p></div>`;
+  }else if(k==='tape'){
+    h=`<div class="paper tape"><h3>録音_303号室（文字起こし）</h3><div class="meta">1998/10/09 19:40 ／ 4分12秒</div>
+      ${TAPE.map((t,i)=>`<div class="ln${t[0]==='？'?' unk':''}" data-i="${i}"><span class="sp">${t[0]}</span><span class="tx">${esc(t[1])}</span></div>`).join('')}
+      </div><div class="row" style="margin-top:14px"><button class="btn" type="button" id="playTape">▶ 録音を再生</button></div>`;
+  }else if(k==='ext'){
+    h=`<div class="figure">${extSVG()}</div><p class="cap">ひばりヶ丘第二団地 2号棟 南側（1998/10/02 撮影）。3階は、左から5つめまで窓がある。</p>`;
+  }else if(k==='kmemo'){
+    h=`<div class="paper"><h3>調査メモ_03</h3><div class="meta">1998/10/12</div>
+      <p>もと管理人の平井さんが、管理人室に残していった日誌と貸出簿を見せてもらった。</p>
+      <p>平井さんは去年の暮れに急に辞めて、今は連絡がつかないらしい。</p>
+      <p>管理人室の鍵箱には、ダイヤル錠がかかっている。番号は誰も知らない。<br>日誌に、<span class="hand">番号の決め方</span>が書いてあった。</p>
+      <p>鍵箱の中に、夜の廊下を録ったテープを入れておく。<br>……自分で入れたのに、自分では開けたくない。</p></div>`;
+  }else if(k==='diary'){
+    const D=[
+      ['1997/03/14','303号室の大野 正一さん（82）が、部屋で亡くなっているのが見つかる。一人暮らしだった。'],
+      ['1997/03/20','親族の方が荷物を引き取る。303号室は空室に。表札を外して、「空室」の紙を貼る。'],
+      ['1997/04/02','夜中に3階で戸の開け閉めの音がする、と301の田村さん。見回ったが、何もなし。'],
+      ['1997/06/11','302の三浦さん「303から話し声がする」。空室のはず。鍵を開けて見たが、誰もいない。'],
+      ['1997/09/30','鍵箱に、見たことのない「304」の札が下がっていた。誰がつけたのか。外しておく。'],
+      ['1997/10/20','また「304」の札。外しても、次の朝には下がっている。'],
+      ['1997/10/24','鍵箱のダイヤル錠の番号を変えた。<span class="hand">この1週間の貸出簿で、鍵が1本も外に出ていないまま1日を終えた日</span>。その日付（月日の4桁）にしておく。'],
+      ['1997/11/02','夜回りで3階を歩いたら、303と305のあいだの壁の中から、ノックが聞こえた。数を数えるように叩いている。<br>二つずつ組になっている。<span class="hand">五十音の表の、行と段</span>を叩いているようにも聞こえた。'],
+      ['1997/12/28','管理人を辞めることにした。後の人には「304には、返事をしないこと」とだけ伝えておく。'],
+    ];
+    h=`<div class="paper"><h3>管理日誌（1997年・抜き書き）</h3><div class="meta">ひばりヶ丘第二団地 管理人 平井</div>
+      ${D.map(d=>`<p><b style="font-family:var(--ui);font-weight:400;font-size:.8rem">${d[0]}</b><br>${d[1]}</p>`).join('')}</div>`;
+  }else if(k==='survey'){
+    h=`<div class="paper"><h3>住民アンケート（3階）</h3><div class="meta">1998/10/05 ／ 聞き取り：三枝</div>
+      <table><thead><tr><th>号室</th><th>夜中に物音を聞いたことは？</th><th>おとなりは何号室？</th></tr></thead><tbody>
+      <tr><td class="no">301</td><td>毎晩3時すぎ。ドアの開け閉めの音。</td><td>302</td></tr>
+      <tr><td class="no">302</td><td>303から話し声。空き部屋なのに。</td><td>301と303</td></tr>
+      <tr><td class="no">303</td><td colspan="2" style="color:#6d685c">（空室のため、回答なし）</td></tr>
+      <tr><td class="no">305</td><td>壁の向こうから、ノック。返事はしていない。</td><td><span class="hand">304</span></td></tr>
+      </tbody></table></div>`;
+  }else if(k==='keylog'){
+    const K=[
+      ['10/18','302','三浦','09:10','10/18 09:40'],
+      ['10/18','303','清掃業者','13:00','10/19 10:00'],
+      ['10/19','305','木下','18:00','10/19 18:20'],
+      ['10/20','301','田村','07:50','10/22 09:00'],
+      ['10/21','303','（記入なし）','03:04','10/21 03:10'],
+      ['10/22','302','三浦','12:00','10/22 12:30'],
+      ['10/22','303','（記入なし）','03:04','—'],
+      ['10/23','305','木下','08:00','10/23 08:15'],
+    ];
+    h=`<div class="paper"><h3>鍵の貸出簿（1997年10月）</h3><div class="meta">管理人室 予備鍵</div>
+      <table><thead><tr><th>日付</th><th>鍵</th><th>借りた人</th><th>貸出</th><th>返却</th></tr></thead><tbody>
+      ${K.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td${r[2][0]==='（'?' class="hand"':''}>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`).join('')}
+      </tbody></table><p style="margin-top:12px;font-size:.85rem">※ 10/18〜10/23 以外の日は、貸し出しなし。10/18 の朝は、全部の鍵がそろっていた。</p></div>`;
+  }else if(k==='keybox'){
+    h=`<div class="figure">${keyboxSVG()}</div><p class="cap">管理人室の鍵箱（1998/10/12 撮影）。${S.stage>=3?'ダイヤル錠は外れている。中に、カセットテープが1本。':'ダイヤル錠：4桁。「04_夜間録音」のフォルダを開こうとすると、番号を聞かれる。'}</p>`;
+  }else if(k==='nmemo'){
+    h=`<div class="paper"><h3>調査メモ_04</h3><div class="meta">1998/10/14</div>
+      <p>3階の廊下、303と305のあいだの壁の前に、録音機を置いて一晩録った。</p>
+      <p>03:04 から、壁の中でノックが鳴りはじめた。平井さんの日誌に書いてあったのと同じ、二つずつの組。</p>
+      <p><span class="hand">1つ目の数が行、2つ目の数が段</span>。あ行が1、か行が2……。段は、あ・い・う・え・お の順。</p>
+      <p>ノックが言っていることを、そのまま次のフォルダのパスワードにした。</p>
+      <p>録音の最後に、自分の声が入っている。<br>自分では、何も言った覚えがない。</p></div>`;
+  }else if(k==='night'){
+    h=`<div class="paper tape"><h3>夜間録音_3階廊下（文字起こし）</h3><div class="meta">1998/10/14 02:58〜03:12</div>
+      ${NIGHT.map((t,i)=>`<div class="ln${t[2]?' unk':''}" data-i="${i}"><span class="sp">${t[0]}</span><span class="tx${t[3]?' kn':''}">${t[1]}</span></div>`).join('')}
+      </div><div class="row" style="margin-top:14px"><button class="btn" type="button" id="playTape">▶ 録音を再生</button></div>`;
+  }else if(k==='memo3'){
+    h=`<div class="paper"><h3>調査メモ_05</h3><div class="meta">1998/10/16</div>
+      <p>同じ場所から、1週間ごとに廊下を撮っている。</p>
+      <p>写真1と写真3を見くらべると、<span class="hand">ちがうところが3つある</span>。</p>
+      <p>全部見つけたら、最後のフォルダの鍵が外れるようにしておいた。</p>
+      <p>大野さんは、去年の春に亡くなっていた。<br>それなのに、303号室の前を通るたびに、ドアの向こうから、こっちを数える声がする。</p></div>`;
+  }else if(k==='p1'||k==='p2'||k==='p3'){
+    const n=k.slice(1);
+    h=`<div class="figure">${photoSVG(PHOTOS[k](),{label:'写真'+n+'：団地3階の外廊下'})}</div><p class="cap">写真${n}　ひばりヶ丘第二団地 3階 外廊下（左から301〜305）</p>`;
+  }else if(k==='cmp'){
+    h=`<div class="figure">${photoSVG(PHOTOS.p1(),{label:'写真1'})}</div><p class="cap">写真1（1998/10/02）</p>
+      <div class="figure" id="cmpTap">${photoSVG(PHOTOS.p3(),{tap:true,label:'写真3。ちがうところをタップ'})}</div>
+      <p class="found" id="foundMsg" aria-live="polite"></p>
+      <p class="cap">写真3（1998/10/16）　写真1とちがうところを、下の写真でタップしてください。</p>`;
+    h+=hintBlock('diff',['303号室のドア、303と305のあいだの壁、床の上をよく見てみよう。','ドアに貼ってあるもの、壁にあらわれたもの、床に置いてあるもの。']);
+  }else if(k==='memo4'){
+    h=`<div class="paper"><h3>最後のメモ</h3><div class="meta">1998/10/17 03:04</div>
+      <p>名簿が勝手に書きかわる。写真も。たぶん、記憶も。</p>
+      <p>あれは、ずっと前から住んでいたような顔をして、名簿にまぎれこむ。<br>まぎれこまれた人は、自分の部屋が「用意」される。</p>
+      <p>まぎれこんだ名前を名簿から消せば、あの部屋はなくなる。……はずだ。</p>
+      <p>このメモを読んでいる人へ。<br>名簿を開いて、<span class="hand">もう、そこにいるはずのない名前</span>を、消してくれ。</p>
+      <p>自分の名前が名簿に書かれていても、あわてないで。</p></div>`;
+  }
+  $('sheetBody').innerHTML=h;
+  $('sheet').hidden=false; $('sheet').scrollTop=0;
+  if(k==='tape'||k==='night') $('playTape').onclick=k==='night'?playNight:playTape;
+  if(k==='cmp') setupDiff();
+  if(k==='roster') $('sheetBody').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>delRow(+b.dataset.del));
+  if(k==='memo4'&&!S.final&&!S.epi){
+    S.final=true; save();
+    setTimeout(()=>{ noise(1.2,.05,700); toast('入居者名簿_3階 が更新されました（1998/10/17 03:04）'); },900);
+  }
+  if(k==='plan'&&S.stage>=5&&!S.epi) noise(.4,.04,1200);
+}
+function closeSheet(){ $('sheet').hidden=true; tapeStop=true; renderDesk(); }
+$('closeSheet').onclick=closeSheet;
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(!$('ask').hidden) $('ask').hidden=true; else if(!$('pw').hidden) $('pw').hidden=true; else if(!$('sheet').hidden) closeSheet(); } });
+
+function hintBlock(id,list){
+  const n=S.hints[id]||0;
+  return `<div class="hint" data-hid="${id}">${list.slice(0,n).map(t=>`<p>${t}</p>`).join('')}
+    ${n<list.length?`<button class="iconbtn" type="button" data-hint='${JSON.stringify(list)}'>ヒントを見る（${n+1}/${list.length}）</button>`:''}</div>`;
+}
+$('sheetBody').addEventListener('click',e=>{
+  const b=e.target.closest('[data-hint]'); if(!b) return;
+  const box=b.parentElement, id=box.dataset.hid, list=JSON.parse(b.dataset.hint);
+  S.hints[id]=Math.min(list.length,(S.hints[id]||0)+1); save();
+  box.outerHTML=hintBlock(id,list);
+});
+
+/* 録音の再生：1行ずつ光らせる。「？」の行ではノイズ */
+let tapeStop=false;
+function playTape(){
+  audio(); startDrone(); tapeStop=false;
+  const lines=[...document.querySelectorAll('.tape .ln')]; let i=0;
+  $('playTape').disabled=true; $('playTape').textContent='再生中…';
+  (function step(){
+    lines.forEach(l=>l.classList.remove('on'));
+    if(tapeStop||i>=lines.length||!$('playTape')){ if($('playTape')){ $('playTape').disabled=false; $('playTape').textContent='▶ もう一度再生'; } return; }
+    const l=lines[i]; l.classList.add('on'); l.scrollIntoView({block:'center',behavior:'smooth'});
+    const unk=l.classList.contains('unk');
+    if(unk) noise(1.1,.09,500+Math.random()*600); else blip(240+Math.random()*60,.05,.012,'sine');
+    i++; setTimeout(step,unk?1500:1300);
+  })();
+}
+
+/* 写真のちがい探し */
+function setupDiff(){
+  const svg=$('cmpTap').querySelector('svg'), marks=svg.querySelector('.marks');
+  const draw=()=>{
+    marks.innerHTML=DIFFS.filter(d=>S.found.includes(d.id)).map(d=>`<circle cx="${d.x}" cy="${d.y}" r="${d.r}" fill="none" stroke="#e0483c" stroke-width="4"/>`).join('');
+    $('foundMsg').textContent=S.stage>=5?'3つとも見つけた。「06_最後」が開いた。':`見つけたちがい：${S.found.length} / 3`;
+  };
+  draw();
+  svg.addEventListener('click',e=>{
+    if(S.stage>=5) return;
+    const p=svg.createSVGPoint(); p.x=e.clientX; p.y=e.clientY;
+    const q=p.matrixTransform(svg.getScreenCTM().inverse());
+    const hit=DIFFS.find(d=>!S.found.includes(d.id)&&Math.hypot(q.x-d.x,q.y-d.y)<d.r+6);
+    if(hit){
+      S.found.push(hit.id); save(); blip(880,.1,.04,'sine'); draw();
+      $('foundMsg').textContent+=`（${hit.label}）`;
+      if(S.found.length>=3){
+        S.stage=5; save();
+        setTimeout(()=>{ noise(1,.07,800); $('cmpTap').classList.add('glitch'); $('cmpTap').innerHTML=photoSVG(PHOTOS.p3(),{label:'写真3'}); setupDiff(); toast('「06_最後」の鍵が外れました。304号室の表札に、名前が出ている。'); },700);
+      }
+    }else{
+      blip(150,.08,.03);
+      marks.insertAdjacentHTML('beforeend',`<text x="${q.x}" y="${q.y+6}" font-size="20" text-anchor="middle" fill="#ffd8a0" class="miss">×</text>`);
+      setTimeout(()=>{ const m=marks.querySelector('.miss'); if(m) m.remove(); },500);
+    }
+  });
+}
+
+/* ===== パスワード ===== */
+let pwStage=0;
+const norm=s=>String(s).normalize('NFKC').replace(/[\u30a1-\u30f6]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60)).replace(/[\s　、。・]/g,'').replace(/号室$/,'').toLowerCase();
+function openPw(st){
+  pwStage=st; const L=LOCKS[st];
+  $('pwTtl').textContent=L.title; $('pwMsg').textContent=L.msg; $('pwIn').value=''; $('pwErr').textContent='';
+  $('pwIn').setAttribute('inputmode',st===1?'numeric':'text');
+  renderPwHints(); $('pw').hidden=false; setTimeout(()=>$('pwIn').focus(),50);
+}
+function renderPwHints(){
+  const L=LOCKS[pwStage], n=S.hints['pw'+pwStage]||0;
+  $('pwHints').innerHTML=L.hints.slice(0,n).map(t=>`<p>${t}</p>`).join('');
+  $('pwHint').hidden=n>=L.hints.length;
+}
+$('pwHint').onclick=()=>{ S.hints['pw'+pwStage]=(S.hints['pw'+pwStage]||0)+1; save(); renderPwHints(); };
+$('pwCancel').onclick=()=>{ $('pw').hidden=true; };
+$('pwForm').onsubmit=e=>{
+  e.preventDefault();
+  const L=LOCKS[pwStage], v=norm($('pwIn').value);
+  if(L.ok.includes(v)){
+    $('pw').hidden=true; S.stage=pwStage; save();
+    blip(440,.1,.04,'sine'); setTimeout(()=>blip(330,.3,.04,'sine'),120);
+    noise(.6,.05,900);
+    cur=FOLDERS.find(x=>x.need===pwStage).id; S.seen['f'+cur]=1; save(); renderDesk();
+    if(pwStage===1) setTimeout(()=>toast('入居者名簿_3階 が更新されました（1998/10/17 03:04）'),1400);
+  }else{
+    $('pwErr').textContent=v?'ちがうようです。':'パスワードを入れてください。';
+    const b=$('pwForm'); b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); blip(140,.12,.04);
+  }
+};
+
+let toastT=0;
+function toast(t){ const el=$('toast'); el.textContent=t; el.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>el.hidden=true,4200); }
+
+/* ===== 名前を消す → エンディング ===== */
+function delRow(i){
+  const r=roster().rows[i]; if(!r) return;
+  /* 確認はページ内のダイアログで（confirm() は埋めこみ表示などで止められて、押しても何も起きないことがある） */
+  $('askTtl').textContent=`「${r.nm}」を名簿から消しますか？`;
+  $('ask').hidden=false; blip(200,.1,.03); setTimeout(()=>$('askNo').focus(),50);
+  $('askNo').onclick=()=>{ $('ask').hidden=true; };
+  $('askYes').onclick=()=>{ $('ask').hidden=true; eraseRow(r); };
+}
+function eraseRow(r){
+  let end;
+  if(r.key==='oono') end='A';
+  else if(r.key==='me') end='B';
+  else if(r.key==='saegusa') end='C';
+  else end='D';
+  $('sheet').hidden=true; showEnd(end,r.nm);
+}
+const ENDS={
+  A:{ttl:'空室',lines:n=>[
+    '「大野 正一」の行が、消えた。',
+    'つづけて、304号室の行が、ふたつとも薄くなって、消えた。',
+    '303号室の欄には、「空室（1997年3月〜）」と書かれている。',
+    '最初に見た名簿と、同じだ。',
+    '大野さんは、1997年の春に亡くなっていた。',
+    '三枝さんが話を聞いた相手は、大野さんの顔をした、あの部屋の住人だった。',
+    '名簿の最終更新は、1998/10/02 14:10 に戻っている。']},
+  B:{ttl:'名簿にない人',lines:n=>[
+    `「${n}」の行が、消えた。`,
+    '画面が、少しだけ暗くなった気がする。',
+    'このUSBメモリを見つけたのは、誰だったか。',
+    '「はじめに」には、「中を見るのは、あなたが最初です」と書いてある。',
+    '名簿には、もう、あなたの名前はない。',
+    'だから、ここにいるあなたは、どの部屋の人でもない。',
+    '304号室のドアが、内側から開く音がした。']},
+  C:{ttl:'行方不明',lines:n=>[
+    '「三枝 浩一」の行が、消えた。',
+    '「はじめに」のファイルから、三枝さんの名前がなくなっている。',
+    '最初から、そんな調査員はいなかったことになった。',
+    'それでも、304号室の行は残っている。',
+    `住人の欄には、「${who()}」とだけ書いてある。`,
+    '入居：1998。']},
+  D:{ttl:'ひとり減った',lines:n=>[
+    `「${n}」の行が、消えた。`,
+    'その人は、ちゃんとそこに住んでいた。',
+    '名簿の行は、ひとつ減った。かわりに、304号室の行は、少し濃くなった。',
+    'まぎれこんだ名前は、まだ、名簿のどこかにある。']},
+};
+let lastEnd='A';
+function showEnd(k,nm){
+  lastEnd=k;
+  if(!S.ends.includes(k)){ S.ends.push(k); S.ends.sort(); }
+  save();
+  ['title','desk'].forEach(id=>$(id).hidden=true); $('ending').hidden=false; window.scrollTo(0,0);
+  $('endTag').textContent='END '+k; $('endTtl').textContent=ENDS[k].ttl;
+  const L=ENDS[k].lines(nm);
+  $('endTx').innerHTML=L.map((t,i)=>`<p style="animation-delay:${.6+i*1.4}s">${esc(t)}</p>`).join('');
+  $('endBtns').hidden=true; $('epiBtn').hidden=k!=='A';
+  $('ending').classList.add('glitch'); setTimeout(()=>$('ending').classList.remove('glitch'),600);
+  noise(1.6,.08,600); if(drone&&AC) drone.gain.linearRampToValueAtTime(k==='A'?.012:.05,AC.currentTime+3);
+  setTimeout(()=>{ $('endBtns').hidden=false; $('endsLine2').textContent=endsText(); },600+L.length*1400);
+}
+const endsText=()=>`見つけたエンド ${S.ends.length} / 4`+(S.ends.length?`（${S.ends.join('・')}）`:'');
+$('retryBtn').onclick=()=>{ S.epi=false; S.final=true; S.stage=5; save(); goDesk('a'); };
+$('epiBtn').onclick=()=>{ S.epi=true; save(); if(drone&&AC) drone.gain.linearRampToValueAtTime(.02,AC.currentTime+2); goDesk('a'); setTimeout(()=>toast('「01_調査」に、ファイルがひとつ増えています。'),800); };
+$('endTitle').onclick=()=>showTitle();
+$('shareBtn').onclick=async()=>{
+  const t=`「ないはずの部屋」END ${lastEnd}「${ENDS[lastEnd].ttl}」にたどりついた。（${S.ends.length}/4）\n#ないはずの部屋 #picoruno\n${GAME_URL}`;
+  try{ if(navigator.share){ await navigator.share({text:t}); return; } }catch(e){ return; }
+  window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(t),'_blank','noopener');
+};
+
+/* ===== 画面の切りかえ ===== */
+function goDesk(folder){
+  ['title','ending'].forEach(id=>$(id).hidden=true); $('desk').hidden=false;
+  cur=folder||null; renderDesk(); window.scrollTo(0,0);
+}
+function showTitle(){
+  ['desk','ending'].forEach(id=>$(id).hidden=true); $('sheet').hidden=true; $('title').hidden=false;
+  $('nameIn').value=S.name||'';
+  const has=S.stage>0||S.final||S.ends.length>0;
+  $('contBtn').hidden=!has; $('startBtn').textContent=has?'はじめから':'USBメモリを開く';
+  $('endsLine').textContent=S.ends.length?endsText():'';
+}
+$('startBtn').onclick=()=>{
+  const nm=$('nameIn').value.trim().slice(0,8);
+  const ends=S.ends;
+  S={name:nm,stage:0,final:false,epi:false,found:[],seen:{},hints:{},ends};
+  save(); audio(); startDrone(); pingPlay(); goDesk(null);
+  setTimeout(()=>toast('「01_調査」の「はじめに」から読んでみよう。'),600);
+};
+$('contBtn').onclick=()=>{
+  const nm=$('nameIn').value.trim().slice(0,8); if(nm) S.name=nm; save();
+  audio(); startDrone(); pingPlay(); goDesk(null);
+};
+$('nameIn').addEventListener('keydown',e=>{ if(e.key==='Enter') $('startBtn').click(); });
+$('toTitle').onclick=showTitle;
+
+load(); setMute(muted); showTitle();
+window.__naihazu={get S(){return S},roster,openFile,showEnd};
+</script>
+<script>
+/* 遊んだ回数を数える（トップページの ▶ 回数）。同じタブでの再読みこみは1回だけ数えます。 */
+function pingPlay(){
+  var G="ないはずの部屋", K="picoruno-played:"+G;
+  try{ if(sessionStorage.getItem(K)) return; sessionStorage.setItem(K,"1"); }catch(e){}
+  var KEY="sb_publishable_5hbtIPW-1y5MqsoiLC6X_A_oZMG0Z5Z";
+  fetch("https://fymwlpbspigpeaoenhhp.supabase.co/rest/v1/rpc/add_play",{method:"POST",keepalive:true,
+    headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify({g:G})})
+  .then(function(r){ if(!r.ok) throw 0; })
+  .catch(function(){ try{ var d=JSON.parse(localStorage.getItem("picoruno-stats")||"{}"); d[G]=d[G]||{plays:0,likes:0}; d[G].plays++; localStorage.setItem("picoruno-stats",JSON.stringify(d)); }catch(e){} });
+}
+</script>
+</body>
+</html>
