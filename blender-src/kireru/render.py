@@ -157,7 +157,8 @@ cam.data.sensor_height = 24
 cam.data.dof.use_dof = True
 cam.data.dof.focus_distance = 43
 cam.data.dof.aperture_fstop = 0.9
-bl.render(os.path.join(OUT, "bg.png"), 1080, 1620, samples=S)
+if "--packs-only" not in sys.argv:
+    bl.render(os.path.join(OUT, "bg.png"), 1080, 1620, samples=S)
 
 # ---------- 2) 小袋 ----------
 labels.make_bump(os.path.join(OUT, "bump.png"))
