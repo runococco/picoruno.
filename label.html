@@ -537,7 +537,8 @@ cv.addEventListener("pointerdown", e => {
   const p = toWorld(e), f = frontPt();
   const d = Math.hypot(p.x - f.x, p.y - f.y);
   if (S.p < 0.002 && d > 80) { say("ラベルのはし（光っている所）をつまんで", 1.6); return; }
-  S.grip = { id: e.pointerId }; S.finger = p; S.anchor = Math.min(S.p * CIRC, d);
+  // つまんだ瞬間に引っぱった扱いにしない（指の位置までの距離はたるみとして持つ）
+  S.grip = { id: e.pointerId, t: S.t }; S.finger = p; S.anchor = d; S.peelV = 0;
   S.lastMove = { x: p.x, y: p.y, t: S.t };
   try { cv.setPointerCapture(e.pointerId); } catch (er) {}
   KIT.tone({ f: 900, dur: 0.03, vol: 0.04, type: "triangle", wet: 0 });
@@ -575,16 +576,17 @@ function update(dt) {
     if (d > S.anchor) {
       // ぴんと張った：はがれる
       const glue = glueAt(S.p);
-      const dl = (d - S.anchor) * (1 - glue * 0.45);
+      const dl = Math.min(d - S.anchor, 40) * (1 - glue * 0.45);
       const v = dl / dt;
       S.peelV = lerp(S.peelV, v, 0.3);
       S.p = Math.min(1, S.p + dl / CIRC);
       S.anchor = d;
       // 引く向き：真横（左）からのずれ
       const ang = Math.atan2(p.y - f.y, f.x - p.x);   // 上向きが負
-      const dev = Math.abs(ang) * 180 / Math.PI;
+      let dev = Math.abs(ang) * 180 / Math.PI;
       const vlim = B().vmax * (1 - glue * 0.7);
       let grow = 0;
+      if (S.t - S.grip.t < 0.15) dev = 0;   // つまみ直した直後は向きを見ない
       if (p.x > f.x - 10) grow += dl * 0.02;          // うしろへ引いている
       if (dev > 16) grow += (dev - 16) * 0.0009 * dl;
       if (S.peelV > vlim) grow += (S.peelV - vlim) / vlim * dl * 0.03;

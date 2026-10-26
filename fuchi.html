@@ -83,7 +83,7 @@ button{font-family:inherit;color:inherit}
 <section class="sheet" id="title">
   <div class="kicker">picoruno. 新作</div>
   <h1>ふちギリギリ</h1>
-  <p>蛇口の水をグラスに注いで、ふちより上へ。表面張力でぷっくりふくらむ限界まで、何mm盛れるか。こぼしたら、そのグラスは0点。</p>
+  <p>蛇口の水をグラスに注いで、ふちより上へ。表面張力でぷっくりふくらむ限界まで。限界の高さと蛇口の勢いは毎回ちがうので、水面のぷるぷるを見て止めよう。限界にどれだけ迫れたかで、1つ100点。こぼしたら0点。</p>
   <div class="how">
     <b>注ぐ</b><span>画面を長押し。長く押すほど勢いが強くなる</span>
     <b>止める</b><span>はなしても、空中の水はあとから届く</span>
@@ -102,7 +102,7 @@ button{font-family:inherit;color:inherit}
 </section>
 
 <section class="sheet" id="result" hidden>
-  <div class="rank"><small>3つのグラスで、ふちから合計</small><div class="total" id="rTotal">0<small>mm</small></div></div>
+  <div class="rank"><small>3つのグラスで、限界にどこまで迫れたか</small><div class="total" id="rTotal">0<small>点</small></div></div>
   <div class="rank"><small>あなたは</small><b id="rRank"></b></div>
   <div class="laps" id="rLaps"></div>
   <div class="note" id="rNote"></div>
@@ -331,9 +331,9 @@ let IMG = {};
 const lerp = (a, b, k) => a + (b - a) * k, clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const ease = k => 1 - Math.pow(1 - clamp(k, 0, 1), 3);
 const ROUNDS = [
-  { id: "tumbler", name: "タンブラー", lim: [2.3, 3.6], qmax: 46 },
-  { id: "ochoko", name: "おちょこ", lim: [2.6, 4.2], qmax: 30 },
-  { id: "flute", name: "フルート", lim: [1.7, 2.9], qmax: 34 }
+  { id: "tumbler", name: "タンブラー", lim: [1.6, 4.2], qmax: 46 },
+  { id: "ochoko", name: "おちょこ", lim: [1.8, 4.8], qmax: 30 },
+  { id: "flute", name: "フルート", lim: [1.3, 3.4], qmax: 34 }
 ];
 const DOME_X = 2.6;          // ふくらみを見やすく強調する倍率
 const DELAY = 0.2;           // 蛇口からふちまで水が落ちる時間（秒）
@@ -355,6 +355,8 @@ function rowAt(z) {
 const rimZ = () => G().inner[G().inner.length - 1][4];
 const rimRow = () => G().inner[G().inner.length - 1];
 const pxmm = () => G().pxcm / 10;
+// 蛇口の勢いもグラスごとに変わる（同じ秒数では止められない）
+const Q = () => R().qmax * (S.qmul || 1);
 
 /* ---------- canvas ---------- */
 const cv = $("cv"), cx = cv.getContext("2d");
@@ -446,7 +448,7 @@ function drawWater(bg) {
     const L = top[0], Rr = top[1], hpx = S.d * pxmm() * DOME_X;
     g.beginPath();
     for (let i = 0; i <= 24; i++) {
-      const u = i / 24, s = 2 * u - 1, wob = Math.sin(u * 9 + S.t * 14) * S.ripple * 0.25 * (1 - s * s);
+      const u = i / 24, s = 2 * u - 1, nr = S.state === "over" ? 0 : clamp((S.d / S.lim - 0.55) / 0.45, 0, 1), wob = (Math.sin(u * 9 + S.t * 14) * S.ripple * 0.25 + Math.sin(u * 6.283 + S.t * (18 + nr * 16)) * nr * nr * 2.6) * (1 - s * s);
       const x = lerp(L, Rr, u), y = top[2] - hpx * Math.pow(Math.max(0, 1 - Math.pow(Math.abs(s), 3.2)), 0.55) - wob;
       i ? g.lineTo(x, y) : g.moveTo(x, y);
     }
@@ -456,8 +458,8 @@ function drawWater(bg) {
     g.beginPath(); g.moveTo(lerp(L, Rr, 0.22), top[2] - hpx * 0.86); g.quadraticCurveTo(lerp(L, Rr, 0.35), top[2] - hpx * 0.98, lerp(L, Rr, 0.48), top[2] - hpx * 0.97); g.stroke();
     // 限界が近いと、ふちがきらきら震える
     const near = S.d / S.lim;
-    if (near > 0.82 && S.state !== "over") {
-      g.fillStyle = `rgba(255,255,255,${(near - 0.82) * 4})`;
+    if (near > 0.7 && S.state !== "over") {
+      g.fillStyle = `rgba(255,255,255,${Math.min(1, (near - 0.7) * 3.3)})`;
       for (const s of [-1, 1]) { const x = s < 0 ? L + 2 : Rr - 2; g.beginPath(); g.arc(x + (Math.random() - 0.5) * 2, top[2] - 3 - Math.random() * 4, 2.2, 0, 6.283); g.fill(); }
     }
   } else {
@@ -476,7 +478,7 @@ function drawStream() {
   const tail = S.hold ? 0 : clamp((S.t - S.pourEnd) / DELAY, 0, 1);
   const y0 = lerp(n[1], yEnd, tail), y1 = lerp(n[1], yEnd, head);
   if (y1 - y0 < 2) return;
-  const w = 2 + Math.min(1, S.q / R().qmax) * 9;
+  const w = 2 + Math.min(1, S.q / Q()) * 9;
   const g = cx;
   const gr = g.createLinearGradient(n[0] - w, 0, n[0] + w, 0);
   gr.addColorStop(0, "rgba(160,210,235,.35)"); gr.addColorStop(0.35, "rgba(255,255,255,.85)"); gr.addColorStop(0.6, "rgba(200,235,250,.5)"); gr.addColorStop(1, "rgba(120,180,210,.4)");
@@ -556,7 +558,7 @@ function updatePourSound(flow) {
   const ac = KIT.ensure(), fill = clamp((S.z - G().inner[0][4]) / (rimZ() - G().inner[0][4]), 0, 1);
   // グラスが満ちるほど、音が高くなる
   n.bp.frequency.setTargetAtTime(300 + fill * fill * 1600 + (S.d > 0 ? 400 : 0), ac.currentTime, 0.05);
-  n.g.gain.setTargetAtTime(Math.min(0.32, flow / R().qmax * 0.32), ac.currentTime, 0.04);
+  n.g.gain.setTargetAtTime(Math.min(0.32, flow / Q() * 0.32), ac.currentTime, 0.04);
 }
 
 /* ---------- 更新 ---------- */
@@ -572,8 +574,8 @@ function update(dt) {
   if (S.over > 0) { S.over += dt * 1.8; S.puddle = Math.min(1, S.puddle + dt * 0.8); }
   if (!["play", "settle", "over"].includes(S.state)) { updatePourSound(0); return; }
   // 蛇口：押している間、勢いが増す
-  if (S.hold && S.state === "play") { S.holdT += dt; S.q = R().qmax * (0.12 + 0.88 * clamp(S.holdT / 1.1, 0, 1)); }
-  else S.q = Math.max(0, S.q - dt * R().qmax * 6);
+  if (S.hold && S.state === "play") { S.holdT += dt; S.q = Q() * (0.12 + 0.88 * clamp(S.holdT / 1.1, 0, 1)); }
+  else S.q = Math.max(0, S.q - dt * Q() * 6);
   S.flight.push({ t: S.t, q: S.q });
   // DELAY 秒前の流量が、いまグラスに届く
   let arriving = 0;
@@ -586,7 +588,7 @@ function update(dt) {
       if (S.z > rimZ()) { const extra = (S.z - rimZ()) * Math.PI * r * r; S.z = rimZ(); S.d += extra / (0.5 * Math.PI * r * r) * 10; }
     } else S.d += vol / (0.5 * Math.PI * r * r) * 10;
     S.ripple = Math.min(10, S.ripple + arriving * dt * 3);
-    if (Math.random() < arriving / R().qmax) { const top = rowAt(Math.min(S.z, rimZ())); S.parts.push({ x: 360 + (Math.random() - 0.5) * 10, y: top[2] - S.d * pxmm() * DOME_X, vx: (Math.random() - 0.5) * 120, vy: -80 - Math.random() * 120, r: 1 + Math.random() * 1.6, life: 0.5 }); }
+    if (Math.random() < arriving / Q()) { const top = rowAt(Math.min(S.z, rimZ())); S.parts.push({ x: 360 + (Math.random() - 0.5) * 10, y: top[2] - S.d * pxmm() * DOME_X, vx: (Math.random() - 0.5) * 120, vy: -80 - Math.random() * 120, r: 1 + Math.random() * 1.6, life: 0.5 }); }
     // 勢いよく当たると、限界の手前でもあふれる
     if (S.d > 0 && S.state !== "over" && S.d + arriving * 0.018 > S.lim) overflow();
   }
@@ -594,7 +596,7 @@ function update(dt) {
   const near = S.z > rimZ() - 1.0;
   const rimY = rimRow()[2];
   if (S.state !== "over") S.camTo = near ? { x: 360, y: rimY + 30, z: 1.9 } : { x: 360, y: 540, z: 1 };
-  if (S.d > 0 && S.d / S.lim > 0.8 && Math.random() < dt * 2) KIT.tone({ f: 2400 + Math.random() * 600, dur: 0.05, vol: 0.02, type: "sine", wet: 0.3 });
+  if (S.d > 0 && S.d / S.lim > 0.7 && Math.random() < dt * (1 + 14 * clamp((S.d / S.lim - 0.7) / 0.3, 0, 1))) KIT.tone({ f: 2400 + Math.random() * 600, dur: 0.05, vol: 0.02, type: "sine", wet: 0.3 });
   if (!S.okShown && S.z > (G().inner[0][4] + rimZ()) / 2) { S.okShown = true; $("ok").hidden = false; }
   if (S.state === "settle") { S.settleT += dt; if (S.settleT > DELAY + 0.5) judge(); }
   if (S.state === "over" && S.over > 1.6 && !S.judged) judge();
@@ -639,14 +641,15 @@ function judge() {
   if (S.judged) return; S.judged = true;
   const over = S.state === "over";
   const mm = over ? 0 : S.d > 0 ? S.d : -(rimZ() - S.z) * 10;
-  S.results.push({ name: R().name, mm, over, lim: S.lim });
+  const pts = over ? 0 : Math.round(100 * clamp(mm / S.lim, 0, 1));
+  S.results.push({ name: R().name, mm, over, lim: S.lim, pts });
   S.state = "judge"; S.judgeAt = S.t;
   const pt = $("jPt");
   pt.className = "pt" + (over ? " ng" : "");
-  pt.innerHTML = over ? "0<small>mm</small>" : `${mm >= 0 ? "+" : ""}${mm.toFixed(1)}<small>mm</small>`;
+  pt.innerHTML = `${pts}<small>点</small>`;
   const ratio = mm / S.lim;
   $("jHead").textContent = `${R().name}　` + (over ? "あふれました" : ratio > 0.95 ? "神のギリギリ！" : ratio > 0.85 ? "ギリギリ！" : ratio > 0.6 ? "なみなみ" : mm > 0 ? "ふちを越えた" : "まだ入る");
-  $("jDetail").textContent = `このグラスの限界は +${S.lim.toFixed(1)}mm`;
+  $("jDetail").textContent = over ? `限界は +${S.lim.toFixed(1)}mm でした` : `限界 +${S.lim.toFixed(1)}mm の ${pts}%`;
   $("judge").hidden = false;
   if (!over) [0, 4, 7, 12].slice(0, ratio > 0.9 ? 4 : ratio > 0.6 ? 3 : 2).forEach((d, i) => KIT.inst.bell(72 + d, 0.05 + i * 0.08, 0.4, 0.12));
   S.camTo = { x: 360, y: rimRow()[2] + 40, z: 1.6 };
@@ -659,7 +662,7 @@ function nextRound() {
 }
 function startRound(i) {
   S.round = i; S.state = "play"; S.z = G().inner[0][4]; S.d = 0; S.q = 0; S.flight = []; S.hold = false; S.over = 0; S.puddle = 0; S.okShown = false; S.judged = false;
-  const L = R().lim; S.lim = L[0] + Math.random() * (L[1] - L[0]);
+  const L = R().lim; S.lim = L[0] + Math.random() * (L[1] - L[0]); S.qmul = 0.75 + Math.random() * 0.5;
   S.cam = { x: 360, y: 540, z: 1 }; S.camTo = { ...S.cam };
   $("ok").hidden = true;
   if (i === 0) say("長押しで注ぐ。ふちを越えて、ぷっくりまで", 2.6);
@@ -673,22 +676,22 @@ function startGame() {
   startMusic(false); KIT.countPlay(GAME_TITLE);
   startRound(0);
 }
-const RANKS = [[10, "表面張力の神"], [8, "ギリギリ職人"], [5, "なみなみ名人"], [2, "ふちまで派"], [0, "ふつうに注ぐ人"], [-1e9, "ひかえめな人"]];
+const RANKS = [[285, "表面張力の神"], [255, "ギリギリ職人"], [210, "なみなみ名人"], [150, "ふちまで派"], [60, "ふつうに注ぐ人"], [-1e9, "ひかえめな人"]];
 function finish() {
   S.state = "result";
-  const total = S.results.reduce((a, r) => a + r.mm, 0);
+  const total = S.results.reduce((a, r) => a + r.pts, 0);
   S.total = total; S.rank = RANKS.find(r => total >= r[0])[1];
-  $("rTotal").innerHTML = `${total >= 0 ? "+" : ""}${total.toFixed(1)}<small>mm</small>`;
+  $("rTotal").innerHTML = `${total}<small>／300点</small>`;
   $("rRank").textContent = S.rank;
-  $("rLaps").innerHTML = S.results.map(r => `<div class="lap${r.over ? " ng" : ""}"><small>${r.name}</small><b>${r.over ? "あふれ" : (r.mm >= 0 ? "+" : "") + r.mm.toFixed(1)}</b><small>限界 +${r.lim.toFixed(1)}</small></div>`).join("");
+  $("rLaps").innerHTML = S.results.map(r => `<div class="lap${r.over ? " ng" : ""}"><small>${r.name}</small><b>${r.pts}点</b><small>${r.over ? "あふれ" : (r.mm >= 0 ? "+" : "") + r.mm.toFixed(1) + "mm"}／限界 +${r.lim.toFixed(1)}</small></div>`).join("");
   const n = S.results.filter(r => r.over).length;
-  const best = KIT.store.get("fuchi-best", null);
-  if (best === null || total > best) KIT.store.set("fuchi-best", +total.toFixed(1));
-  $("rNote").textContent = (n ? `テーブルを${n}回ふきました。` : "1滴もこぼさなかった！ ") + (best === null || total > best ? "自己ベスト更新！" : `自己ベスト +${best}mm`);
+  const best = KIT.store.get("fuchi-best-pt", null);
+  if (best === null || total > best) KIT.store.set("fuchi-best-pt", total);
+  $("rNote").textContent = (n ? `テーブルを${n}回ふきました。` : "1滴もこぼさなかった！ ") + (best === null || total > best ? "自己ベスト更新！" : `自己ベスト ${best}点`);
   $("result").hidden = false; $("ok").hidden = true;
   KIT.music.stop(); setTimeout(() => startMusic(true), 500);
 }
-function shareText() { return `ふちギリギリ、3つのグラスでふちから合計 ${S.total >= 0 ? "+" : ""}${S.total.toFixed(1)}mm\nわたしは「${S.rank}」\n${S.results.map(r => `${r.name}${r.over ? " あふれ" : " " + (r.mm >= 0 ? "+" : "") + r.mm.toFixed(1)}`).join("・")}\n#ふちギリギリ`; }
+function shareText() { return `ふちギリギリ、限界にどこまで迫れたか ${S.total}／300点\nわたしは「${S.rank}」\n${S.results.map(r => `${r.name} ${r.over ? "あふれ" : r.pts + "点"}`).join("・")}\n#ふちギリギリ`; }
 function shareCanvas() {
   const c = document.createElement("canvas"); c.width = 1200; c.height = 630;
   const g = c.getContext("2d");
@@ -698,17 +701,17 @@ function shareCanvas() {
   g.fillStyle = "#3f97c4"; g.fillRect(600, 0, 10, 630);
   g.textAlign = "left";
   g.fillStyle = "#24414a"; g.font = '800 40px "M PLUS Rounded 1c",sans-serif'; g.fillText("ふちギリギリ", 650, 92);
-  g.fillStyle = "#6c8790"; g.font = '700 24px "Zen Maru Gothic",sans-serif'; g.fillText("3つのグラスで、ふちから合計", 650, 170);
+  g.fillStyle = "#6c8790"; g.font = '700 24px "Zen Maru Gothic",sans-serif'; g.fillText("限界にどこまで迫れたか", 650, 170);
   g.fillStyle = "#2b6f93"; g.font = '800 92px "M PLUS Rounded 1c",sans-serif';
-  const t = `${S.total >= 0 ? "+" : ""}${S.total.toFixed(1)}`; g.fillText(t, 650, 270);
-  const tw = g.measureText(t).width; g.font = '800 34px "M PLUS Rounded 1c",sans-serif'; g.fillText("mm", 660 + tw, 270);
+  const t = `${S.total}`; g.fillText(t, 650, 270);
+  const tw = g.measureText(t).width; g.font = '800 34px "M PLUS Rounded 1c",sans-serif'; g.fillText("／300点", 660 + tw, 270);
   g.fillStyle = "#6c8790"; g.font = '700 24px "Zen Maru Gothic",sans-serif'; g.fillText("わたしは", 650, 340);
   g.fillStyle = "#24414a"; g.font = '800 44px "M PLUS Rounded 1c",sans-serif'; g.fillText(S.rank, 650, 396);
   S.results.forEach((r, i) => {
     const x = 650 + i * 172, y = 430;
     g.fillStyle = "#eef6f5"; rr(g, x, y, 160, 100, 16); g.fill();
     g.fillStyle = "#6c8790"; g.font = '700 19px "Zen Maru Gothic",sans-serif'; g.textAlign = "center"; g.fillText(r.name, x + 80, y + 32);
-    g.fillStyle = r.over ? "#d65a4a" : "#24414a"; g.font = '800 32px "M PLUS Rounded 1c",sans-serif'; g.fillText(r.over ? "あふれ" : (r.mm >= 0 ? "+" : "") + r.mm.toFixed(1), x + 80, y + 76);
+    g.fillStyle = r.over ? "#d65a4a" : "#24414a"; g.font = '800 32px "M PLUS Rounded 1c",sans-serif'; g.fillText(r.over ? "あふれ" : r.pts + "点", x + 80, y + 76);
     g.textAlign = "left";
   });
   g.fillStyle = "#6c8790"; g.font = '700 20px "Zen Maru Gothic",sans-serif'; g.fillText("#ふちギリギリ ・ picoruno.", 650, 596);
@@ -735,8 +738,8 @@ $("mute").addEventListener("click", () => { KIT.setMuted(!KIT.muted); muteIcon()
 (async function boot() {
   resize(); muteIcon();
   S.z = G().inner[0][4];
-  const best = KIT.store.get("fuchi-best", null);
-  $("best").textContent = best !== null ? `自己ベスト +${best}mm` : "3つのグラスで、ふちから何mm盛れるか";
+  const best = KIT.store.get("fuchi-best-pt", null);
+  $("best").textContent = best !== null ? `自己ベスト ${best}点` : "限界はグラスごとに毎回ちがう。ぷるぷるを見て止めよう";
   IMG = await KIT.loadImages(SRC);
   requestAnimationFrame(frame);
 })();
