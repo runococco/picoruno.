@@ -114,6 +114,7 @@ button,input{font-family:inherit;color:inherit}
 .tape .ln.unk .tx{color:#5a2a25;letter-spacing:.18em}
 .tape .ln.on{background:rgba(224,161,74,.25)}
 .tape .ln.unk.on .tx{animation:jit .12s infinite}
+.tape .tx.kn{letter-spacing:0;white-space:nowrap;font-size:.74rem}
 @keyframes jit{50%{transform:translate(1px,-1px)}}
 .figure{background:#0e0f0e;padding:8px;box-shadow:0 0 0 1px #000}
 .figure svg{display:block;width:100%;height:auto}
@@ -156,7 +157,7 @@ button,input{font-family:inherit;color:inherit}
 <section class="screen" id="title">
   <h1 class="logo">ないはずの<span class="x">部</span>屋</h1>
   <p class="subt">ひばりヶ丘第二団地 調査記録</p>
-  <div class="note">1998年、ひとりの調査員が団地の調査中に行方不明になりました。のこされたUSBメモリには、名簿、間取り図、録音、写真が入っています。<br>読み解いて、「ないはずの部屋」の正体をたしかめてください。<br><br>※ 大きな音や、急に驚かせる演出はありません。音が出ます（イヤホン推奨）。</div>
+  <div class="note">1998年、ひとりの調査員が団地の調査中に行方不明になりました。のこされたUSBメモリには、名簿、間取り図、録音、写真が入っています。<br>読み解いて、「ないはずの部屋」の正体をたしかめてください。（クリアまで30分ほど）<br><br>※ 大きな音や、急に驚かせる演出はありません。音が出ます（イヤホン推奨）。</div>
   <label class="field">記録を引き継ぐ人の名前
     <input id="nameIn" maxlength="8" placeholder="例：しろ" autocomplete="off" enterkeyhint="go">
   </label>
@@ -218,9 +219,9 @@ const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 /* ===== 進みぐあい =====
-   stage 0: 01だけ開いている / 1: 02録音が開いた / 2: 03写真が開いた / 3: 04が開いた（写真のちがいを3つ見つけた）
+   stage 0: 01だけ開いている / 1: 02録音 / 2: 03管理人室 / 3: 04夜間録音（鍵箱が開いた） / 4: 05写真 / 5: 06最後（写真のちがいを3つ見つけた）
    final: 04のメモを読んだ（名簿に自分の名前が出て、消せるようになる） / epi: END A のあと */
-const SAVE_KEY='picoruno-naihazu';
+const SAVE_KEY='picoruno-naihazu2';
 let S={name:'',stage:0,final:false,epi:false,found:[],seen:{},hints:{},ends:[]};
 function load(){ try{ const d=JSON.parse(localStorage.getItem(SAVE_KEY)||'null'); if(d) S=Object.assign(S,d); }catch(e){} }
 function save(){ try{ localStorage.setItem(SAVE_KEY,JSON.stringify(S)); }catch(e){} }
@@ -277,11 +278,11 @@ function roster(){
   if(S.epi) return {rows:R,upd:'1998/10/02 14:10',changed:[]};
   const changed=[];
   if(S.stage>=1){ R[2]={no:'303',nm:'大野 正一',since:'1968',key:'oono'}; changed.push('303'); }
-  if(S.stage>=3){ R.splice(3,0,{no:'304',nm:'三枝 浩一',since:'1998',key:'saegusa'}); changed.push('304'); }
+  if(S.stage>=5){ R.splice(3,0,{no:'304',nm:'三枝 浩一',since:'1998',key:'saegusa'}); changed.push('304'); }
   if(S.final){ R.splice(4,0,{no:'304',nm:who(),since:'（同居）',key:'me'}); changed.push('304b'); }
   return {rows:R,upd:S.stage>=1?'1998/10/17 03:04':'1998/10/02 14:10',changed};
 }
-function rosterVer(){ return S.epi?'e':[S.stage>=1,S.stage>=3,S.final].map(Number).join(''); }
+function rosterVer(){ return S.epi?'e':[S.stage>=1,S.stage>=5,S.final].map(Number).join(''); }
 
 /* ===== 写真（SVG） ===== */
 function photoSVG(v,opts={}){
@@ -341,7 +342,7 @@ const PHOTOS={
   p1:()=>({date:"'98 10 02",door304:0,p303:'sticker',seed:3}),
   p2:()=>({date:"'98 10 09",door304:.16,p303:'sticker',seed:7,dark:.08}),
   p3:()=>S.epi?({date:"'98 10 16",door304:0,p303:'sticker',shoes:true,seed:11,dark:.16})
-             :({date:"'98 10 16",door304:1,plate304:S.stage>=3?'三枝':'',p303:'oono',shoes:true,seed:11,dark:.16,win:{305:'#20211f'}}),
+             :({date:"'98 10 16",door304:1,plate304:S.stage>=5?'三枝':'',p303:'oono',shoes:true,seed:11,dark:.16,win:{305:'#20211f'}}),
 };
 /* ちがい（写真1→写真3）。タップの当たり判定は SVG 座標 */
 const DIFFS=[
@@ -357,7 +358,7 @@ function planSVG(){
   units.forEach((n,i)=>{
     const x=20+i*112;
     if(n===null){
-      if(S.stage>=3&&!S.epi) g+=`<text x="${x+56}" y="98" font-size="22" text-anchor="middle" fill="#8c2f28" font-family="serif" transform="rotate(-6 ${x+56} 98)">304？</text><text x="${x+56}" y="128" font-size="13" text-anchor="middle" fill="#8c2f28" font-family="serif">三枝</text>`;
+      if(S.stage>=5&&!S.epi) g+=`<text x="${x+56}" y="98" font-size="22" text-anchor="middle" fill="#8c2f28" font-family="serif" transform="rotate(-6 ${x+56} 98)">304？</text><text x="${x+56}" y="128" font-size="13" text-anchor="middle" fill="#8c2f28" font-family="serif">三枝</text>`;
       return;
     }
     g+=`<rect x="${x}" y="30" width="112" height="140" fill="none" stroke="#2c2a25" stroke-width="2"/>`+
@@ -399,18 +400,98 @@ const TAPE=[
   ['大野','あんたの部屋も、ちゃんと用意しとるから。'],
 ];
 
+/* ===== 夜間録音：ノック（行・段） =====  な(5,1) か(2,1) に(5,2) い(1,2) れ(9,4) て(4,4) */
+const KNOCKS=[[5,1],[2,1],[5,2],[1,2],[9,4],[4,4]];
+const dots=n=>'●'.repeat(n);
+const NIGHT=[
+  ['02:58','（廊下の換気扇の音。人の気配はない）'],
+  ['03:01','（遠くで、ドアの閉まる音）'],
+  ...KNOCKS.map((k,i)=>['03:04',`ノック ${dots(k[0])}　${dots(k[1])}`,true,k]),
+  ['03:07','（しばらく、何も聞こえない）'],
+  ['03:09','三枝「……返事、しちゃだめなんだよな」'],
+  ['03:10','ノック ●　●',true,[1,1]],
+  ['03:11','三枝「はい」'],
+  ['03:12','（ドアの開く音。録音はここで切れている）'],
+];
+function knock(t){
+  if(!AC) return;
+  const n=Math.floor(AC.sampleRate*.12), b=AC.createBuffer(1,n,AC.sampleRate), d=b.getChannelData(0);
+  for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/n,4);
+  const s=AC.createBufferSource(); s.buffer=b;
+  const lp=AC.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=380;
+  const g=AC.createGain(); g.gain.value=.55; s.connect(lp); lp.connect(g); g.connect(master); s.start(t);
+}
+function playNight(){
+  audio(); startDrone(); tapeStop=false;
+  const lines=[...document.querySelectorAll('.tape .ln')]; let i=0;
+  $('playTape').disabled=true; $('playTape').textContent='再生中…';
+  (function step(){
+    lines.forEach(l=>l.classList.remove('on'));
+    if(tapeStop||i>=lines.length||!$('playTape')){ if($('playTape')){ $('playTape').disabled=false; $('playTape').textContent='▶ もう一度再生'; } return; }
+    const l=lines[i], k=NIGHT[i][3]; l.classList.add('on'); l.scrollIntoView({block:'center',behavior:'smooth'});
+    let dur=1500;
+    if(k&&AC){ const t0=AC.currentTime+.15; let t=t0;
+      for(let a=0;a<k[0];a++){ knock(t); t+=.26; } t+=.55; for(let a=0;a<k[1];a++){ knock(t); t+=.26; }
+      dur=(t-t0)*1000+900; }
+    else if(k) dur=2600;
+    else if(NIGHT[i][1][0]==='（') noise(.5,.02,400);
+    i++; setTimeout(step,dur);
+  })();
+}
+
+/* ===== 外観写真・鍵箱（SVG） ===== */
+function extSVG(){
+  let g='';
+  for(let f=0;f<4;f++){ const y=40+f*62;
+    for(let w=0;w<5;w++){ const x=60+w*100;
+      const fl=4-f, me=fl===3&&w===3;
+      g+=`<rect x="${x}" y="${y}" width="64" height="38" fill="${me?'#1a1b19':'#3b403c'}" stroke="#22241f" stroke-width="2"/>`+
+        `<path d="M${x+32} ${y}v38" stroke="#22241f" stroke-width="1.5"/>`+
+        `<rect x="${x-10}" y="${y+40}" width="84" height="12" fill="#9ea197" stroke="#55584f"/>`;
+      if(me&&!S.epi) g+=`<path d="M${x+40} ${y+38}v-22q4-8 8 0v22z" fill="#0b0b0a" opacity=".9"/>`;
+    }
+    g+=`<text x="34" y="${y+26}" font-size="12" fill="#2c2e29" font-family="sans-serif">${4-f}F</text>`;
+  }
+  return `<svg viewBox="0 0 600 330" role="img" aria-label="団地の外観。各階に窓が5つ。3階の左から4つめの窓は真っ暗。">
+    <rect width="600" height="330" fill="#7d8a93"/><rect x="20" y="20" width="560" height="270" fill="#b9b7ab" stroke="#6b6a61" stroke-width="2"/>
+    ${g}<rect y="290" width="600" height="40" fill="#545a4e"/>
+    <text x="580" y="316" font-size="18" text-anchor="end" fill="#ff8a3c" font-family="monospace" opacity=".9">'98 10 02</text></svg>`;
+}
+function keyboxSVG(){
+  const open=S.stage>=3;
+  let g='';
+  [301,302,303,304,305].forEach((n,i)=>{ const x=90+i*90;
+    g+=`<circle cx="${x}" cy="110" r="5" fill="#bbb5a0"/><text x="${x}" y="92" font-size="14" text-anchor="middle" fill="#e6e0cc" font-family="sans-serif">${n}</text>`;
+    const has=n===301||n===302||n===305||n===304;
+    if(has) g+=`<path d="M${x} 115v30" stroke="#c8b46a" stroke-width="4"/><circle cx="${x}" cy="150" r="8" fill="none" stroke="#c8b46a" stroke-width="3"/>`+
+      `<rect x="${x-14}" y="160" width="28" height="18" fill="${n===304?'#6e2a24':'#e6e0cc'}"/><text x="${x}" y="173" font-size="10" text-anchor="middle" fill="${n===304?'#f3e6d6':'#222'}" font-family="sans-serif">${n}</text>`;
+  });
+  return `<svg viewBox="0 0 540 300" role="img" aria-label="鍵箱。301、302、304、305のフックに鍵。303のフックだけ空いている。">
+    <rect width="540" height="300" fill="#2a2b28"/><rect x="40" y="40" width="460" height="230" fill="#4f5249" stroke="#1c1d1b" stroke-width="4"/>
+    <rect x="52" y="60" width="436" height="196" fill="#3a3c36"/>${g}
+    ${open?'<rect x="380" y="200" width="70" height="40" fill="#1b1b1a" stroke="#888"/><circle cx="400" cy="220" r="8" fill="none" stroke="#888"/><circle cx="430" cy="220" r="8" fill="none" stroke="#888"/>'
+      :'<rect x="230" y="232" width="80" height="30" fill="#8a8a82" stroke="#222"/><text x="270" y="253" font-size="16" text-anchor="middle" fill="#111" font-family="monospace">＊＊＊＊</text>'}
+    <text x="520" y="290" font-size="16" text-anchor="end" fill="#ff8a3c" font-family="monospace" opacity=".9">'98 10 12</text></svg>`;
+}
+
 /* ===== フォルダとファイル ===== */
 const FOLDERS=[
-  {id:'a',name:'01_調査',files:['readme','memo1','roster','plan','log']},
+  {id:'a',name:'01_調査',files:['readme','memo1','roster','plan','ext','log']},
   {id:'b',name:'02_録音',need:1,files:['memo2','tape']},
-  {id:'c',name:'03_写真',need:2,files:['memo3','p1','p2','p3','cmp']},
-  {id:'d',name:'04_最後',need:3,files:['memo4']},
+  {id:'c',name:'03_管理人室',need:2,files:['kmemo','diary','survey','keylog','keybox']},
+  {id:'d',name:'04_夜間録音',need:3,files:['nmemo','night']},
+  {id:'e',name:'05_写真',need:4,files:['memo3','p1','p2','p3','cmp']},
+  {id:'f',name:'06_最後',need:5,files:['memo4']},
 ];
 const LOCKS={
   1:{title:'02_録音 のパスワード',msg:'調査メモ_01 に、パスワードのことが書いてあります。',ok:['304'],
      hints:['間取り図の部屋番号を、左から順に読んでみよう。','301、302、303、そのつぎは……？']},
-  2:{title:'03_写真 のパスワード',msg:'調査メモ_02 に、パスワードのことが書いてあります。（ひらがな）',ok:['かべのなか'],
+  2:{title:'03_管理人室 のパスワード',msg:'調査メモ_02 に、パスワードのことが書いてあります。（ひらがな）',ok:['かべのなか'],
      hints:['文字起こしで、話している人が「？」の行だけを見よう。','「？」の行の最初の1文字を、上から順に並べてみよう。']},
+  3:{title:'鍵箱のダイヤル錠（4桁）',msg:'「04_夜間録音」は、鍵箱の中にしまってあります。番号の決め方は、管理日誌に書いてあります。',ok:['1019'],
+     hints:['管理日誌の 1997/10/24 を読もう。貸出簿の「その日の終わりに、外に出たままの鍵があるか」を1日ずつ確かめよう。','返却が次の日以降になっている鍵や、返却が「—」の鍵に気をつけて。全部の鍵がその日のうちに戻った日は、1日だけ。']},
+  4:{title:'05_写真 のパスワード',msg:'調査メモ_04 に、パスワードのことが書いてあります。（ひらがな）',ok:['なかにいれて'],
+     hints:['1組のノックは、2つの数でできている。最初の数が「行」（あ行=1、か行=2、さ行=3…）、次の数が「段」（あ・い・う・え・お=1〜5）。','1組目は 5回・1回 → な行の1つ目 → 「な」。ら行は9番目。']},
 };
 const FILES={
   readme:{nm:'はじめに',ext:'TXT',date:'2026/10/25',show:()=>true},
@@ -420,7 +501,15 @@ const FILES={
   log:{nm:()=>'調査記録_'+who(),ext:'TXT',date:'1998/10/17 03:04',show:()=>S.epi},
   memo2:{nm:'調査メモ_02',ext:'TXT',date:'1998/10/09',show:()=>true},
   tape:{nm:'録音_303号室',ext:'WAV',date:'1998/10/09',show:()=>true},
-  memo3:{nm:'調査メモ_03',ext:'TXT',date:'1998/10/16',show:()=>true},
+  ext:{nm:'外観写真',ext:'JPG',date:'1998/10/02',show:()=>true},
+  kmemo:{nm:'調査メモ_03',ext:'TXT',date:'1998/10/12',show:()=>true},
+  diary:{nm:'管理日誌_1997',ext:'TXT',date:'1997/12/28',show:()=>true},
+  survey:{nm:'住民アンケート',ext:'DOC',date:'1998/10/05',show:()=>true},
+  keylog:{nm:'鍵の貸出簿',ext:'DOC',date:'1997/10/23',show:()=>true},
+  keybox:{nm:'鍵箱の写真',ext:'JPG',date:'1998/10/12',show:()=>true},
+  nmemo:{nm:'調査メモ_04',ext:'TXT',date:'1998/10/14',show:()=>true},
+  night:{nm:'夜間録音_3階廊下',ext:'WAV',date:'1998/10/14 03:04',show:()=>true},
+  memo3:{nm:'調査メモ_05',ext:'TXT',date:'1998/10/16',show:()=>true},
   p1:{nm:'写真1',ext:'JPG',date:'1998/10/02',show:()=>true},
   p2:{nm:'写真2',ext:'JPG',date:'1998/10/09',show:()=>true},
   p3:{nm:'写真3',ext:'JPG',date:'1998/10/16',show:()=>true},
@@ -454,7 +543,7 @@ function renderDesk(){
 function statusText(){
   if(S.epi) return '調査は終わりました。……終わったはずです。';
   if(S.final) return '名簿を開いて、まぎれこんだ名前を消してください。';
-  return ['まずは「01_調査」の中を読んでみよう。','「02_録音」が開いた。','「03_写真」が開いた。','「04_最後」が開いた。'][S.stage];
+  return ['まずは「01_調査」の中を読んでみよう。','「02_録音」が開いた。','「03_管理人室」が開いた。','鍵箱が開いた。「04_夜間録音」が聞けるようになった。','「05_写真」が開いた。','「06_最後」が開いた。'][S.stage];
 }
 $('icons').onclick=e=>{
   const b=e.target.closest('[data-f]'); if(!b) return;
@@ -462,7 +551,7 @@ $('icons').onclick=e=>{
   if((f.need||0)>S.stage){
     blip(180,.12,.04);
     if(LOCKS[f.need]&&f.need===S.stage+1) openPw(f.need);
-    else if(f.need===3) toast('「03_写真」の中の「見くらべ」で、ちがいを3つ見つけると開きます。');
+    else if(f.need===5) toast('「05_写真」の中の「見くらべ」で、ちがいを3つ見つけると開きます。');
     else toast('まだ開けません。');
     return;
   }
@@ -498,7 +587,7 @@ function openFile(k){
       ${canDel?'<p style="margin-top:14px;font-size:.85rem">まぎれこんだ名前を、ひとつだけ消してください。もとには戻せません。</p>':''}</div>`;
     if(flick){ noise(.7,.06,900); }
     S.seen.roster=ver; save();
-    if(canDel) h+=hintBlock('final',['写真1の303号室のドアに、何が貼ってあった？','最初から、そこに住んでいなかったのは誰？']);
+    if(canDel) h+=hintBlock('final',['写真1の303号室のドアに、何が貼ってあった？','管理日誌の1997年3月を思い出して。もう、そこにいるはずのない人は誰？']);
   }else if(k==='plan'){
     h=`<div class="figure">${planSVG()}</div><p class="cap">ひばりヶ丘第二団地 3階 平面図（1967年 竣工時）。</p>`;
   }else if(k==='log'){
@@ -513,17 +602,75 @@ function openFile(k){
       <p>303号室の大野さんに話を聞いた。三十年住んでいるという、気さくなおじいさん。</p>
       <p>あとで録音を聞きかえしたら、知らない声がまざっていた。部屋には二人しかいなかった。</p>
       <p>文字起こしでは、その声を「？」にしてある。<br><span class="hand">「？」の行だけ、最初の一文字を上から拾って読んでみた。</span></p>
-      <p>それを、写真フォルダのパスワードにした。<br>見たくない。でも、確かめないといけない。</p></div>`;
+      <p>それを、管理人室で借りてきた資料のフォルダのパスワードにした。<br>見たくない。でも、確かめないといけない。</p></div>`;
   }else if(k==='tape'){
     h=`<div class="paper tape"><h3>録音_303号室（文字起こし）</h3><div class="meta">1998/10/09 19:40 ／ 4分12秒</div>
       ${TAPE.map((t,i)=>`<div class="ln${t[0]==='？'?' unk':''}" data-i="${i}"><span class="sp">${t[0]}</span><span class="tx">${esc(t[1])}</span></div>`).join('')}
       </div><div class="row" style="margin-top:14px"><button class="btn" type="button" id="playTape">▶ 録音を再生</button></div>`;
+  }else if(k==='ext'){
+    h=`<div class="figure">${extSVG()}</div><p class="cap">ひばりヶ丘第二団地 2号棟 南側（1998/10/02 撮影）。3階は、左から5つめまで窓がある。</p>`;
+  }else if(k==='kmemo'){
+    h=`<div class="paper"><h3>調査メモ_03</h3><div class="meta">1998/10/12</div>
+      <p>もと管理人の平井さんが、管理人室に残していった日誌と貸出簿を見せてもらった。</p>
+      <p>平井さんは去年の暮れに急に辞めて、今は連絡がつかないらしい。</p>
+      <p>管理人室の鍵箱には、ダイヤル錠がかかっている。番号は誰も知らない。<br>日誌に、<span class="hand">番号の決め方</span>が書いてあった。</p>
+      <p>鍵箱の中に、夜の廊下を録ったテープを入れておく。<br>……自分で入れたのに、自分では開けたくない。</p></div>`;
+  }else if(k==='diary'){
+    const D=[
+      ['1997/03/14','303号室の大野 正一さん（82）が、部屋で亡くなっているのが見つかる。一人暮らしだった。'],
+      ['1997/03/20','親族の方が荷物を引き取る。303号室は空室に。表札を外して、「空室」の紙を貼る。'],
+      ['1997/04/02','夜中に3階で戸の開け閉めの音がする、と301の田村さん。見回ったが、何もなし。'],
+      ['1997/06/11','302の三浦さん「303から話し声がする」。空室のはず。鍵を開けて見たが、誰もいない。'],
+      ['1997/09/30','鍵箱に、見たことのない「304」の札が下がっていた。誰がつけたのか。外しておく。'],
+      ['1997/10/20','また「304」の札。外しても、次の朝には下がっている。'],
+      ['1997/10/24','鍵箱のダイヤル錠の番号を変えた。<span class="hand">この1週間の貸出簿で、鍵が1本も外に出ていないまま1日を終えた日</span>。その日付（月日の4桁）にしておく。'],
+      ['1997/11/02','夜回りで3階を歩いたら、303と305のあいだの壁の中から、ノックが聞こえた。数を数えるように叩いている。<br>二つずつ組になっている。<span class="hand">五十音の表の、行と段</span>を叩いているようにも聞こえた。'],
+      ['1997/12/28','管理人を辞めることにした。後の人には「304には、返事をしないこと」とだけ伝えておく。'],
+    ];
+    h=`<div class="paper"><h3>管理日誌（1997年・抜き書き）</h3><div class="meta">ひばりヶ丘第二団地 管理人 平井</div>
+      ${D.map(d=>`<p><b style="font-family:var(--ui);font-weight:400;font-size:.8rem">${d[0]}</b><br>${d[1]}</p>`).join('')}</div>`;
+  }else if(k==='survey'){
+    h=`<div class="paper"><h3>住民アンケート（3階）</h3><div class="meta">1998/10/05 ／ 聞き取り：三枝</div>
+      <table><thead><tr><th>号室</th><th>夜中に物音を聞いたことは？</th><th>おとなりは何号室？</th></tr></thead><tbody>
+      <tr><td class="no">301</td><td>毎晩3時すぎ。ドアの開け閉めの音。</td><td>302</td></tr>
+      <tr><td class="no">302</td><td>303から話し声。空き部屋なのに。</td><td>301と303</td></tr>
+      <tr><td class="no">303</td><td colspan="2" style="color:#6d685c">（空室のため、回答なし）</td></tr>
+      <tr><td class="no">305</td><td>壁の向こうから、ノック。返事はしていない。</td><td><span class="hand">304</span></td></tr>
+      </tbody></table></div>`;
+  }else if(k==='keylog'){
+    const K=[
+      ['10/18','302','三浦','09:10','10/18 09:40'],
+      ['10/18','303','清掃業者','13:00','10/19 10:00'],
+      ['10/19','305','木下','18:00','10/19 18:20'],
+      ['10/20','301','田村','07:50','10/22 09:00'],
+      ['10/21','303','（記入なし）','03:04','10/21 03:10'],
+      ['10/22','302','三浦','12:00','10/22 12:30'],
+      ['10/22','303','（記入なし）','03:04','—'],
+      ['10/23','305','木下','08:00','10/23 08:15'],
+    ];
+    h=`<div class="paper"><h3>鍵の貸出簿（1997年10月）</h3><div class="meta">管理人室 予備鍵</div>
+      <table><thead><tr><th>日付</th><th>鍵</th><th>借りた人</th><th>貸出</th><th>返却</th></tr></thead><tbody>
+      ${K.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td${r[2][0]==='（'?' class="hand"':''}>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`).join('')}
+      </tbody></table><p style="margin-top:12px;font-size:.85rem">※ 10/18〜10/23 以外の日は、貸し出しなし。10/18 の朝は、全部の鍵がそろっていた。</p></div>`;
+  }else if(k==='keybox'){
+    h=`<div class="figure">${keyboxSVG()}</div><p class="cap">管理人室の鍵箱（1998/10/12 撮影）。${S.stage>=3?'ダイヤル錠は外れている。中に、カセットテープが1本。':'ダイヤル錠：4桁。「04_夜間録音」のフォルダを開こうとすると、番号を聞かれる。'}</p>`;
+  }else if(k==='nmemo'){
+    h=`<div class="paper"><h3>調査メモ_04</h3><div class="meta">1998/10/14</div>
+      <p>3階の廊下、303と305のあいだの壁の前に、録音機を置いて一晩録った。</p>
+      <p>03:04 から、壁の中でノックが鳴りはじめた。平井さんの日誌に書いてあったのと同じ、二つずつの組。</p>
+      <p><span class="hand">1つ目の数が行、2つ目の数が段</span>。あ行が1、か行が2……。段は、あ・い・う・え・お の順。</p>
+      <p>ノックが言っていることを、そのまま次のフォルダのパスワードにした。</p>
+      <p>録音の最後に、自分の声が入っている。<br>自分では、何も言った覚えがない。</p></div>`;
+  }else if(k==='night'){
+    h=`<div class="paper tape"><h3>夜間録音_3階廊下（文字起こし）</h3><div class="meta">1998/10/14 02:58〜03:12</div>
+      ${NIGHT.map((t,i)=>`<div class="ln${t[2]?' unk':''}" data-i="${i}"><span class="sp">${t[0]}</span><span class="tx${t[3]?' kn':''}">${t[1]}</span></div>`).join('')}
+      </div><div class="row" style="margin-top:14px"><button class="btn" type="button" id="playTape">▶ 録音を再生</button></div>`;
   }else if(k==='memo3'){
-    h=`<div class="paper"><h3>調査メモ_03</h3><div class="meta">1998/10/16</div>
+    h=`<div class="paper"><h3>調査メモ_05</h3><div class="meta">1998/10/16</div>
       <p>同じ場所から、1週間ごとに廊下を撮っている。</p>
       <p>写真1と写真3を見くらべると、<span class="hand">ちがうところが3つある</span>。</p>
       <p>全部見つけたら、最後のフォルダの鍵が外れるようにしておいた。</p>
-      <p>大野さんの部屋の前を通るたびに、ドアの向こうから、こっちを数える声がする。</p></div>`;
+      <p>大野さんは、去年の春に亡くなっていた。<br>それなのに、303号室の前を通るたびに、ドアの向こうから、こっちを数える声がする。</p></div>`;
   }else if(k==='p1'||k==='p2'||k==='p3'){
     const n=k.slice(1);
     h=`<div class="figure">${photoSVG(PHOTOS[k](),{label:'写真'+n+'：団地3階の外廊下'})}</div><p class="cap">写真${n}　ひばりヶ丘第二団地 3階 外廊下（左から301〜305）</p>`;
@@ -538,19 +685,19 @@ function openFile(k){
       <p>名簿が勝手に書きかわる。写真も。たぶん、記憶も。</p>
       <p>あれは、ずっと前から住んでいたような顔をして、名簿にまぎれこむ。<br>まぎれこまれた人は、自分の部屋が「用意」される。</p>
       <p>まぎれこんだ名前を名簿から消せば、あの部屋はなくなる。……はずだ。</p>
-      <p>このメモを読んでいる人へ。<br>名簿を開いて、<span class="hand">最初からそこにいなかった名前</span>を、消してくれ。</p>
+      <p>このメモを読んでいる人へ。<br>名簿を開いて、<span class="hand">もう、そこにいるはずのない名前</span>を、消してくれ。</p>
       <p>自分の名前が名簿に書かれていても、あわてないで。</p></div>`;
   }
   $('sheetBody').innerHTML=h;
   $('sheet').hidden=false; $('sheet').scrollTop=0;
-  if(k==='tape') $('playTape').onclick=playTape;
+  if(k==='tape'||k==='night') $('playTape').onclick=k==='night'?playNight:playTape;
   if(k==='cmp') setupDiff();
   if(k==='roster') $('sheetBody').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>delRow(+b.dataset.del));
   if(k==='memo4'&&!S.final&&!S.epi){
     S.final=true; save();
     setTimeout(()=>{ noise(1.2,.05,700); toast('入居者名簿_3階 が更新されました（1998/10/17 03:04）'); },900);
   }
-  if(k==='plan'&&S.stage>=3&&!S.epi) noise(.4,.04,1200);
+  if(k==='plan'&&S.stage>=5&&!S.epi) noise(.4,.04,1200);
 }
 function closeSheet(){ $('sheet').hidden=true; tapeStop=true; renderDesk(); }
 $('closeSheet').onclick=closeSheet;
@@ -589,11 +736,11 @@ function setupDiff(){
   const svg=$('cmpTap').querySelector('svg'), marks=svg.querySelector('.marks');
   const draw=()=>{
     marks.innerHTML=DIFFS.filter(d=>S.found.includes(d.id)).map(d=>`<circle cx="${d.x}" cy="${d.y}" r="${d.r}" fill="none" stroke="#e0483c" stroke-width="4"/>`).join('');
-    $('foundMsg').textContent=S.stage>=3?'3つとも見つけた。「04_最後」が開いた。':`見つけたちがい：${S.found.length} / 3`;
+    $('foundMsg').textContent=S.stage>=5?'3つとも見つけた。「06_最後」が開いた。':`見つけたちがい：${S.found.length} / 3`;
   };
   draw();
   svg.addEventListener('click',e=>{
-    if(S.stage>=3) return;
+    if(S.stage>=5) return;
     const p=svg.createSVGPoint(); p.x=e.clientX; p.y=e.clientY;
     const q=p.matrixTransform(svg.getScreenCTM().inverse());
     const hit=DIFFS.find(d=>!S.found.includes(d.id)&&Math.hypot(q.x-d.x,q.y-d.y)<d.r+6);
@@ -601,8 +748,8 @@ function setupDiff(){
       S.found.push(hit.id); save(); blip(880,.1,.04,'sine'); draw();
       $('foundMsg').textContent+=`（${hit.label}）`;
       if(S.found.length>=3){
-        S.stage=3; save();
-        setTimeout(()=>{ noise(1,.07,800); $('cmpTap').classList.add('glitch'); $('cmpTap').innerHTML=photoSVG(PHOTOS.p3(),{label:'写真3'}); setupDiff(); toast('「04_最後」の鍵が外れました。304号室の表札に、名前が出ている。'); },700);
+        S.stage=5; save();
+        setTimeout(()=>{ noise(1,.07,800); $('cmpTap').classList.add('glitch'); $('cmpTap').innerHTML=photoSVG(PHOTOS.p3(),{label:'写真3'}); setupDiff(); toast('「06_最後」の鍵が外れました。304号室の表札に、名前が出ている。'); },700);
       }
     }else{
       blip(150,.08,.03);
@@ -663,8 +810,8 @@ const ENDS={
     'つづけて、304号室の行が、ふたつとも薄くなって、消えた。',
     '303号室の欄には、「空室（1997年3月〜）」と書かれている。',
     '最初に見た名簿と、同じだ。',
-    '大野さんは、最初からいなかった。',
-    '三枝さんが話を聞いた相手は、あの部屋の、住人だった。',
+    '大野さんは、1997年の春に亡くなっていた。',
+    '三枝さんが話を聞いた相手は、大野さんの顔をした、あの部屋の住人だった。',
     '名簿の最終更新は、1998/10/02 14:10 に戻っている。']},
   B:{ttl:'名簿にない人',lines:n=>[
     `「${n}」の行が、消えた。`,
@@ -702,7 +849,7 @@ function showEnd(k,nm){
   setTimeout(()=>{ $('endBtns').hidden=false; $('endsLine2').textContent=endsText(); },600+L.length*1400);
 }
 const endsText=()=>`見つけたエンド ${S.ends.length} / 4`+(S.ends.length?`（${S.ends.join('・')}）`:'');
-$('retryBtn').onclick=()=>{ S.epi=false; S.final=true; S.stage=3; save(); goDesk('a'); };
+$('retryBtn').onclick=()=>{ S.epi=false; S.final=true; S.stage=5; save(); goDesk('a'); };
 $('epiBtn').onclick=()=>{ S.epi=true; save(); if(drone&&AC) drone.gain.linearRampToValueAtTime(.02,AC.currentTime+2); goDesk('a'); setTimeout(()=>toast('「01_調査」に、ファイルがひとつ増えています。'),800); };
 $('endTitle').onclick=()=>showTitle();
 $('shareBtn').onclick=async()=>{
