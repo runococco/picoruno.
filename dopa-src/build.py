@@ -19,7 +19,7 @@ def build(slug):
     m['slug'] = slug
     game = f"const META={json.dumps(m, ensure_ascii=False)};\n" + (d/'game.js').read_text()
     rep = {
-        'TITLE': html.escape(m['title']), 'DESC': html.escape(m['desc']), 'OGDESC': html.escape(m.get('ogdesc', m['desc'])),
+        'TITLE': html.escape(m['title']), 'TLEN': str(len(m['title'])), 'DESC': html.escape(m['desc']), 'OGDESC': html.escape(m.get('ogdesc', m['desc'])),
         'CATCH': html.escape(m['catch']), 'HOWTO': ''.join(f'<li>{html.escape(h)}</li>' for h in m['howto']),
         'BG': m['bg'], 'PANEL': m.get('panel', m['bg']), 'ACCENT': m['accent'], 'SLUG': slug, 'FAVICON': favicon(m),
         'CSS': css, 'ENGINE': eng, 'GAME': game,

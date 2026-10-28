@@ -34,7 +34,7 @@ button{font-family:inherit;color:inherit}
 @keyframes scrIn{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:none}}
 #iconCv{width:min(44%,170px);height:auto;aspect-ratio:1;animation:bob 2.2s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(-6px) rotate(-2deg)}}
-.ttl{font-family:"Mochiy Pop One",sans-serif;font-weight:400;font-size:clamp(26px,8.4cqw,38px);margin:0;line-height:1.2;color:#5b4d45;letter-spacing:.02em}
+.ttl{font-family:"Mochiy Pop One",sans-serif;font-weight:400;font-size:clamp(20px,min(8.4cqw,calc(84cqw / var(--tl,8))),38px);margin:0;line-height:1.2;color:#5b4d45;letter-spacing:.02em}
 #stage{container-type:size}
 .catch{margin:0;font-size:15px;color:#8e8077}
 .howto{list-style:none;margin:4px 0;padding:10px 14px;background:#fffdf8;border:2.5px solid #5b4d45;border-radius:16px;font-size:14px;line-height:1.7;text-align:left;max-width:330px}
@@ -69,7 +69,7 @@ button{font-family:inherit;color:inherit}
   <canvas id="cv"></canvas>
   <section class="scr" id="titleScr">
     <canvas id="iconCv" width="360" height="360"></canvas>
-    <h1 class="ttl">連打ロケット</h1>
+    <h1 class="ttl" style="--tl:6">連打ロケット</h1>
     <p class="catch">連打、連打、連打、はっしゃー！</p>
     <ul class="howto"><li>10秒間、画面をひたすら連打</li><li>最後にゲージの真ん中で発射すると飛距離アップ</li><li>連打するほど、とんでもなく遠くへ</li><li>PCはスペースキーでもOK</li></ul>
     <p class="best" id="bestTxt"></p>
