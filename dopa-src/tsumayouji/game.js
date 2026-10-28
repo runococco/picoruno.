@@ -1,6 +1,6 @@
 /* たこ焼きにつまようじ：Knife Hit 系。回転パターンはステージごとに変化。 */
 const CX=W/2,CY=270,R=82,PL=78,TH=0.17;
-const GAME={...META,unit:'本',hudUnit:true,
+const GAME={...META,sprites:['icon','tako','pick','katsuo'],unit:'本',hudUnit:true,
   bgm:{bpm:136,root:62,scale:'minor',prog:[1,7,6,5],seed:88,lead:'square',drums:'four'},
   ranks:[[0,'つまようじ見習い'],[15,'屋台の手伝い'],[35,'たこ焼き屋さん'],[60,'くるくる職人'],[90,'つまようじの名手'],[130,'大阪の伝説']],
   shareText:(v,f)=>`たこ焼きにつまようじ ${f}本 さした！`,
@@ -34,20 +34,25 @@ const GAME={...META,unit:'本',hudUnit:true,
     st.kick=Math.max(0,(st.kick||0)-dt);
     for(const d of st.drop){d.vy+=1500*dt;d.x+=d.vx*dt;d.y+=d.vy*dt;d.r+=d.vr*dt}st.drop=st.drop.filter(d=>d.y<H+100)},
   overUpdate(dt){const st=this.st;for(const d of st.drop){d.vy+=1500*dt;d.x+=d.vx*dt;d.y+=d.vy*dt;d.r+=d.vr*dt}},
+  // かつおぶし：うすくて波うつピンクベージュの削り節。ゆらゆら踊る
+  katsuo(c,x,y,rot,t){c.save();c.translate(x,y);c.rotate(rot+Math.sin(t*5)*.18);c.scale(1.25,1.25);const w=Math.sin(t*7)*3;
+    D.path(c,c=>{c.moveTo(-22,6);c.bezierCurveTo(-18,-8+w,-8,-14,0,-10-w);c.bezierCurveTo(8,-18+w,18,-12,24,-2);c.bezierCurveTo(18,4+w,22,10,14,14);c.bezierCurveTo(4,8-w,-6,16,-14,12);c.closePath()},'#f0c3a4',3);
+    if(D.mode!=='sil'){c.lineWidth=2;c.strokeStyle='#cf8f72';c.lineCap='round';for(const k of[-1,0,1]){c.beginPath();c.moveTo(-14+k*2,4+k*5);c.quadraticCurveTo(0,-4+k*5+w*.5,16,0+k*5);c.stroke()}}
+    c.restore()},
   draw(c,api){const st=this.st;c.fillStyle=this.bg;c.fillRect(0,0,W,H);
     c.fillStyle='#efd2ad';for(let i=0;i<6;i++){c.beginPath();c.arc(CX,CY,140+i*90,0,7);c.lineWidth=30;c.strokeStyle='#efd2ad';c.stroke()}
     D.rrect(c,-20,H-80,W+40,120,0,'#c9894f',4);
     const ky=CY-(st.kick||0)*40;
     if(st.clearT>0){for(const s of st.shards){c.save();c.translate(s.x,s.y);c.rotate(s.r);D.path(c,c=>{c.moveTo(0,0);c.arc(0,0,R*.6,0,.63);c.closePath()},'#e7a35c',3);c.restore()}}
     else{for(const p of st.picks){const wa=p.a+st.rot;this.pick(c,CX+Math.cos(wa)*(R-14),ky+Math.sin(wa)*(R-14),wa-Math.PI/2)}
-      for(const q of st.bonus){const wa=q.a+st.rot,x=CX+Math.cos(wa)*(R+14),y=ky+Math.sin(wa)*(R+14);c.save();c.translate(x,y);c.rotate(wa+Math.PI/2);D.poly(c,[[-14,-6],[12,-10],[15,6],[-10,9]],'#f2d9a0',2.5);c.restore()}
-      this.tako(c,CX,ky,R,st.rot,api.state==='over'?'sad':st.stage%5===0?'angry':'smile')}
+      this.tako(c,CX,ky,R,st.rot,api.state==='over'?'sad':st.stage%5===0?'angry':'smile');
+      for(const q of st.bonus){const wa=q.a+st.rot;this.katsuo(c,CX+Math.cos(wa)*(R+6),ky+Math.sin(wa)*(R+6),wa+Math.PI/2,api.t+q.a*3)}}
     for(const d of st.drop){c.save();c.translate(d.x,d.y);c.rotate(d.r);this.pick(c,0,-PL/2,0);c.restore()}
     if(st.fly)this.pick(c,CX,st.fly.y,0);
     else if(api.state==='play'&&st.left>0&&st.clearT<=0)this.pick(c,CX,H-120,0);
     // 残り本数
     for(let i=0;i<st.need;i++){const x=24,y=H-110-i*26;c.globalAlpha=i<st.left?1:.25;this.pick(c,x,y,-Math.PI/2,30);c.globalAlpha=1}
-    D.text(c,st.stage%5===0?'ボス たこ焼き':'たこ焼き '+st.stage+'こめ',CX,CY+R+70,20,'#7a6658');
+    D.text(c,st.stage%5===0?'ボス たこ焼き':'たこ焼き '+st.stage+'こめ',CX,CY+R+70,20,'#8e8077');
   },
   __bot(api){const st=this.st;if(st.fly)return;const la=Math.PI/2-st.rot;if(!st.picks.some(p=>Math.abs(this.ad(p.a,la))<.4)||Math.random()<.02)this.throw_(api)},
 };

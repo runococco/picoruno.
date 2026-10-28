@@ -19,7 +19,7 @@ const slug=process.argv[2],playMs=+(process.argv[3]||6000),out=process.env.OUT||
     if(!shot&&Date.now()-t0>playMs*(+process.env.SHOTAT||.5)){await p.screenshot({path:`${out}/${slug}-2play.png`});shot=true}
   }
   if(!shot)await p.screenshot({path:`${out}/${slug}-2play.png`});
-  await p.evaluate(()=>__P.end());await p.waitForTimeout(2600);
+  await p.evaluate(()=>__P.end());await p.waitForTimeout(+(process.env.ENDMS||2600));
   await p.screenshot({path:`${out}/${slug}-3result.png`});
   const sc=await p.evaluate(()=>__P.score);
   console.log(slug,'score',sc,'errors',errs.length?[...new Set(errs)].slice(0,5):'none');

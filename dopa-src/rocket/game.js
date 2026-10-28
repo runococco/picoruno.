@@ -1,7 +1,7 @@
 /* 連打ロケット：10秒連打→タイミング発射→飛行演出。到達高度は指数関数で伸びる。 */
 const MASH=10;
 const SPOTS=[[0,'はっしゃ台'],[1,'ビルの上'],[10,'雲の上'],[100,'宇宙'],[400,'宇宙ステーション'],[36000,'静止衛星'],[384400,'月'],[7.8e7,'火星'],[6.3e8,'木星'],[4.5e9,'海王星'],[1e12,'太陽系の外'],[4e13,'となりの星'],[1e17,'銀河のはし']];
-const GAME={...META,unit:'km',hudUnit:false,comboHud:false,countdown:true,hud:false,
+const GAME={...META,sprites:['icon','rocket'],unit:'km',hudUnit:false,comboHud:false,countdown:true,hud:false,
   fmt:v=>v>=1e8?(v/1e8).toFixed(1)+'億':v>=1e4?(v/1e4).toFixed(v>=1e6?0:1)+'万':Math.round(v).toLocaleString('ja-JP'),
   bgm:{bpm:168,root:60,scale:'major',prog:[1,5,6,4],seed:3,lead:'square',drums:'four',density:.75},
   ranks:SPOTS.map(([km,n])=>[km,n+'まで到達']),
@@ -43,12 +43,12 @@ const GAME={...META,unit:'km',hudUnit:false,comboHud:false,countdown:true,hud:fa
     else{D.rrect(c,-20,520,W+40,300,0,'#9ac98a',4);D.rrect(c,W/2-70,490,140,30,6,'#bfb4a6',3.5);
       const sx=rnd(-st.shakeR,st.shakeR),fuel=Math.min(1,st.taps/120);this.rocket(c,W/2+sx,410,150,st.ph==='aim'?.4:fuel*.4);
       // 燃料ゲージ
-      D.rrect(c,30,180,24,300,12,'#fffdf8',3.5);const fh=296*fuel;if(fh>4)D.rrect(c,32,478-fh,20,fh,10,fuel>.8?'#e2645a':'#f6b04a',0);D.text(c,'燃料',42,500,14,'#4a3428')}
+      D.rrect(c,30,180,24,300,12,'#fffdf8',3.5);const fh=296*fuel;if(fh>4)D.rrect(c,32,478-fh,20,fh,10,fuel>.8?'#e2645a':'#f6b04a',0);D.text(c,'燃料',42,500,14,'#5b4d45')}
     // HUD
-    if(st.ph==='mash'&&api.state==='play'){const tl=Math.max(0,MASH-api.t);D.text(c,tl.toFixed(1),W/2,80,40,'#fff','center',OL,9);D.text(c,st.taps+' 連打',W/2,140,34,'#f3c84b','center',OL,8);D.text(c,'毎秒 '+st.rate+' 回',W/2,180,18,'#4a3428');
+    if(st.ph==='mash'&&api.state==='play'){const tl=Math.max(0,MASH-api.t);D.text(c,tl.toFixed(1),W/2,80,40,'#fff','center',OL,9);D.text(c,st.taps+' 連打',W/2,140,34,'#f3c84b','center',OL,8);D.text(c,'毎秒 '+st.rate+' 回',W/2,180,18,'#5b4d45');
       if(Math.sin(api.t*14)>0)D.text(c,'連打！',W/2,620,40,'#fff','center',OL,9)}
     if(st.ph==='aim'){D.text(c,'真ん中で タップ！',W/2,120,30,'#fff','center',OL,8);const gx=60,gw=W-120;D.rrect(c,gx,170,gw,30,15,'#fffdf8',3.5);c.fillStyle='#f3c84b';c.fillRect(gx+gw*.35,173,gw*.3,24);c.fillStyle='#e2645a';c.fillRect(gx+gw*.45,173,gw*.1,24);
-      const px=gx+gw*st.gauge;D.poly(c,[[px,166],[px-10,150],[px+10,150]],'#4a3428',2)}
+      const px=gx+gw*st.gauge;D.poly(c,[[px,166],[px-10,150],[px+10,150]],'#5b4d45',2)}
     if(st.ph==='fly'){D.text(c,GAME.fmt(st.alt)+' km',W/2,90,40,'#fff','center',OL,9);D.text(c,'×'+st.mult+'  '+st.taps+'連打',W/2,140,18,'#fff','center',OL,5);if(st.done)D.text(c,GAME.spot(st.final)+'まで到達！',W/2,600,30,'#f3c84b','center',OL,8)}
   },
   __bot(api){const st=this.st;if(st.ph==='mash'&&Math.random()<.5)this.tap(api);if(st.ph==='aim'&&Math.abs(st.gauge-.5)<.06)this.tap(api)},

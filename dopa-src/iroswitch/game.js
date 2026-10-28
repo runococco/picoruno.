@@ -1,6 +1,6 @@
 /* いろいろくぐり：Color Switch 系。輪（回転）とバー（横スライド）、虹玉で色替え。 */
 const COLS=['#e2645a','#f3c84b','#5fb4c4','#9a83c9'],BXX=W/2,BRAD=13,GAPY=360;
-const GAME={...META,unit:'点',
+const GAME={...META,sprites:['icon','ball'],unit:'点',
   bgm:{bpm:128,root:62,scale:'minor',prog:[6,4,1,5],seed:21,lead:'square',drums:'four',density:.6},
   ranks:[[0,'色迷子'],[5,'色見習い'],[12,'カラフル跳び'],[22,'虹のぼり'],[35,'色の支配者'],[55,'レインボーの化身']],
   shareText:(v,f)=>`いろいろくぐりで ${f}点！`,

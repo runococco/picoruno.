@@ -2,7 +2,7 @@
 const PR=6,BRr=9,TOPY=170,ROWS=11,SPX=36,SPY=38,SLOTY=TOPY+ROWS*SPY+20,BALLS=15;
 const MULT=[10,4,2,1,.5,.2,.5,1,2,4,10],SW=W/MULT.length;
 const MC={10:'#e2645a',4:'#f2a97a',2:'#f3c84b',1:'#9fd27c',.5:'#7fc6d8',.2:'#b9b3c9'};
-const GAME={...META,unit:'点',
+const GAME={...META,sprites:['icon','ball'],unit:'点',
   bgm:{bpm:124,root:62,scale:'major',prog:[1,6,2,5],seed:77,lead:'square',drums:'pop',density:.55},
   ranks:[[0,'ころがりはじめ'],[1000,'ぽとぽと好き'],[2500,'カンコン名人'],[5000,'倍率ハンター'],[9000,'×10マスター'],[15000,'プリンコの神']],
   shareText:(v,f)=>`ぽとぽとプリンコで ${f}点！`,
@@ -33,10 +33,10 @@ const GAME={...META,unit:'点',
     // 投入ゾーン
     D.rrect(c,14,TOPY-96,W-28,52,16,'rgba(255,253,248,.7)',3);
     if(api.state==='play'&&st.left>0){c.globalAlpha=st.cd>0?.4:1;this.ball(c,st.dropX,TOPY-70,BRr);c.globalAlpha=1}
-    for(const p of st.pegs){const col=p.t==='gold'?'#f3c84b':p.t==='split'?'#8fd0e0':p.flash>0?'#fbe7a6':'#fffdf8';const r=PR+(p.t!=='n'?2:0)+p.flash*2;D.circle(c,p.x,p.y,r,col,2.5);if(p.t==='split'){D.circle(c,p.x-3,p.y,2,'#4a3428',0);D.circle(c,p.x+3,p.y,2,'#4a3428',0)}}
+    for(const p of st.pegs){const col=p.t==='gold'?'#f3c84b':p.t==='split'?'#8fd0e0':p.flash>0?'#fbe7a6':'#fffdf8';const r=PR+(p.t!=='n'?2:0)+p.flash*2;D.circle(c,p.x,p.y,r,col,2.5);if(p.t==='split'){D.circle(c,p.x-3,p.y,2,'#5b4d45',0);D.circle(c,p.x+3,p.y,2,'#5b4d45',0)}}
     for(let i=0;i<MULT.length;i++){const m=MULT[i],x=i*SW,fx=st.slotFx[i];D.rrect(c,x+2,SLOTY+4-fx*6,SW-4,46,8,MC[m],3);D.text(c,'×'+m,x+SW/2,SLOTY+27-fx*6,String(m).length>2?11:14,'#fff','center',OL,4)}
     for(const b of st.balls)this.ball(c,b.x,b.y,BRr);
-    D.text(c,'のこり',W/2-40,SLOTY+90,16,'#7a6658');D.text(c,st.left+'球',W/2+20,SLOTY+90,26,'#4a3428');
+    D.text(c,'のこり',W/2-40,SLOTY+90,16,'#8e8077');D.text(c,st.left+'球',W/2+20,SLOTY+90,26,'#5b4d45');
   },
   __bot(api){if(Math.random()<.3)this.drop(this.st.dropX,api)},
 };

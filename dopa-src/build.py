@@ -9,8 +9,8 @@ eng = (here/'common/engine.js').read_text()
 
 def favicon(m):
     svg = (f"<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='{m['bg']}'/>"
-           f"<circle cx='16' cy='17' r='10' fill='{m['accent']}' stroke='#4a3428' stroke-width='2'/>"
-           f"<circle cx='12.5' cy='16' r='1.6' fill='#1d1612'/><circle cx='19.5' cy='16' r='1.6' fill='#1d1612'/></svg>")
+           f"<circle cx='16' cy='17' r='10' fill='{m['accent']}' stroke='#5b4d45' stroke-width='2'/>"
+           f"<circle cx='12.5' cy='16' r='1.6' fill='#5b4d45'/><circle cx='19.5' cy='16' r='1.6' fill='#5b4d45'/></svg>")
     return 'data:image/svg+xml,' + urllib.parse.quote(svg)
 
 def build(slug):

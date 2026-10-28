@@ -3,7 +3,7 @@ const CX=W/2,CY=330;
 const FOODS=[
   ['ケーキ',0],['ドーナツ',0],['プリン',0],['ソフトクリーム',0],['キャンディ',0],['チョコ',0],['マカロン',0],['ホットケーキ',0],
   ['ポテチ',1],['せんべい',1],['ソーセージ',1],['うめぼし',1],['フライドポテト',1],['えだまめ',1],['ハンバーガー',1],['しおラーメン',1]];
-const GAME={...META,time:30,unit:'点',
+const GAME={...META,sprites:['icon','food'],time:30,unit:'点',
   bgm:{bpm:150,root:65,scale:'major',prog:[1,4,5,4],seed:33,lead:'square',drums:'four',density:.65},
   ranks:[[0,'まだおなかすいてない'],[30,'つまみぐい'],[70,'食いしんぼう'],[120,'ふりわけ名人'],[180,'味覚のプロ'],[250,'ベロが光速']],
   shareText:(v,f)=>`あまい？しょっぱい？で ${f}点！`,
@@ -47,7 +47,7 @@ const GAME={...META,time:30,unit:'点',
     c.fillStyle='#f9e1d3';c.fillRect(0,0,W/2,H);c.fillStyle='#e3eef4';c.fillRect(W/2,0,W/2,H);
     D.rrect(c,24,540,150,120,26,'#f3a6bd',4);D.text(c,'あまい',99,600,28,'#fff','center',OL,6);D.text(c,'←',99,560,22,'#fff','center',OL,5);
     D.rrect(c,W-174,540,150,120,26,'#7fb6d8',4);D.text(c,'しょっぱい',W-99,600,24,'#fff','center',OL,6);D.text(c,'→',W-99,560,22,'#fff','center',OL,5);
-    if(st.cur){const s=ease.outBack(Math.min(1,st.cur.t*6));D.circle(c,CX,CY,100*s+1,'#fffdf8',4);this.food(c,st.cur.i,CX,CY,130*s+1);D.text(c,FOODS[st.cur.i][0],CX,CY+130,22,'#4a3428')}
+    if(st.cur){const s=ease.outBack(Math.min(1,st.cur.t*6));D.circle(c,CX,CY,100*s+1,'#fffdf8',4);this.food(c,st.cur.i,CX,CY,130*s+1);D.text(c,FOODS[st.cur.i][0],CX,CY+130,22,'#5b4d45')}
     for(const f of st.fly){c.globalAlpha=1-f.t*2;this.food(c,f.i,f.x,f.y,90*(1-f.t));c.globalAlpha=1}
   },
   __bot(api){const st=this.st;if(st.cur&&st.cur.t>.25){const f=FOODS[st.cur.i];this.sort(Math.random()<.9?f[1]:1-f[1],api)}},

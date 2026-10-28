@@ -5,7 +5,7 @@ const TIERS=[
   {r:41,c:'#f2b183',n:'みたらし'},{r:50,c:'#cbb6e2',n:'いもあん'},{r:60,c:'#9fd2d9',n:'ソーダもち'},{r:71,c:'#f4d66d',n:'たまご'},
   {r:83,c:'#ea9292',n:'いちごだいふく'},{r:96,c:'#b4a08a',n:'くさだんご'},{r:110,c:'#fffdf8',n:'かがみもち'}];
 const PTS=[1,3,6,10,15,21,28,36,45,55,100];
-const GAME={...META,unit:'点',
+const GAME={...META,sprites:['icon','mochi'],unit:'点',
   bgm:{bpm:118,root:60,scale:'major',prog:[1,4,5,1],seed:27,lead:'triangle',drums:'pop',density:.55},
   ranks:[[0,'もち初心者'],[300,'もちつき見習い'],[800,'もちもち名人'],[1500,'おもちの達人'],[2500,'かがみもちの使い手'],[4000,'もちもち神']],
   shareText:(v,f)=>`もちもちがったいで ${f}点！`,
@@ -71,7 +71,7 @@ const GAME={...META,unit:'点',
     if(api.state==='play'||api.state==='count'){const r=TIERS[st.cur].r,x=clamp(st.x,L+r,Rt-r);
       c.globalAlpha=.25;c.fillStyle=OL;c.fillRect(x-1.5,TOP,3,BOT-TOP);c.globalAlpha=st.cd>0?.4:1;this.mochi(c,x,TOP-10,r,st.cur);c.globalAlpha=1}
     for(const b of st.b)this.mochi(c,b.x,b.y,TIERS[b.t].r,b.t,b.sq,b.rot);
-    D.text(c,'つぎ',W-48,108,14,'#7a6658');this.mochi(c,W-48,134,14,st.next);
+    D.text(c,'つぎ',W-48,108,14,'#8e8077');this.mochi(c,W-48,134,14,st.next);
     // しんか表
     for(let i=0;i<11;i++){const x=40+i*34.5;this.mochi(c,x,702,6+i*.9,i);}
   },

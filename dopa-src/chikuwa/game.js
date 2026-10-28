@@ -1,6 +1,6 @@
 /* ちくわブリッジ：Stick Hero 系。長押しで伸ばし、離すと倒れる。 */
 const TOPY=470,HX=70;
-const GAME={...META,unit:'本',hudUnit:true,
+const GAME={...META,sprites:['icon','chikuwa','hero'],unit:'本',hudUnit:true,
   bgm:{bpm:108,root:62,scale:'major',prog:[1,3,4,5],seed:19,lead:'triangle',drums:'pop',density:.5},
   ranks:[[0,'ちくわの穴'],[5,'ちくわ見習い'],[12,'ちくわ大工'],[22,'ちくわ建築士'],[35,'ちくわ橋の巨匠'],[50,'ちくわ大明神']],
   shareText:(v,f)=>`ちくわブリッジで ${f}本 わたった！`,

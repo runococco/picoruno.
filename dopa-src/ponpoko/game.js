@@ -1,6 +1,6 @@
 /* ぽんぽこリズム：2レーンの音ゲー。譜面はBGMと同じテンポで生成。時刻は AudioContext 基準。 */
 const HITY=520,SPD=430,LX=[W*.28,W*.72],BPM=118,BEAT=60/BPM,BARS=16;
-const GAME={...META,unit:'点',
+const GAME={...META,sprites:['icon','drum','note'],unit:'点',
   bgm:{bpm:BPM,root:62,scale:'major',prog:[1,5,6,4],seed:101,lead:'triangle',drums:'pop',density:.6},
   ranks:[[0,'たいこデビュー'],[3000,'お祭り好き'],[7000,'リズム名人'],[11000,'ぽんぽこ師匠'],[15000,'たいこの達人'],[18500,'フルコンボの神']],
   shareText:(v,f)=>`ぽんぽこリズムで ${f}点！`,

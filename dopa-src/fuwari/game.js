@@ -1,7 +1,7 @@
 /* ふうせんフワリ：Flappy 系。障害物＝上下のえんぴつ。ニアミスでボーナス。 */
 const BX=120,BR=24,PW=56;
 const PCOL=['#e2645a','#5fb4c4','#f2c14e','#7cb35f','#9a83c9'];
-const GAME={...META,unit:'点',
+const GAME={...META,sprites:['icon','balloon','pencil'],unit:'点',
   bgm:{bpm:120,root:65,scale:'major',prog:[1,6,4,5],seed:31,lead:'triangle',drums:'pop',density:.55},
   ranks:[[0,'しぼんだふうせん'],[5,'ふわふわ初心者'],[15,'そよ風ライダー'],[30,'空の散歩名人'],[50,'えんぴつよけの達人'],[80,'ふうせんの神']],
   shareText:(v,f)=>`ふうせんフワリで ${f}点！`,
@@ -11,7 +11,7 @@ const GAME={...META,unit:'点',
   pencil(c,x,y,w,len,col,up){c.save();c.translate(x,y);if(!up)c.scale(1,-1);
     // up=true: 先が上をむく
     D.rrect(c,-w/2,-len+w*1.1,w,len,4,PCOL[col||0],3);
-    D.poly(c,[[-w/2,-len+w*1.1],[w/2,-len+w*1.1],[0,-len-w*.2]],'#f3d9b0',3);D.poly(c,[[-w*.17,-len+w*.2],[w*.17,-len+w*.2],[0,-len-w*.2]],'#4a3428',0);c.restore()},
+    D.poly(c,[[-w/2,-len+w*1.1],[w/2,-len+w*1.1],[0,-len-w*.2]],'#f3d9b0',3);D.poly(c,[[-w*.17,-len+w*.2],[w*.17,-len+w*.2],[0,-len-w*.2]],'#5b4d45',0);c.restore()},
   reset(api){this.st={y:330,vy:0,obs:[],stars:[],t:0,next:.8,speed:170,pop:0,tilt:0,sq:1};api.score=0},
   flap(api){const st=this.st;st.vy=-370;st.sq=1.25;S.boing(1.6);api.burst(BX-10,st.y+BR,{c:['#fff'],n:3,sp:80,r:4,g:0,life:.3})},
   down(x,y,api){this.flap(api)},key(k,api){if(k===' '||k==='ArrowUp')this.flap(api)},

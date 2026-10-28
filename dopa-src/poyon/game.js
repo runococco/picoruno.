@@ -1,7 +1,7 @@
 /* ぽよんダイブ：Helix Jump を横スクロールにした版。全床が同じだけスライドする。 */
 const L=W,FH=170,BY0=200,BALLX=W/2,BR=16,TH=22;
 const FC=['#8fcfc4','#a9c8e8','#c6b4e4','#f3c48a','#a9d68f'];
-const GAME={...META,unit:'段',hudUnit:true,
+const GAME={...META,sprites:['icon','ball'],unit:'段',hudUnit:true,
   bgm:{bpm:138,root:60,scale:'major',prog:[1,6,4,5],seed:52,lead:'square',drums:'four',density:.6},
   ranks:[[0,'ころころ初心者'],[10,'ぽよんの子'],[25,'すとん名人'],[45,'ダイブの達人'],[70,'地底探検家'],[100,'地球のうら側']],
   shareText:(v,f)=>`ぽよんダイブで ${f}段 落ちた！`,

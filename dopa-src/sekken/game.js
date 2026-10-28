@@ -3,7 +3,7 @@ const SX=70,SY=200,CS=10,NC=28,NR=36,BR=22;
 const PALS=[['#f6c6cf','#f9e0a8','#cbe6b8','#bfe0ef','#d9cdef'],['#cfe6e3','#a9d6cf','#f6efcf'],['#f2d1a8','#e9b68c','#fbe7c8'],['#d9cdef','#f3c6dc','#fbe0ec','#c8e1f2'],['#fff1c9','#ffd9a8','#f7b9a3','#e996a0']];
 const SHAPES=['rect','round','heart','rect','oval'];
 const TREAS=['star','heart','gem','duck','coin'];
-const GAME={...META,time:30,unit:'個',hudUnit:true,comboHud:false,
+const GAME={...META,sprites:['icon','treasure'],time:30,unit:'個',hudUnit:true,comboHud:false,
   bgm:{bpm:96,root:65,scale:'major',prog:[1,6,4,5],seed:15,lead:'triangle',drums:'pop',density:.45,stab:false},
   ranks:[[0,'あわあわ初心者'],[2,'せっけん好き'],[4,'ザリザリ職人'],[6,'けずりの達人'],[8,'せっけん彫刻家'],[11,'人間かんな']],
   shareText:(v,f)=>`せっけんザリザリで ${f}個 けずった！`,
@@ -51,7 +51,7 @@ const GAME={...META,time:30,unit:'個',hudUnit:true,comboHud:false,
     if(st.left>st.total*.7)D.face(c,SX+NC*CS/2,SY+NR*CS*.3,60,'smile');
     c.restore();
     for(const q of st.curls)this.curl(c,q.x,q.y,q.r,q.c,q.rot);
-    const pr=1-st.left/st.total;D.text(c,'けずった',W/2,150,13,'#7a6658');D.rrect(c,90,162,W-180,12,6,'#fffdf8',3);if(pr>0)D.rrect(c,92,164,(W-184)*Math.min(1,pr/.97),8,4,this.accent,0);
+    const pr=1-st.left/st.total;D.text(c,'けずった',W/2,150,13,'#8e8077');D.rrect(c,90,162,W-180,12,6,'#fffdf8',3);if(pr>0)D.rrect(c,92,164,(W-184)*Math.min(1,pr/.97),8,4,this.accent,0);
   },
   __bot(api){const st=this.st;const y=SY+rnd(0,NR*CS);this.down(SX-20,y,api);for(let k=0;k<6;k++)this.move(SX+k*60,y+rnd(-20,20),api);this.up()},
 };

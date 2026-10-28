@@ -1,6 +1,6 @@
 /* ひとりだけ色ちがい：Kuku Kube 系。レベルでマス数↑・色差↓。ミス-3秒。 */
 const AREA=360,AX=(W-AREA)/2,AY=200;
-const GAME={...META,time:40,unit:'問',hudUnit:true,comboHud:false,
+const GAME={...META,sprites:['icon'],time:40,unit:'問',hudUnit:true,comboHud:false,
   bgm:{bpm:124,root:60,scale:'major',prog:[4,5,3,6],seed:58,lead:'triangle',drums:'pop',density:.55},
   ranks:[[0,'色ってむずかしい'],[10,'ふつうの目'],[18,'いい目してる'],[26,'色のソムリエ'],[34,'ほぼカメラ'],[42,'色ちがい検出AI']],
   shareText:(v,f)=>`ひとりだけ色ちがい、40秒で ${f}問 正解！`,
@@ -22,7 +22,7 @@ const GAME={...META,time:40,unit:'問',hudUnit:true,comboHud:false,
     for(let j=0;j<st.n;j++)for(let i=0;i<st.n;i++){const k=j*st.n+i,cx=AX+(i+.5)*cs,cy=AY+(j+.5)*cs;let ox=0;if(st.wrongT>0&&k===st.wi)ox=Math.sin(st.wrongT*60)*4;
       D.circle(c,cx+ox,cy,r,k===st.odd?st.c2:st.c1,Math.max(2,cs*.05));D.face(c,cx+ox,cy+r*.1,r*1.15,st.wrongT>0&&k===st.wi?'sad':'smile');
       if(api.state==='over'&&k===st.odd){c.lineWidth=4;c.strokeStyle='#e2645a';c.beginPath();c.arc(cx,cy,r+8,0,7);c.stroke()}}
-    D.text(c,'レベル '+(st.lv+1),W/2,AY+AREA+50,20,'#7a6658');
+    D.text(c,'レベル '+(st.lv+1),W/2,AY+AREA+50,20,'#8e8077');
   },
   __bot(api){const st=this.st;if(Math.random()<.5)return;const k=Math.random()<.9?st.odd:rndi(0,st.n*st.n-1),cs=AREA/st.n;this.down(AX+(k%st.n+.5)*cs,AY+(Math.floor(k/st.n)+.5)*cs,api)},
 };

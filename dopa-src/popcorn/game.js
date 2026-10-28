@@ -1,6 +1,6 @@
 /* ポップコーン連鎖：Boomshine 系。1タップで爆発→ふれた粒が連鎖。目標数でクリア、失敗3回で終了。 */
 const AX=20,AY=150,AW=W-40,AH=530;
-const GAME={...META,unit:'点',comboHud:false,
+const GAME={...META,sprites:['icon','kernel','pop'],unit:'点',comboHud:false,
   bgm:{bpm:112,root:62,scale:'major',prog:[1,6,2,5],seed:73,lead:'triangle',drums:'pop',density:.5},
   ranks:[[0,'コーンの粒'],[100,'ポップコーン屋さん'],[300,'連鎖マニア'],[700,'大連鎖職人'],[1300,'ポップコーンの魔術師'],[2200,'ポップコーン大爆発']],
   shareText:(v,f)=>`ポップコーン連鎖で ${f}点！`,
@@ -33,10 +33,10 @@ const GAME={...META,unit:'点',comboHud:false,
     D.rrect(c,AX,AY,AW,AH,30,'#c0553f',4);D.rrect(c,AX+10,AY+10,AW-20,AH-20,24,'#8f3d2e',3);
     for(const k of st.ks)this.kernel(c,k.x,k.y,9,k.rot);
     for(const p of st.pops)if(p.r>1)this.pop(c,p.x,p.y,p.r,p.t);
-    D.text(c,'ステージ '+st.lv,30,112,18,'#4a3428','left');
-    D.text(c,'のこり',W-110,112,13,'#7a6658','left');for(let i=0;i<3;i++)this.kernel(c,W-50+i*16-10,112,6,0),i>=st.lives&&(c.fillStyle='rgba(251,236,208,.8)',c.fillRect(W-50+i*16-19,100,18,24));
+    D.text(c,'ステージ '+st.lv,30,112,18,'#5b4d45','left');
+    D.text(c,'のこり',W-110,112,13,'#8e8077','left');for(let i=0;i<3;i++)this.kernel(c,W-50+i*16-10,112,6,0),i>=st.lives&&(c.fillStyle='rgba(251,236,208,.8)',c.fillRect(W-50+i*16-19,100,18,24));
     const pr=Math.min(1,st.chain/st.need);D.rrect(c,AX+30,AY+AH+12,AW-60,20,10,'#fffdf8',3);if(pr>0)D.rrect(c,AX+32,AY+AH+14,(AW-64)*pr,16,8,pr>=1?'#7cb35f':'#e76f51',0);
-    D.text(c,(st.chain>1?st.chain+'連鎖  ':'')+st.chain+' / '+st.need,W/2,AY+AH+22,14,'#4a3428');
+    D.text(c,(st.chain>1?st.chain+'連鎖  ':'')+st.chain+' / '+st.need,W/2,AY+AH+22,14,'#5b4d45');
     if(st.phase==='aim'&&api.state==='play'){c.globalAlpha=.6+.4*Math.sin(api.t*5);D.text(c,'どこか1か所タップ！',W/2,AY+AH/2,24,'#fff','center',OL,6);c.globalAlpha=1}
     if(st.phase==='msg'){D.text(c,st.msg,W/2,AY+AH/2,36,st.ok?'#fff':'#f3b0a6','center',OL,9)}
   },
