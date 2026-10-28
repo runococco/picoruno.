@@ -26,7 +26,7 @@ const GAME={...META,sprites:['icon','cake'],unit:'段',hudUnit:true,overDelay:3.
       st.fall.push({x:cut.x,y,w:cut.w,vy:-60,vx:(c.x<top.x?-1:1)*90,rot:0,vr:(c.x<top.x?-1:1)*3,i:st.L.length});
       st.L.push({x:l,w:r-l});S.thud();S.pop(.7+Math.random()*.2);api.shake(3)}
     api.score=st.L.length-1;st.dropAnim=1;
-    if(api.score%10===0){api.float(W/2,250,api.score+'段！',{size:40,c:'#fff'});S.fanfare()}
+    if(api.score%10===0){api.float(W/2,330,api.score+'段 達成！',{size:36,c:'#fff',vy:-30});S.fanfare()}
     st.camT=Math.max(0,(st.L.length-12)*PH);this.spawn()},
   update(dt,api){const st=this.st;
     if(st.cur){st.cur.x+=st.dir*st.speed*dt;const top=st.L[st.L.length-1];
@@ -60,7 +60,7 @@ const GAME={...META,sprites:['icon','cake'],unit:'段',hudUnit:true,overDelay:3.
     c.save();if(st.zoom<1){c.translate(CX,BASEY+40);c.scale(st.zoom,st.zoom);c.translate(-CX,-(BASEY+40))}c.translate(0,st.cam);
     this.tower(c,api);
     c.restore();
-    if(api.state==='over'&&api.overT>1.4){c.globalAlpha=Math.min(1,(api.overT-1.4)*3);D.text(c,'パシャッ！ 写真にのこしたよ',W/2,H-50,22,'#fff','center',OL,6);c.globalAlpha=1}
+    if(api.state==='over'&&api.overT>.4){const sh=api.overT>1.4;c.globalAlpha=Math.min(1,(api.overT-(sh?1.4:.4))*3);D.text(c,sh?'パシャッ！':'写真に残そう！',W/2,H-50,sh?28:24,'#fff','center',OL,6);c.globalAlpha=1}
   },
   __bot(api){const st=this.st;if(st.cur){const top=st.L[st.L.length-1];if(Math.abs(st.cur.x-top.x)<(Math.random()<.5?6:30))this.place(api)}},
 };

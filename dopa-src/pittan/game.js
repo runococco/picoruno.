@@ -1,5 +1,5 @@
-/* ぴったんブロック：Block Blast/1010 系。8x8、3ピース、列消し、コンボ。トレイのブロックはタップで90°回転。 */
-const N=8,CS=44,BX=(W-N*CS)/2,BY=150,TRAYY=600,SLOTS=[78,210,342],TS=.5;
+/* ぴったんブロック：Block Blast/1010 系。8x8、3ピース、列消し、コンボ。左の回転ボタンで3つまとめて、ブロックをタップでそれだけ90°回転。 */
+const N=8,CS=44,BX=(W-N*CS)/2,BY=150,TRAYY=600,SLOTS=[140,250,356],RBX=52,TS=.5;
 const SHP=[[[0,0]],[[0,0],[1,0]],[[0,0],[0,1]],[[0,0],[1,0],[2,0]],[[0,0],[0,1],[0,2]],[[0,0],[1,0],[2,0],[3,0]],[[0,0],[0,1],[0,2],[0,3]],
   [[0,0],[1,0],[0,1],[1,1]],[[0,0],[1,0],[2,0],[0,1],[1,1],[2,1],[0,2],[1,2],[2,2]],[[0,0],[0,1],[1,1]],[[1,0],[0,1],[1,1]],[[0,0],[1,0],[0,1]],[[0,0],[1,0],[1,1]],
   [[0,0],[0,1],[0,2],[1,2],[2,2]],[[0,0],[1,0],[2,0],[2,1],[2,2]],[[0,0],[1,0],[2,0],[1,1]],[[1,0],[0,1],[1,1],[2,1]],[[0,0],[0,1],[1,1],[1,2]],[[1,0],[2,0],[0,1],[1,1]],
@@ -19,8 +19,9 @@ const GAME={...META,sprites:['icon','cell'],unit:'点',
   fitsSome(s){for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(this.fits(s,x,y))return true;return false},
   // 回転させればおける場合もOK
   canAny(p){let s=p.s;for(let r=0;r<4;r++){if(this.fitsSome(s))return true;s=this.rot(s)}return false},
-  pieceAt(x,y){const st=this.st;for(const p of st.tray){const cx=SLOTS[p.slot];if(Math.abs(x-cx)<66&&Math.abs(y-TRAYY)<70)return p}return null},
-  down(x,y,api){const p=this.pieceAt(x,y);if(!p)return;this.st.drag={p,x,y,sx:x,sy:y,moved:false};S.tap(1.2)},
+  pieceAt(x,y){const st=this.st;for(const p of st.tray){const cx=SLOTS[p.slot];if(Math.abs(x-cx)<55&&Math.abs(y-TRAYY)<70)return p}return null},
+  rotAll(){const st=this.st;for(const p of st.tray){this.setShape(p,this.rot(p.s));p.spin=1}st.rbtn=1;S.swish();S.tap(1.5)},
+  down(x,y,api){if(dist(x,y,RBX,TRAYY)<34){this.rotAll();return}const p=this.pieceAt(x,y);if(!p)return;this.st.drag={p,x,y,sx:x,sy:y,moved:false};S.tap(1.2)},
   move(x,y){const d=this.st.drag;if(d){d.x=x;d.y=y;if(dist(x,y,d.sx,d.sy)>14)d.moved=true}},
   target(d){const p=d.p,gx=d.x-p.w*CS/2,gy=d.y-90-p.h*CS/2;return[Math.round((gx-BX)/CS),Math.round((gy-BY)/CS)]},
   up(x,y,api){const st=this.st,d=st.drag;if(!d)return;st.drag=null;
@@ -45,7 +46,7 @@ const GAME={...META,sprites:['icon','cell'],unit:'点',
     st.moves++;
     if(!st.tray.length)this.fill();
     if(!st.tray.some(p=>this.canAny(p))){st.over=true;setTimeout(()=>{S.bad();api.end()},500)}},
-  update(dt){const st=this.st;for(const p of st.tray)p.spin=Math.max(0,(p.spin||0)-dt*5);for(const p of st.pop)p.t+=dt;st.pop=st.pop.filter(p=>p.t<p.d+.35)},
+  update(dt){const st=this.st;st.rbtn=Math.max(0,(st.rbtn||0)-dt*5);for(const p of st.tray)p.spin=Math.max(0,(p.spin||0)-dt*5);for(const p of st.pop)p.t+=dt;st.pop=st.pop.filter(p=>p.t<p.d+.35)},
   overText:'おけない！',
   draw(c,api){const st=this.st;c.fillStyle=this.bg;c.fillRect(0,0,W,H);
     c.fillStyle='#dfe6f0';for(let i=0;i<20;i++){c.beginPath();c.arc((i*71)%W,(i*137)%H,20+(i%3)*10,0,7);c.fill()}
@@ -60,9 +61,12 @@ const GAME={...META,sprites:['icon','cell'],unit:'点',
     D.rrect(c,20,TRAYY-70,W-40,140,22,'rgba(255,255,255,.6)',3);
     for(const p of st.tray){if(d&&d.p===p&&d.moved)continue;const s=CS*TS,cx=SLOTS[p.slot],ok=this.canAny(p);c.globalAlpha=ok?1:.35;
       c.save();c.translate(cx,TRAYY);c.rotate(-(p.spin||0)*Math.PI/2);for(const[i,j]of p.s)this.cell(c,-p.w*s/2+i*s,-p.h*s/2+j*s,s,p.c);c.restore();c.globalAlpha=1;
-      // 回転マーク
-      if(p.s.length>1&&!(p.w===p.h&&p.s.length===p.w*p.h)){c.lineWidth=2.5;c.strokeStyle='#8e8077';c.lineCap='round';c.beginPath();c.arc(cx+44,TRAYY+50,8,-.4,Math.PI*1.4);c.stroke();D.poly(c,[[cx+44+8*Math.cos(-.4)+4,TRAYY+50+8*Math.sin(-.4)-1],[cx+44+8*Math.cos(-.4)-5,TRAYY+50+8*Math.sin(-.4)-4],[cx+44+8*Math.cos(-.4)-1,TRAYY+50+8*Math.sin(-.4)+5]],'#8e8077',0)}}
-    if(api.state==='play'&&st.moves<2)D.text(c,'タップで回転・ドラッグでおく',W/2,TRAYY+92,15,'#8e8077');
+}
+    // 回転ボタン（3つまとめて回す）
+    {const k=1-(st.rbtn||0)*.12;c.save();c.translate(RBX,TRAYY);c.scale(k,k);D.circle(c,0,3,27,'rgba(91,77,69,.25)',0);D.circle(c,0,0,27,'#fffdf8',3);
+      c.rotate(-(st.rbtn||0)*Math.PI/2);c.lineWidth=4;c.strokeStyle=OL;c.lineCap='round';c.beginPath();c.arc(0,0,12,-.3,Math.PI*1.45);c.stroke();
+      const ex=Math.cos(-.3)*12,ey=Math.sin(-.3)*12;D.poly(c,[[ex+7,ey-2],[ex-5,ey-6],[ex+1,ey+7]],OL,0);c.restore();D.text(c,'回転',RBX,TRAYY+42,12,'#8e8077')}
+    if(api.state==='play'&&st.moves<2)D.text(c,'左のボタンかタップで回転・ドラッグでおく',W/2,TRAYY+92,14,'#8e8077');
     if(d&&d.moved){const p=d.p,gx=d.x-p.w*CS/2,gy=d.y-90-p.h*CS/2;for(const[i,j]of p.s)this.cell(c,gx+i*CS,gy+j*CS,CS,p.c);D.face(c,gx+p.s[0][0]*CS+CS/2,gy+p.s[0][1]*CS+CS/2,CS*.7,'o')}
   },
   __bot(api){const st=this.st;if(st.over)return;for(const p of st.tray){for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(this.fits(p.s,x,y)){const cx=SLOTS[p.slot];this.down(cx,TRAYY,api);const tx=BX+x*CS+p.w*CS/2,ty=BY+y*CS+p.h*CS/2+90;this.move(tx,ty);this.up(tx,ty,api);return}}

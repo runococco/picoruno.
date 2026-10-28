@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#e4efdc">
 <title>やさいスパスパ</title>
-<meta name="description" content="とんでくる野菜を指でスパッと切る40秒ゲーム。左上の注文の野菜をそろえるとサラダ完成で時間が増える。一回のスワイプでまとめて切るとボーナス。金のかぼちゃでフィーバー、ウニは切っちゃダメ。">
+<meta name="description" content="とんでくる野菜を指でスパッと切る30秒ゲーム。左上の注文の野菜をそろえるとサラダ完成で時間が増える。一回のスワイプでまとめて切るとボーナス。金のトマトでフィーバー、赤とうがらしは切っちゃダメ。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="やさいスパスパ">
-<meta property="og:description" content="とんでくる野菜をスパッ！40秒で何点とれる？">
+<meta property="og:description" content="とんでくる野菜をスパッ！30秒でサラダいくつ作れる？">
 <meta property="og:url" content="https://runococco.github.io/picoruno./supasupa.html">
 <meta name="twitter:card" content="summary_large_image">
 <meta property="og:image" content="https://runococco.github.io/picoruno./og-image.png">
@@ -71,7 +71,7 @@ button{font-family:inherit;color:inherit}
     <canvas id="iconCv" width="360" height="360"></canvas>
     <h1 class="ttl" style="--tl:7">やさいスパスパ</h1>
     <p class="catch">スワイプひとつで、スパパパッ。</p>
-    <ul class="howto"><li>画面をなぞって野菜を切る</li><li>左上の注文どおりに切るとサラダ完成で +4秒</li><li>1回でたくさん切るとボーナス</li><li>金のかぼちゃでフィーバー</li><li>ウニを切ると -3秒</li></ul>
+    <ul class="howto"><li>画面をなぞって野菜を切る</li><li>左上の注文どおりに切るとサラダ完成で +2秒</li><li>1回でたくさん切るとボーナス</li><li>金のトマトでフィーバー</li><li>赤とうがらしを切ると -3秒</li></ul>
     <p class="best" id="bestTxt"></p>
     <button class="btn big" id="startBtn">スタート</button>
     <a class="back" href="https://runococco.github.io/picoruno./">← picoruno. のゲーム一覧へ</a>
@@ -243,7 +243,7 @@ const AU=(()=>{
     setMute(m){muted=m;try{localStorage.setItem('dopa-mute',m?'1':'0')}catch(e){}if(master&&ac)master.gain.setTargetAtTime(m?0:1,ac.currentTime,.02)},
     bgmStart(o){init();if(!ac)return;this.bgmStop(true);song=makeSong(o);step=0;nextT=ac.currentTime+.08;this.t0=nextT;bgm.gain.cancelScheduledValues(ac.currentTime);bgm.gain.setValueAtTime(.2,ac.currentTime);timer=setInterval(schedule,25)},
     bgmStop(now){if(timer){clearInterval(timer);timer=null}song=null;if(ac&&!now){bgm.gain.setTargetAtTime(0,ac.currentTime,.15)}},
-    get ctx(){return ac},
+    get ctx(){return ac},get sfx(){return sfx},get nbuf(){return nbuf},
   };
 })();
 const S=AU.S;
@@ -410,49 +410,49 @@ const P=(()=>{
 
 </script>
 <script>
-const META={"title": "やさいスパスパ", "desc": "とんでくる野菜を指でスパッと切る40秒ゲーム。左上の注文の野菜をそろえるとサラダ完成で時間が増える。一回のスワイプでまとめて切るとボーナス。金のかぼちゃでフィーバー、ウニは切っちゃダメ。", "ogdesc": "とんでくる野菜をスパッ！40秒で何点とれる？", "catch": "スワイプひとつで、スパパパッ。", "howto": ["画面をなぞって野菜を切る", "左上の注文どおりに切るとサラダ完成で +4秒", "1回でたくさん切るとボーナス", "金のかぼちゃでフィーバー", "ウニを切ると -3秒"], "bg": "#e4efdc", "accent": "#7cb35f", "slug": "supasupa"};
-/* やさいスパスパ：放物線でとぶ野菜をスワイプで切る。サラダの注文（左上の伝票）をそろえるとボーナス＋時間。1スワイプ複数切りでボーナス。ウニは-3秒。 */
+const META={"title": "やさいスパスパ", "desc": "とんでくる野菜を指でスパッと切る30秒ゲーム。左上の注文の野菜をそろえるとサラダ完成で時間が増える。一回のスワイプでまとめて切るとボーナス。金のトマトでフィーバー、赤とうがらしは切っちゃダメ。", "ogdesc": "とんでくる野菜をスパッ！30秒でサラダいくつ作れる？", "catch": "スワイプひとつで、スパパパッ。", "howto": ["画面をなぞって野菜を切る", "左上の注文どおりに切るとサラダ完成で +2秒", "1回でたくさん切るとボーナス", "金のトマトでフィーバー", "赤とうがらしを切ると -3秒"], "bg": "#e4efdc", "accent": "#7cb35f", "slug": "supasupa"};
+/* やさいスパスパ：放物線でとぶ野菜をスワイプで切る。サラダの注文（左上の伝票）をそろえるとボーナス＋時間。1スワイプ複数切りでボーナス。赤とうがらしは-3秒。 */
 const VEG=[
-  {n:'トマト',r:30,c:'#e8695c',in:'#f6a99c',pts:1},{n:'なす',r:30,c:'#8a6aa8',in:'#efe6c8',pts:1},{n:'にんじん',r:28,c:'#f09a4a',in:'#f7c58e',pts:1},
-  {n:'キャベツ',r:36,c:'#a9d38a',in:'#e3f2c9',pts:1},{n:'だいこん',r:30,c:'#f6f2e6',in:'#ffffff',pts:1},{n:'ピーマン',r:28,c:'#5fa65a',in:'#c9e6b6',pts:1}];
-const GAME={...META,sprites:['icon','veg'],time:40,unit:'点',
+  {n:'トマト',r:30,c:'#e8695c',in:'#f6a99c',pts:1},{n:'きゅうり',r:30,c:'#6fae55',in:'#dcefc4',pts:1},{n:'にんじん',r:28,c:'#f09a4a',in:'#f7c58e',pts:1},
+  {n:'レタス',r:36,c:'#b5dc8c',in:'#eaf6d4',pts:1},{n:'だいこん',r:30,c:'#f6f2e6',in:'#ffffff',pts:1},{n:'ブロッコリー',r:30,c:'#6aa85a',in:'#cfe8b8',pts:1}];
+const GAME={...META,sprites:['icon','veg'],time:30,unit:'点',
   bgm:{bpm:140,root:57,scale:'minor',prog:[1,6,3,7],seed:41,lead:'square',drums:'four'},
-  ranks:[[0,'ピーラー係'],[60,'見習いシェフ'],[130,'スパスパ料理人'],[220,'包丁さばきの達人'],[330,'やさい斬りの剣豪'],[450,'伝説の板前']],
+  ranks:[[0,'ピーラー係'],[45,'見習いシェフ'],[100,'スパスパ料理人'],[165,'包丁さばきの達人'],[250,'やさい斬りの剣豪'],[340,'伝説の板前']],
   shareText:(v,f)=>`やさいスパスパで ${f}点！`,
   icon(c,x,y,s){c.save();c.translate(x,y);this.veg(c,{t:0,r:s*.3,rot:-.2},0,0);this.veg(c,{t:2,r:s*.2,rot:.6},s*.28,-s*.26);this.veg(c,{t:1,r:s*.2,rot:-.8},-s*.3,-s*.24);
     c.lineWidth=s*.04;c.strokeStyle='#fff';c.lineCap='round';c.beginPath();c.moveTo(-s*.45,s*.35);c.lineTo(s*.45,-s*.05);c.stroke();c.restore()},
   shape(c,t,r){c.beginPath();
-    if(t===1){c.ellipse(0,r*.15,r*.75,r*1.05,0,0,7)}
+    if(t===1){c.ellipse(0,0,r*.48,r*1.25,0,0,7)}
     else if(t===2){c.moveTo(-r*.6,-r*.8);c.quadraticCurveTo(0,-r*1,r*.6,-r*.8);c.lineTo(r*.12,r*1.1);c.quadraticCurveTo(0,r*1.25,-r*.12,r*1.1);c.closePath()}
     else if(t===4){c.ellipse(0,r*.1,r*.6,r*1.1,0,0,7)}
-    else if(t===5){c.moveTo(-r*.9,-r*.3);c.bezierCurveTo(-r*1.1,r*.9,-r*.2,r*1.1,0,r*.8);c.bezierCurveTo(r*.2,r*1.1,r*1.1,r*.9,r*.9,-r*.3);c.bezierCurveTo(r*.6,-r*.9,-r*.6,-r*.9,-r*.9,-r*.3)}
-    else if(t==='gold'){c.ellipse(0,0,r*1.15,r*.9,0,0,7)}
+    else if(t===5){c.moveTo(-r*.3,r*1.05);c.lineTo(-r*.22,r*.2);c.arc(-r*.5,-r*.05,r*.42,1.2,4.4);c.arc(0,-r*.45,r*.48,3.6,5.9);c.arc(r*.5,-r*.05,r*.42,5,8.1);c.lineTo(r*.3,r*1.05);c.closePath()}
+    else if(t==='chili'){c.moveTo(-r*.4,-r*.8);c.quadraticCurveTo(r*.7,-r*.75,r*.55,r*.15);c.quadraticCurveTo(r*.4,r*.95,-r*.45,r*1.15);c.quadraticCurveTo(-r*.1,r*.45,-r*.4,-r*.8)}
     else c.arc(0,0,r,0,7)},
   veg(c,v,x,y,clip=0){
     const t=v.t,r=v.r;c.save();c.translate(x,y);c.rotate(v.rot||0);
     if(clip){c.save();c.rotate(v.cut||0);c.beginPath();c.rect(-200,clip<0?-200:0,400,200);c.restore();c.clip()}
-    if(t==='uni'){D.star(c,0,0,r*1.25,'#4b3c5e',3,0,14,.72);D.circle(c,0,0,r*.75,'#5f4c78',3);D.face(c,0,2,r*.9,'angry')}
-    else{const col=t==='gold'?'#f2c14e':VEG[t].c;this.shape(c,t,r);c.fillStyle=col;c.fill();c.lineWidth=3.5;c.strokeStyle=OL;c.lineJoin='round';c.stroke();
-      if(t==='gold'){c.lineWidth=2.5;for(const k of[-1,1]){c.beginPath();c.ellipse(r*k*.62,0,r*.42,r*.82,0,0,7);c.stroke()}D.rrect(c,-4,-r*1.15,8,r*.35,3,'#7a9b4f',2.5)}
-      if(t===0||t===2||t===4){D.path(c,c=>{const yy=t===0?-r*.92:t===2?-r*.9:-r*1.15;for(let i=-1;i<=1;i++){c.moveTo(0,yy);c.quadraticCurveTo(i*r*.3,yy-r*.3,i*r*.5,yy-r*.45)}},null,3);c.lineWidth=5;c.strokeStyle='#6fae55';c.stroke()}
-      if(t===1)D.rrect(c,-r*.35,-r*1,r*.7,r*.28,r*.1,'#5c7f45',3);
+    {const col=t==='gold'?'#f2c14e':t==='chili'?'#e2453a':VEG[t].c;this.shape(c,t,r);c.fillStyle=col;c.fill();c.lineWidth=3.5;c.strokeStyle=OL;c.lineJoin='round';c.stroke();
+      if(t==='chili')D.path(c,c=>{c.moveTo(-r*.1,-r*.78);c.quadraticCurveTo(-r*.2,-r*1.15,r*.15,-r*1.2)},null,4);
+      if(t==='chili'&&!clip){c.lineWidth=4;c.strokeStyle='#6fae55';c.beginPath();c.moveTo(-r*.1,-r*.78);c.quadraticCurveTo(-r*.2,-r*1.15,r*.15,-r*1.2);c.stroke()}
+      if(t===0||t==='gold'||t===2||t===4){D.path(c,c=>{const yy=t===0||t==='gold'?-r*.92:t===2?-r*.9:-r*1.15;for(let i=-1;i<=1;i++){c.moveTo(0,yy);c.quadraticCurveTo(i*r*.3,yy-r*.3,i*r*.5,yy-r*.45)}},null,3);c.lineWidth=5;c.strokeStyle='#6fae55';c.stroke()}
+      if(t===1){c.fillStyle='rgba(91,77,69,.25)';for(const[a,b]of[[-.15,-.6],[.15,-.2],[-.1,.25],[.12,.65]]){c.beginPath();c.arc(a*r,b*r,1.8,0,7);c.fill()}}
       if(t===3){c.lineWidth=2.5;c.strokeStyle='#7fb064';c.beginPath();c.arc(0,r*.2,r*.6,Math.PI*1.1,Math.PI*1.9);c.stroke()}
-      if(!clip)D.face(c,0,t===2?-r*.2:r*.05,r*.95,v.hit?'o':'smile')}
-    if(clip){c.save();c.rotate(v.cut||0);c.fillStyle=t==='uni'?'#f0c070':t==='gold'?'#fbe7a6':VEG[t].in;c.fillRect(-r*1.1,-2.5,r*2.2,5);c.restore()}
+      if(!clip)D.face(c,0,t===2||t===5?-r*.2:t==='chili'?-r*.1:r*.05,t==='chili'?r*.8:r*.95,t==='chili'?'angry':v.hit?'o':'smile')}
+    if(clip){c.save();c.rotate(v.cut||0);c.fillStyle=t==='chili'?'#f6b3a3':t==='gold'?'#fbe7a6':VEG[t].in;c.fillRect(-r*1.1,-2.5,r*2.2,5);c.restore()}
     c.restore()},
   reset(api){this.st={items:[],halves:[],trail:[],spawnT:.4,feverT:0,down:false,px:0,py:0,swipeCut:0,swipeT:0,wave:0,orders:0,ord:null,ordPop:0,bowl:0};this.newOrder();api.score=0},
   // 注文：2〜3種類の野菜を1〜3個ずつ。そろうとサラダ完成
   newOrder(){const st=this.st,n=Math.min(3,2+Math.floor(st.orders/2)),ts=[0,1,2,3,4,5].sort(()=>Math.random()-.5).slice(0,n);
     st.ord=ts.map(t=>({t,need:rndi(1,Math.min(3,1+Math.floor(st.orders/2)+1)),got:0}));st.ordPop=1},
   orderHit(v,api){const st=this.st,o=st.ord.find(q=>q.t===v.t&&q.got<q.need);if(!o)return;o.got++;st.ordPop=.6;S.coin(1.2);
-    if(st.ord.every(q=>q.got>=q.need)){st.orders++;const b=(10+st.orders*5)*(st.feverT>0?2:1);api.score+=b;api.timeLeft+=4;st.bowl=1.4;
-      S.fanfare();api.flash('#fff',.35);api.float(W/2,H/2-40,'サラダ完成！',{c:'#fff',size:44,life:1.2});api.float(W/2,H/2+10,'+'+b+'点  +4秒',{c:'#f3c84b',size:28,life:1.2});
+    if(st.ord.every(q=>q.got>=q.need)){st.orders++;const b=(10+st.orders*5)*(st.feverT>0?2:1);api.score+=b;api.timeLeft+=2;st.bowl=1.4;
+      S.fanfare();api.flash('#fff',.35);api.float(W/2,H/2-40,'サラダ完成！',{c:'#fff',size:44,life:1.2});api.float(W/2,H/2+10,'+'+b+'点  +2秒',{c:'#f3c84b',size:28,life:1.2});
       api.burst(W/2,H/2,{c:['#e8695c','#a9d38a','#f09a4a','#fff'],n:30,sp:380,shape:'star',r:5});this.newOrder()}},
   spawn(api){const st=this.st;st.wave++;const fever=st.feverT>0,n=fever?rndi(3,5):rndi(1,Math.min(5,2+Math.floor(api.t/10)));
     const want=st.ord.filter(q=>q.got<q.need).map(q=>q.t);
     for(let i=0;i<n;i++){let t=want.length&&Math.random()<.5?pick(want):rndi(0,VEG.length-1);
-      if(!fever&&Math.random()<Math.min(.22,.06+api.t*.004))t='uni';else if(!fever&&st.wave%9===0&&i===0)t='gold';
-      const x=rnd(70,W-70),r=t==='uni'?26:t==='gold'?34:VEG[t].r;
+      if(!fever&&Math.random()<Math.min(.22,.06+api.t*.004))t='chili';else if(!fever&&st.wave%9===0&&i===0)t='gold';
+      const x=rnd(70,W-70),r=t==='chili'?28:t==='gold'?32:VEG[t].r;
       st.items.push({t,r,x,y:H+40,vx:(W/2-x)*rnd(.4,.9),vy:-rnd(880,1060),rot:0,vr:rnd(-3,3),hit:false})}
     S.whoosh()},
   down(x,y){const st=this.st;st.down=true;st.px=x;st.py=y;st.swipeCut=0;st.trail=[{x,y,a:0}]},
@@ -465,7 +465,7 @@ const GAME={...META,sprites:['icon','veg'],time:40,unit:'点',
   cut(v,ang,api){const st=this.st;v.hit=true;v.cut=ang-(v.rot||0);
     const nx=-Math.sin(ang),ny=Math.cos(ang);
     for(const s of[-1,1])st.halves.push({...v,clip:s,x:v.x,y:v.y,vx:v.vx*.5+nx*s*-140,vy:v.vy*.3+ny*s*-140-80,vr:s*rnd(3,6)});
-    if(v.t==='uni'){api.combo=0;api.timeLeft=Math.max(0,api.timeLeft-3);S.bad();S.boom();api.shake(16);api.flash('#4b3c5e',.4);api.float(v.x,v.y-30,'イタッ！ -3秒',{c:'#e2645a',size:30});api.burst(v.x,v.y,{c:['#4b3c5e','#f0c070'],n:18,sp:300});return}
+    if(v.t==='chili'){api.combo=0;api.timeLeft=Math.max(0,api.timeLeft-3);S.bad();S.boom();api.shake(16);api.flash('#e2453a',.4);api.float(v.x,v.y-30,'からっ！ -3秒',{c:'#e2645a',size:30});api.burst(v.x,v.y,{c:['#e2453a','#f6b3a3'],n:18,sp:300});return}
     st.swipeCut++;api.combo++;
     let p=v.t==='gold'?10:1;if(st.feverT>0)p*=2;p+=Math.floor(api.combo/10);api.score+=p;
     if(typeof v.t==='number')this.orderHit(v,api);
@@ -502,7 +502,7 @@ const GAME={...META,sprites:['icon','veg'],time:40,unit:'点',
     this.drawOrder(c);
     if(st.trail.length>1){c.lineCap='round';c.lineJoin='round';for(let i=1;i<st.trail.length;i++){const a=st.trail[i-1],b=st.trail[i],k=1-b.a/.15;c.strokeStyle=`rgba(255,255,255,${k})`;c.lineWidth=12*k;c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke()}}
   },
-  __bot(api){const st=this.st;const v=st.items.find(q=>!q.hit&&q.t!=='uni'&&q.y<330&&Math.random()<.3);if(!v)return;this.down(v.x-60,v.y-20,api);this.move(v.x,v.y,api);this.move(v.x+60,v.y+20,api);this.up(0,0,api)},
+  __bot(api){const st=this.st;const v=st.items.find(q=>!q.hit&&q.t!=='chili'&&q.y<330&&Math.random()<.3);if(!v)return;this.down(v.x-60,v.y-20,api);this.move(v.x,v.y,api);this.move(v.x+60,v.y+20,api);this.up(0,0,api)},
 };
 
 </script>

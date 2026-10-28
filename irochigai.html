@@ -243,7 +243,7 @@ const AU=(()=>{
     setMute(m){muted=m;try{localStorage.setItem('dopa-mute',m?'1':'0')}catch(e){}if(master&&ac)master.gain.setTargetAtTime(m?0:1,ac.currentTime,.02)},
     bgmStart(o){init();if(!ac)return;this.bgmStop(true);song=makeSong(o);step=0;nextT=ac.currentTime+.08;this.t0=nextT;bgm.gain.cancelScheduledValues(ac.currentTime);bgm.gain.setValueAtTime(.2,ac.currentTime);timer=setInterval(schedule,25)},
     bgmStop(now){if(timer){clearInterval(timer);timer=null}song=null;if(ac&&!now){bgm.gain.setTargetAtTime(0,ac.currentTime,.15)}},
-    get ctx(){return ac},
+    get ctx(){return ac},get sfx(){return sfx},get nbuf(){return nbuf},
   };
 })();
 const S=AU.S;
