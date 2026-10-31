@@ -53,6 +53,9 @@ const C={
   rally:{g:'tap',check:'__G.st.n>0||__G.st.dead'},
   juice:{g:'hold',check:'__G.st.lv>0||__G.st.done'},
   gum:{g:'hold',check:'__G.st.r>0||__G.st.done'},
+  kinobori:{g:'tap',check:'__G.st.n>0'},
+  hurdle:{g:'tap',check:'true'},
+  shutter:{g:'tap',check:'true'},
 };
 (async()=>{const b=await chromium.launch();
   for(const s of process.argv.slice(2)){const p=await b.newPage({viewport:{width:390,height:780}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
