@@ -416,7 +416,7 @@ const GAME={...META,sprites:['icon','ufo','enemy','boss'],unit:'点',fullBleed:t
   bgm:{bpm:150,root:57,scale:'minor',prog:[1,6,7,5],seed:61,lead:'square',drums:'four',density:.66},
   ranks:[[0,'見習いパイロット'],[1000,'星くずハンター'],[3000,'ぎんがのエース'],[6000,'流星の騎士'],[10000,'うちゅう最強'],[16000,'伝説のUFO']],
   shareText:(v,f)=>`ほしくずシューターで ${f}点！`,
-  icon(c,x,y,s){this.enemy(c,x+s*.22,y-s*.25,s*.16,0);this.ufo(c,x-s*.05,y+s*.12,s*.5);c.fillStyle='#f4d66d';for(let i=0;i<3;i++){c.beginPath();c.ellipse(x-s*.05+(i-1)*s*.12,y-s*.12-i%2*s*.08,s*.03,s*.07,0,0,7);c.fill()}},
+  icon(c,x,y,s){this.enemy(c,x+s*.24,y-s*.28,s*.17,1);this.ufo(c,x-s*.06,y+s*.16,s*.75);c.fillStyle='#f4d66d';for(let i=0;i<3;i++){c.beginPath();c.ellipse(x-s*.06+(i-1)*s*.12,y-s*.3-i%2*s*.08,s*.03,s*.07,0,0,7);c.fill()}},
   ufo(c,x,y,s){const k=s/60;D.group(c,()=>{D.ellipse(c,x,y-6*k,16*k,16*k,'#bfe3ee');D.ellipse(c,x,y+4*k,30*k,11*k,'#f2a5c0')});D.face(c,x,y-7*k,16*k);
     c.fillStyle='#f4d66d';for(const i of[-1,0,1]){c.beginPath();c.arc(x+i*14*k,y+5*k,2.5*k,0,7);c.fill()}},
   enemy(c,x,y,r,k,hurt){const col=['#a7a3ad','#c9a0e0','#8fbfd6'][k%3];D.path(c,c=>{c.arc(x-r*.45,y+r*.15,r*.55,Math.PI*.5,Math.PI*1.5);c.arc(x,y-r*.3,r*.6,Math.PI*1.1,Math.PI*1.9);c.arc(x+r*.5,y+r*.1,r*.55,Math.PI*1.5,Math.PI*.5);c.closePath()},hurt?'#fff':col);D.face(c,x,y+r*.05,r*.9,k===1?'angry':'flat')},

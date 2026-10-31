@@ -4,7 +4,7 @@ const GAME={...META,sprites:['icon','bottle'],unit:'問',time:90,hudUnit:true,co
   bgm:{bpm:112,root:60,scale:'major',prog:[1,5,6,4],seed:55,lead:'triangle',drums:'pop',density:.5},
   ranks:[[0,'まぜまぜ'],[2,'ジュース係'],[4,'いろわけ上手'],[7,'色のソムリエ'],[10,'ジュース職人'],[14,'いろわけの神']],
   shareText:(v,f)=>`いろわけジュースで ${f}問 とけた！`,
-  icon(c,x,y,s){this.bottle(c,x-s*.22,y+s*.05,s*.3,[0,0,1,1],0,false);this.bottle(c,x+s*.22,y+s*.05,s*.3,[5,5,5,5],0,true)},
+  icon(c,x,y,s){this.bottle(c,x-s*.3,y+s*.06,s*.62,[2,0,5,0]);this.bottle(c,x,y+s*.02,s*.62,[0,0,0,0],0,true);this.bottle(c,x+s*.3,y+s*.06,s*.62,[5,2,2])},
   // 底から順に色番号の配列
   bottle(c,x,y,h,cols,lift=0,done=false,sel=false){const w=h*.27,top=y-h/2-lift,lw=Math.max(2.5,h*.03);c.save();
     const shape=c=>{c.moveTo(x-w/2,top+h*.08);c.lineTo(x-w/2,top+h-w/2);c.arc(x,top+h-w/2,w/2,Math.PI,0,true);c.lineTo(x+w/2,top+h*.08)};

@@ -418,7 +418,7 @@ const GAME={...META,sprites:['icon','ball'],unit:'面',time:60,hudUnit:true,comb
   bgm:{bpm:128,root:62,scale:'major',prog:[1,4,6,5],seed:63,lead:'square',drums:'four',density:.55},
   ranks:[[0,'はじめてのペンキ'],[3,'ペンキ見習い'],[6,'ぬりぬり上手'],[10,'ペンキ職人'],[15,'ゆかぬり名人'],[22,'ペンキの神']],
   shareText:(v,f)=>`ころころペンキで ${f}面 ぬりつぶした！`,
-  icon(c,x,y,s){const g=s*.16;for(let i=0;i<4;i++)for(let j=0;j<4;j++)D.rrect(c,x-g*2+i*g,y-g*2+j*g,g,g,3,(i+j)%3?'#f08a8a':'#fbf7f0',2.5);this.ball(c,x+g*.5,y+g*.5,g*.45,'#f08a8a')},
+  icon(c,x,y,s){const g=s*.19,P=[[0,0],[1,0],[2,0],[2,1],[2,2],[1,2]];D.rrect(c,x-g*2.1,y-g*2.1,g*4.2,g*4.2,g*.4,'#6b5d78',4);for(let i=0;i<4;i++)for(let j=0;j<4;j++){if(i===3||j===3&&i<2)continue;const pnt=P.some(q=>q[0]===i&&q[1]===j);c.fillStyle=pnt?'#f08a8a':'#fbf7f0';c.fillRect(x-g*2+i*g,y-g*2+j*g,g,g)}this.ball(c,x-g*.5,y+g*.5,g*.6,'#f08a8a')},
   ball(c,x,y,r,col){D.circle(c,x,y,r,col);D.face(c,x,y+r*.05,r*1.05)},
   gen(lv){// 掘ったマスから、ボールの止まる位置どうしのつながりで塗れるマスを決める
     const n=Math.min(6+Math.floor(lv/2),11),m=Math.min(8+Math.floor(lv/2),14);

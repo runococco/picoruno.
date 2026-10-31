@@ -4,7 +4,7 @@ const GAME={...META,sprites:['icon','fish','bowl'],unit:'ひき',hudUnit:true,co
   bgm:{bpm:96,root:62,scale:'major',prog:[1,6,4,5],seed:12,lead:'triangle',drums:'pop',density:.45,stab:false},
   ranks:[[0,'ぽちゃん'],[3,'すくい見習い'],[7,'夜店のじょうれん'],[12,'すくいの達人'],[18,'きんぎょ名人'],[26,'夏まつりの伝説']],
   shareText:(v,f)=>`きんぎょすくいで ${f}ひき すくった！`,
-  icon(c,x,y,s){this.poi(c,x+s*.12,y-s*.05,s*.32,1,0);this.fish(c,x-s*.15,y+s*.12,s*.22,0,0,0)},
+  icon(c,x,y,s){D.ellipse(c,x,y+s*.08,s*.46,s*.32,'#8ccbdb');this.fish(c,x-s*.18,y+s*.14,s*.3,-.3,0,0);this.fish(c,x+s*.2,y+s*.18,s*.22,3.4,2,1);this.poi(c,x+s*.1,y-s*.12,s*.22,1,0,true)},
   // k:0 あか 1 くろでめきん 2 きん
   fish(c,x,y,s,ang,k,sw){c.save();c.translate(x,y);c.rotate(ang);const col=k===1?'#8a8392':k===2?'#f2c84b':'#e86a4a',lw=Math.max(2,s*.09),w=Math.sin(sw)*.35;
     D.group(c,()=>{c.save();c.translate(-s*.45,0);c.rotate(w);D.path(c,c=>{c.moveTo(0,0);c.quadraticCurveTo(-s*.5,-s*.55,-s*.65,-s*.3);c.quadraticCurveTo(-s*.35,0,-s*.65,s*.3);c.quadraticCurveTo(-s*.5,s*.55,0,0)},k===1?'#9a93a2':col,lw);c.restore();

@@ -417,7 +417,7 @@ const GAME={...META,sprites:['icon','mallow','plat'],unit:'m',hudUnit:true,fullB
   bgm:{bpm:138,root:64,scale:'major',prog:[1,4,5,4],seed:33,lead:'square',drums:'pop',density:.6},
   ranks:[[0,'ふもと'],[50,'木のてっぺん'],[150,'雲の上'],[300,'空のはて'],[500,'宇宙のいりぐち'],[800,'月まで']],
   shareText:(v,f)=>`ぴょんぴょんマシュマロで ${f}m のぼった！`,
-  icon(c,x,y,s){this.plat(c,x,y+s*.28,s*.6,0);this.mallow(c,x,y-s*.02,s*.42,1)},
+  icon(c,x,y,s){c.save();c.translate(x,y);c.scale(s/150,s/150);this.plat(c,22,52,120,0);this.plat(c,-48,-48,80,3,1);this.mallow(c,22,14,64,1);c.restore()},
   mallow(c,x,y,s,sq){D.rrect(c,x-s*.42*(2-sq),y-s*.5*sq,s*.84*(2-sq),s*.95*sq,s*.3,'#fbf2f4');D.face(c,x,y-s*.05*sq+s*.1,s*.6)},
   plat(c,x,y,w,k,t=0){if(k===0){D.rrect(c,x-w/2,y-9,w,18,7,'#e3b47a',3);c.fillStyle='#b98450';for(let i=1;i<4;i++){c.beginPath();c.arc(x-w/2+i*w/4,y,2.2,0,7);c.fill()}}
     else if(k===1){D.rrect(c,x-w/2,y-9,w,18,7,'#a9d6e6',3)}// うごく
