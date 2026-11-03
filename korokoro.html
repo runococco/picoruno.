@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f2e8">
 <title>ころころおやつ</title>
-<meta name="description" content="となりのおやつと入れかえて、3ついじょう並べて消すパズル。時間内にお客さんの注文をそろえて、ステージをどんどん進もう。ボムやほしクッキーで一気に消して、コンボをつなげるとフィーバー！">
+<meta name="description" content="となりのおやつと入れかえて、3ついじょう並べて消すパズル。時間内にお客さんの注文をそろえて、ステージをどんどん進もう。注文をそろえきったおやつは「おかえし」をしてくれる。めんぼうでころころ、ポップコーンでぽんっ、消し続けるとやきたてタイム！">
 <meta property="og:type" content="website">
 <meta property="og:title" content="ころころおやつ">
 <meta property="og:description" content="おやつを3つそろえて消すパズル。注文をこなして、あなたは何ステージまで行ける？">
@@ -95,6 +95,7 @@ button{font-family:inherit;color:inherit}
 .timebar i{position:absolute;inset:0;transform-origin:left;background:var(--leaf);border-radius:999px}
 .timebar.warn i{background:var(--accent);animation:blink .5s steps(2) infinite}
 .timebar.frozen i{background:var(--fever)}
+.timebar.chill i{background:#9cc2e4}
 .timebar b{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:.8rem;font-family:var(--pop);font-weight:400;font-variant-numeric:tabular-nums}
 @keyframes blink{50%{opacity:.55}}
 .order{display:flex;align-items:center;gap:8px;width:var(--box);max-width:100%;background:var(--card);border:2px dashed #d6c9b6;border-radius:14px;padding:4px 8px;box-sizing:border-box}
@@ -127,6 +128,17 @@ button{font-family:inherit;color:inherit}
   -webkit-text-stroke:2px var(--ink);paint-order:stroke fill;text-shadow:3px 3px 0 var(--ink);animation:pop .35s cubic-bezier(.3,1.6,.6,1)}
 .banner small{display:block;margin-top:6px;font-family:var(--pop);font-size:.95rem;color:var(--ink);background:var(--egg);border:2px solid var(--ink);border-radius:999px;padding:4px 14px;animation:pop .35s .1s both}
 @keyframes pop{from{transform:scale(.4);opacity:0}}
+.banner .bicon{display:block;width:76px;height:76px;margin-bottom:4px;animation:okhop .6s cubic-bezier(.3,1.6,.6,1) both}
+.banner .bicon svg{width:100%;height:100%;display:block}
+@keyframes okhop{0%{transform:translateY(30px) scale(.4);opacity:0}60%{transform:translateY(-10px) scale(1.08);opacity:1}100%{transform:none}}
+.okbox{position:relative;width:170px;height:118px;margin-bottom:6px;animation:pop .3s cubic-bezier(.3,1.6,.6,1)}
+.okbox>svg{position:absolute;left:0;width:100%;display:block}
+.okbox .back{bottom:0}.okbox .front{bottom:0}
+.okbox i{position:absolute;bottom:50px;width:46px;height:46px;left:var(--x);animation:dropin .5s calc(.15s + var(--j)*.13s) cubic-bezier(.3,1.5,.6,1) both}
+.okbox i svg{width:100%;height:100%;display:block}
+@keyframes dropin{0%{transform:translateY(-110px) rotate(-20deg);opacity:0}30%{opacity:1}100%{transform:none}}
+.board.purun{animation:purun .55s}
+@keyframes purun{20%{transform:scale(1.04,.95)}45%{transform:scale(.97,1.04)}70%{transform:scale(1.015,.99)}}
 .ctrl{display:flex;gap:8px;width:var(--box);max-width:100%;justify-content:space-between}
 
 /* ---- 結果 ---- */
@@ -144,7 +156,7 @@ button{font-family:inherit;color:inherit}
 .catches{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .catches div{font-family:var(--pop);font-size:.75rem;font-variant-numeric:tabular-nums}
 .catches svg{width:100%;aspect-ratio:1;display:block}
-.fav{margin:10px 0 0;font-size:.85rem;font-weight:700}
+.fav{margin:10px 0 0;font-size:.85rem;font-weight:700;white-space:pre-line}
 .site{margin:8px 0 0;font-size:.72rem;color:var(--sub)}
 
 .modal{position:fixed;inset:0;background:rgba(62,51,45,.55);display:flex;align-items:center;justify-content:center;
@@ -154,7 +166,7 @@ button{font-family:inherit;color:inherit}
 .sheet img{-webkit-touch-callout:default;-webkit-user-select:auto;user-select:auto;width:100%;border-radius:14px;border:2px solid var(--line);aspect-ratio:1;background:var(--bg)}
 .sheet p{margin:0;font-size:.8rem;color:var(--sub)}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--card);border-radius:999px;padding:10px 18px;font-size:.85rem;z-index:20;pointer-events:none;white-space:nowrap}
-@media (prefers-reduced-motion:reduce){.logo span,.parade i{animation:none}.board.shake{animation:none}}
+@media (prefers-reduced-motion:reduce){.logo span,.parade i,.banner .bicon,.okbox,.okbox i{animation:none}.board.shake,.board.purun{animation:none}}
 </style>
 </head>
 <body>
@@ -169,8 +181,8 @@ button{font-family:inherit;color:inherit}
     <b>①</b> スワイプで、となりと入れかえ<br>
     <b>②</b> たて・よこに3つ並ぶと消える<br>
     <b>③</b> 時間内に<b>注文</b>をそろえてステージクリア<br>
-    <b>④</b> 消し続けて<b>コンボ</b>、たまると<b>フィーバー</b>！<br>
-    <b>⑤</b> とくしゅコマどうしで<b>がったい技</b>！
+    <b>④</b> そろえきったおやつは<b>おかえし</b>をしてくれる<br>
+    <b>⑤</b> 消し続けて<b>コンボ</b>、たまると<b>やきたてタイム</b>！
   </p>
   <div class="specials" id="specials"></div>
   <button class="btn" id="startBtn" type="button">あそぶ</button>
@@ -190,8 +202,8 @@ button{font-family:inherit;color:inherit}
   <div class="order"><span>ちゅうもん</span><div class="quota" id="quota"></div></div>
   <div class="meters">
     <span class="combo" id="comboLbl">0<small>コンボ</small></span>
-    <span class="fevlabel">フィーバー</span>
-    <div class="fever" id="feverBar"><i id="feverFill"></i></div>
+    <span class="fevlabel">やきたて</span>
+    <div class="fever" id="feverBar" role="progressbar" aria-label="やきたてタイムのゲージ"><i id="feverFill"></i></div>
   </div>
   <div class="board" id="board">
     <canvas id="cv" aria-label="パズルの盤面"></canvas>
@@ -288,7 +300,7 @@ const SWEETS=[
      <rect x="22" y="8" width="56" height="68" rx="24" fill="#9cc2e4"/>
      <rect x="29" y="18" width="5" height="22" rx="2.5" fill="#fff" opacity=".55"/>
      ${face(44,11,'#f2adb0')}`},
-  {id:'candy',name:'キャンディ',emoji:'🍬',col:'#f2a65a',svg:
+  {id:'ame',name:'あめ玉',emoji:'🍬',col:'#f2a65a',svg:
     `<path d="M30 50 L8 32 Q3 50 8 68 Z" fill="#f7c896"/><path d="M70 50 L92 32 Q97 50 92 68 Z" fill="#f7c896"/>
      <circle cx="50" cy="50" r="29" fill="#f2a65a"/>
      ${face(48,10,'#ea857c')}`},
@@ -306,6 +318,16 @@ const SWEETS=[
      ${face(54,11,'#ee9f8f')}`},
 ];
 const NT=SWEETS.length;
+// おかえし：注文の1種類をそろえきると、そのおやつがお礼にひと仕事してくれる（おやつごとにちがう）
+const OKAESHI=[
+  {name:'いちごのせ',desc:'キラキラが4つふえる'},
+  {name:'ぷるるん',desc:'のこり時間 +4秒'},
+  {name:'まんまるわっか',desc:'わっかの形に消える'},
+  {name:'ひんやり',desc:'こおりが全部とけて、時間が4秒とまる'},
+  {name:'おすそわけ',desc:'とくしゅコマが3つできる'},
+  {name:'チョコスプレー',desc:'あちこち8マス消える'},
+  {name:'あみあみ',desc:'ななめ2本が消える'},
+];
 // ほしクッキー：入れかえた相手と同じおやつを全部消す
 const EGG_SVG=`<path class="thk" d="M50.0 15.0 L61.2 39.6 L88.0 42.6 L68.1 60.9 L73.5 87.4 L50.0 74.0 L26.5 87.4 L31.9 60.9 L12.0 42.6 L38.8 39.6 Z" fill="#dda35c" stroke="#dda35c" stroke-width="9" stroke-linejoin="round"/>
   <g fill="#c4874a"><circle cx="34" cy="49" r="2.2"/><circle cx="66" cy="49" r="2.2"/><circle cx="40" cy="74" r="2"/><circle cx="60" cy="74" r="2"/><circle cx="50" cy="30" r="2"/></g>
@@ -313,8 +335,9 @@ const EGG_SVG=`<path class="thk" d="M50.0 15.0 L61.2 39.6 L88.0 42.6 L68.1 60.9 
 // ふち線：同じ形を太いこげ茶の線で描いた影を、うしろに敷く（角も丸くつながる）
 const OUTLINE=`<style>.ol *{fill:${INK}!important;stroke:${INK}!important;stroke-width:11px!important;stroke-linejoin:round!important;stroke-linecap:round!important;opacity:1!important}.ol .thk{stroke-width:20px!important}</style>`;
 const svgOf=(i,extra='')=>`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-7 -7 114 114" ${extra}><defs>${OUTLINE}</defs><g class="ol">${i<0?EGG_SVG:SWEETS[i].svg}</g>${i<0?EGG_SVG:SWEETS[i].svg}</svg>`;
-const BOMB_RING=`<circle cx="50" cy="50" r="44" fill="none" stroke="#e3c26b" stroke-width="7" stroke-dasharray="12 8"/>`;
-const BOMB_STAR=`<path d="M82 14 q4 -9 11 -8" stroke="#9a7a5f" stroke-width="3.5" stroke-linecap="round" fill="none"/><circle cx="78" cy="22" r="10" fill="${INK}"/><circle cx="94" cy="6" r="5" fill="#f2a65a"/>`;
+const BOMB_RING=`<circle cx="50" cy="50" r="44" fill="none" stroke="#f3d27a" stroke-width="7" stroke-linecap="round" stroke-dasharray="1 13"/>`;
+// ポップコーン（L字・T字でできる。まわり9マスをぽんっ）
+const BOMB_STAR=`<g fill="${INK}"><circle cx="76" cy="22" r="12.5"/><circle cx="88" cy="13" r="10.5"/><circle cx="90" cy="28" r="10.5"/></g><g fill="#fff3d6"><circle cx="76" cy="22" r="9"/><circle cx="88" cy="13" r="7"/><circle cx="90" cy="28" r="7"/></g><circle cx="84" cy="22" r="2.6" fill="#f3d27a"/>`;
 const BOMB_BADGE=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${BOMB_RING}</svg>`;
 
 /* ===== 音 ===== */
@@ -337,12 +360,12 @@ const sfx={
   swap(){tone(520,.06,'sine',.08)},
   bad(){tone(180,.12,'square',.06);tone(150,.14,'square',.05,.08)},
   pop(n){const f=440*Math.pow(2,Math.min(n,24)/12);tone(f,.14,'triangle',.15);tone(f*1.5,.1,'sine',.06,.03)},
-  boom(){noise(.3,.22);tone(110,.25,'sine',.2)},
+  boom(){noise(.18,.16);tone(180,.12,'sine',.16);sfx.popcorn()},
   egg(){[784,988,1175,1568,1976].forEach((f,i)=>tone(f,.16,'sine',.1,i*.04))},
   make(){tone(1047,.08,'sine',.1);tone(1568,.12,'sine',.08,.06)},
-  line(){if(muted||!actx)return;const t=actx.currentTime,o=actx.createOscillator(),g=actx.createGain();o.type='sawtooth';
-    o.frequency.setValueAtTime(300,t);o.frequency.exponentialRampToValueAtTime(1800,t+.18);g.gain.setValueAtTime(.08,t);g.gain.exponentialRampToValueAtTime(.0001,t+.22);
-    o.connect(g).connect(actx.destination);o.start(t);o.stop(t+.25)},
+  line(){for(let i=0;i<7;i++){tone(330+i*70,.05,'triangle',.09,i*.035);tone(165+i*35,.06,'sine',.07,i*.035)}}, // めんぼうが ころころ
+  okaeshi(i){const b=[523,587,659,698,784,880,988][i]||660;[1,1.25,1.5,2].forEach((m,k)=>tone(b*m,.16,'sine',.1,k*.07));tone(b*2,.3,'triangle',.06,.3)},
+  popcorn(){for(let i=0;i<5;i++)tone(700+Math.random()*900,.035,'square',.035,i*.04+Math.random()*.02);noise(.12,.12)},
   ice(){tone(2093,.06,'sine',.07);tone(2637,.08,'sine',.05,.04)},
   gold(){tone(1319,.1,'sine',.1);tone(1760,.16,'sine',.08,.07)},
   clear(){[523,659,784,1047].forEach((f,i)=>tone(f,.18,'triangle',.14,i*.08))},
@@ -430,7 +453,7 @@ function makeOrder(s){
 function freshState(mode){
   return {mode,lines:0,stage:1,score:0,time:TIME_MAX,quota:makeOrder(1),caught:Array(NT).fill(0),
     combo:0,comboT:0,maxCombo:0,fever:0,feverT:0,fevers:0,bombs:0,eggs:0,busy:false,over:false,paused:false,idle:0,hint:null,
-    sel:null,clock:0,grid:null,fx:[],texts:[],timers:[],tick:0,banner:0,stageClearPending:false};
+    sel:null,clock:0,grid:null,fx:[],texts:[],timers:[],tick:0,banner:0,stageClearPending:false,thanks:[],oks:0,chill:0,kinds:[]};
 }
 
 /* ===== 盤面 ===== */
@@ -490,7 +513,7 @@ const EASE={
 };
 
 /* ===== 特殊コマの範囲 ===== */
-// sp: 1=ボム(3×3) 2=ほしクッキー 3=よこライン 4=たてライン
+// sp: 1=ポップコーン(3×3) 2=ほしクッキー 3=よこめんぼう 4=たてめんぼう
 const area=(r,c,d)=>{const o=[];for(let i=r-d;i<=r+d;i++)for(let j=c-d;j<=c+d;j++)if(i>=0&&i<N&&j>=0&&j<N)o.push([i,j]);return o};
 const rowCells=r=>[...Array(N).keys()].map(c=>[r,c]);
 const colCells=c=>[...Array(N).keys()].map(r=>[r,c]);
@@ -525,7 +548,7 @@ async function trySwap(a,b){
     else cells=[...rowCells(r),...colCells(c)];
     A.sp=0; B.sp=0;
     showBanner('がったい！','',.8); sfx.boom(); shake();
-    if(s1!==1||s2!==1) beam(true,r), beam(false,c);
+    if(s1!==1||s2!==1) beam(true,r,c), beam(false,c,r);
     await resolve([a,b],cells,b);
   }else if(!(lineAt(...a)||lineAt(...b))){
     sfx.bad(); await wait(.05); if(G!==g) return; rawSwap(a,b); tween(A,.2,'back'); tween(B,.2,'back'); await waitSettle();
@@ -542,13 +565,21 @@ async function resolve(moved,preset,origin){
   let first=true;
   while(G===g){
     const groups=preset?[]:findMatches();
-    if(!preset&&!groups.length) break;
+    if(!preset&&!groups.length){
+      // れんさが止まったら、注文をそろえきったおやつの「おかえし」
+      if(!G.thanks.length) break;
+      const cells=await okaeshi(G.thanks.shift());
+      if(G!==g) return;
+      if(cells.length) preset=cells;
+      continue;
+    }
     const gone=new Map(), make=new Map(), keep=new Set(), flying=new Map();
     if(preset){
       preset.forEach(([r,c])=>{gone.set(r*N+c,[r,c]); if(origin) flying.set(r*N+c,[r,c,origin[0],origin[1]])});
       origin=null;
       G.combo++; G.comboT=COMBO_WIN; G.maxCombo=Math.max(G.maxCombo,G.combo);
-      const [er,ec]=moved[1]; addScore(150*preset.length,ec,er);
+      let er=0,ec=0; preset.forEach(([r,c])=>{er+=r;ec+=c}); er/=preset.length; ec/=preset.length;
+      addScore(150*preset.length,ec,er);
       preset=null;
     }
     // 2本のラインが重なったマス（L字・T字）
@@ -578,7 +609,7 @@ async function resolve(moved,preset,origin){
       if(!t||!(t.sp===1||t.sp===3||t.sp===4)||blasted.has(t.id)) continue;
       blasted.add(t.id); if(!flying.has(r*N+c)) flying.set(r*N+c,[r,c]);
       const cells=t.sp===1?area(r,c,1):t.sp===3?rowCells(r):colCells(c);
-      if(t.sp===1){booms++; ring(c,r)} else {zips++; beam(t.sp===3,t.sp===3?r:c)}
+      if(t.sp===1){booms++; ring(c,r)} else {zips++; beam(t.sp===3,t.sp===3?r:c,t.sp===3?c:r)}
       for(const [rr,cc] of cells){
         const n=at(rr,cc),k=rr*N+cc;
         if(!n||n.sp===2||gone.has(k)) continue;
@@ -593,7 +624,7 @@ async function resolve(moved,preset,origin){
     for(const [k,[r,c]] of gone){
       const t=G.grid[r][c]; if(!t) continue;
       if(t.ice){t.ice=0; keep.add(k); crack(c,r); continue}  // こおりは割れるだけ
-      if(t.t>=0){G.caught[t.t]++; if(G.quota[t.t]>0){G.quota[t.t]--; bumpQuota(t.t)}}
+      if(t.t>=0){G.caught[t.t]++; if(G.quota[t.t]>0){G.quota[t.t]--; bumpQuota(t.t); if(!G.quota[t.t]) G.thanks.push(t.t)}}
       if(t.gold){t.gold=false; goldBonus(c,r)}
       if(make.has(k)) continue;
       if(flying.has(k)){const f=flying.get(k); fling(t,f[2]==null?r:f[2],f[3]==null?c:f[3]); t.pop=1}
@@ -624,6 +655,29 @@ async function resolve(moved,preset,origin){
   }
   if(G===g&&!findMove()) await shuffle();
 }
+async function okaeshi(i){
+  const g=G, O=OKAESHI[i];
+  G.oks++;
+  showBanner('おかえし！',`${SWEETS[i].name}の「${O.name}」`,1.1,svgOf(i));
+  sfx.okaeshi(i);
+  await wait(.6); if(G!==g) return [];
+  const all=G.grid.flat().filter(Boolean), free=all.filter(t=>!t.sp&&!t.ice&&!t.gold);
+  const pickN=(arr,n)=>{const a=arr.slice(),o=[];while(o.length<n&&a.length)o.push(a.splice(Math.floor(rnd()*a.length),1)[0]);return o};
+  const cellsOf=f=>all.filter(t=>t.sp!==2&&f(t.r,t.c)).map(t=>[t.r,t.c]);
+  let cells=[];
+  if(i===0){pickN(free,4).forEach(t=>{t.gold=true;t.grow=1;burst(t.c,t.r,'#ec7a74')}); sfx.gold()}
+  else if(i===1){G.time=Math.min(TIME_MAX,G.time+4); addText('+4秒',3.5,3.5,'#b98a2f'); purun()}
+  else if(i===2) cells=cellsOf((r,c)=>Math.max(Math.abs(r-3.5),Math.abs(c-3.5))===1.5);
+  else if(i===3){all.forEach(t=>{if(t.ice){t.ice=0;crack(t.c,t.r)}}); G.chill=4; addText('4秒ストップ',3.5,3.5,'#5d8fb8')}
+  else if(i===4){pickN(free,3).forEach((t,k)=>{t.sp=k===0?1:(rnd()<.5?3:4);t.grow=1}); sfx.make()}
+  else if(i===5) cells=pickN(all.filter(t=>t.sp!==2),8).map(t=>[t.r,t.c]);
+  else if(i===6) cells=cellsOf((r,c)=>r===c||r+c===N-1);
+  if(i===5) cells.forEach(([r,c])=>burst(c,r,'#8b5e4a'));
+  if(cells.length){shake(); sfx.boom()}
+  else{await wait(.35); if(G!==g) return []}
+  return cells;
+}
+function purun(){if(reduceMotion)return;const b=$('board');b.classList.remove('purun');void b.offsetWidth;b.classList.add('purun')}
 function addScore(base,c,r,quiet){
   const pts=Math.round(base*(1+Math.min(G.combo,60)*.1)*(G.feverT>0?2:1)/10)*10;
   G.score+=pts; if(!quiet) addText(`+${pts}`,c,r,INK);
@@ -669,7 +723,7 @@ function freeze(stage){
 }
 function startFever(){
   G.feverT=FEVER_TIME; G.fevers++; G.fever=100; sfx.fever(); bgmPlay('fever');
-  showBanner('フィーバー！','スコア2倍・時間ストップ',1.1);
+  showBanner('やきたてタイム！','スコア2倍・時間ストップ',1.1);
   $('board').classList.add('fev'); $('feverBar').classList.add('on');
 }
 async function stageClear(){
@@ -679,9 +733,9 @@ async function stageClear(){
   G.score+=bonus; sfx.clear();
   const add=Math.min(CLEAR_BONUS,TIME_MAX-G.time);
   G.time=Math.min(TIME_MAX,G.time+CLEAR_BONUS);
-  showBanner(`ステージ${G.stage} クリア！`,`+${bonus.toLocaleString()}点${add>=1?` ・ +${Math.round(add)}秒`:''}`,1.5);
-  G.banner=1.5;
-  await wait(1.5);
+  showBanner('おまちどおさま！',`ステージ${G.stage} クリア ・ +${bonus.toLocaleString()}点${add>=1?` ・ +${Math.round(add)}秒`:''}`,1.7,boxHtml(G.kinds));
+  G.banner=1.7;
+  await wait(1.7);
   if(G!==g) return;
   G.stage++; G.quota=makeOrder(G.stage);
   buildQuota(); renderHud();
@@ -736,15 +790,27 @@ function drawFlies(dt){
   flies=flies.filter(f=>f.t<f.life&&f.y<H+cell*2);
 }
 function ring(c,r){G.fx.push({ring:true,x:c+.5,y:r+.5,t:0,life:.35})}
-function beam(horiz,i){G.fx.push({beam:true,horiz,i,t:0,life:.4})}
+function beam(horiz,i,from){G.fx.push({beam:true,horiz,i,from:from==null?3.5:from,t:0,life:.55})}
 function crack(c,r){sfx.ice(); if(reduceMotion) return;
   for(let i=0;i<7;i++){const a=Math.random()*Math.PI*2,v=1.5+Math.random()*2.5;
     G.fx.push({x:c+.5,y:r+.5,vx:Math.cos(a)*v,vy:Math.sin(a)*v-1.5,t:0,life:.5,col:'#d4ebf7',sz:.05+Math.random()*.05,shard:true})}}
 function shake(){if(reduceMotion)return;const b=$('board');b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake')}
 let bannerTimer=0;
-function showBanner(big,small,sec){
-  const b=$('banner'); b.innerHTML=`<p>${big}</p>${small?`<small>${small}</small>`:''}`; b.hidden=false;
+function showBanner(big,small,sec,icon){
+  const b=$('banner'); b.innerHTML=`${icon?(icon.startsWith('<div')?icon:`<i class="bicon">${icon}</i>`):''}<p>${big}</p>${small?`<small>${small}</small>`:''}`; b.hidden=false;
   clearTimeout(bannerTimer); bannerTimer=setTimeout(()=>b.hidden=true,sec*1000);
+}
+
+// ステージクリア：注文のおやつが、おもちかえりの箱にぽんぽん入る
+function boxHtml(kinds){
+  const n=kinds.length, gap=n>3?24:32, w=46+(n-1)*gap, x0=(170-w)/2;
+  return `<div class="okbox" aria-hidden="true">
+    <svg class="back" viewBox="0 0 170 118"><path d="M18 52 L152 52 L146 34 L24 34 Z" fill="#c9a074" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/></svg>
+    ${kinds.map((k,j)=>`<i style="--j:${j};--x:${x0+j*gap}px">${svgOf(k)}</i>`).join('')}
+    <svg class="front" viewBox="0 0 170 118"><path d="M14 52 L156 52 L150 112 L20 112 Z" fill="#e3c79c" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>
+      <rect x="76" y="52" width="18" height="60" fill="#ec7a74"/><path d="M76 52 V112 M94 52 V112" stroke="${INK}" stroke-width="3"/>
+      <path d="M85 50 q-18 -16 -24 -4 q4 10 24 4 q18 -16 24 -4 q-4 10 -24 4z" fill="#ec7a74" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"/><circle cx="85" cy="50" r="5" fill="#ec7a74" stroke="${INK}" stroke-width="3"/></svg>
+  </div>`;
 }
 
 /* ===== 描画 ===== */
@@ -766,6 +832,18 @@ function resize(){
   cv.width=Math.round(size*dpr); cv.height=Math.round(size*dpr); bakeSprites();
 }
 window.addEventListener('resize',resize);
+// めんぼう（横向き）。x,y が真ん中、len が全体の長さ、roll で木目が転がる
+function drawPin(c,x,y,len,roll){
+  const bw=len*.6, bh=len*.2, hw=len*.2, hh=len*.09, lw=Math.max(1.5,len*.035);
+  c.lineJoin='round'; c.strokeStyle=INK; c.lineWidth=lw;
+  c.fillStyle='#b98a5f';
+  for(const sg of [-1,1]){rrect(c,x+sg*(bw/2+hw/2)-hw/2,y-hh/2,hw,hh,hh/2);c.fill();c.stroke()}
+  c.fillStyle='#ebc996'; rrect(c,x-bw/2,y-bh/2,bw,bh,bh/2); c.fill(); c.stroke();
+  c.save(); rrect(c,x-bw/2,y-bh/2,bw,bh,bh/2); c.clip();
+  c.strokeStyle='#d0a571'; c.lineWidth=lw*.8; const st=bw/3, ph=((roll%1)+1)%1*st;
+  for(let i=-1;i<4;i++){const sx=x-bw/2+i*st+ph;c.beginPath();c.moveTo(sx,y-bh/2);c.lineTo(sx,y+bh/2);c.stroke()}
+  c.restore();
+}
 function rrect(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
 function draw(){
   ctx.setTransform(dpr,0,0,dpr,0,0); ctx.imageSmoothingQuality='high';
@@ -798,8 +876,8 @@ function draw(){
       ctx.beginPath();ctx.arc(0,0,cell*.42,0,7);ctx.fill();
       ctx.restore();
     }
-    if((t.sp===3||t.sp===4)&&t.pop<0){ // ラインの帯（向きがひと目でわかるように）
-      ctx.fillStyle='rgba(236,122,116,.28)';
+    if((t.sp===3||t.sp===4)&&t.pop<0){ // めんぼうの帯（向きがひと目でわかるように）
+      ctx.fillStyle='rgba(214,170,112,.3)';
       if(t.sp===3) rrect(ctx,cx-cell*.5,cy-cell*.2,cell,cell*.4,cell*.2); else rrect(ctx,cx-cell*.2,cy-cell*.5,cell*.4,cell,cell*.2);
       ctx.fill();
     }
@@ -814,19 +892,17 @@ function draw(){
     const sp=t.t<0?eggSprite:sprites[t.t];
     if(sp&&sp.width) ctx.drawImage(sp,cx-w/2,cy-h/2,w,h);
     else{ctx.fillStyle=t.t<0?'#fff3c9':SWEETS[t.t].col;ctx.beginPath();ctx.arc(cx,cy,w*.42,0,7);ctx.fill()}
-    if(t.sp===1&&t.pop<0){ // ボムのしるし（小さな爆弾）
-      const bx=cx+cell*.28, by=cy-cell*.26, R=cell*.11, k=(Math.sin(G.clock*12)+1)/2;
-      ctx.strokeStyle='#9a7a5f';ctx.lineWidth=cell*.04;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(bx+R*.5,by-R*.7);ctx.quadraticCurveTo(bx+R*.9,by-R*1.6,bx+R*1.5,by-R*1.5);ctx.stroke();
-      ctx.fillStyle=INK;ctx.beginPath();ctx.arc(bx,by,R,0,7);ctx.fill();
-      ctx.fillStyle=k>.5?'#f2a65a':'#f3c24f';ctx.beginPath();ctx.arc(bx+R*1.5,by-R*1.5,R*(.35+.25*k),0,7);ctx.fill();
+    if(t.sp===1&&t.pop<0){ // ポップコーンのしるし（ぽこぽこ跳ねる）
+      const k=Math.abs(Math.sin(G.clock*7)), bx=cx+cell*.3, by=cy-cell*.28-k*cell*.05, R=cell*.1;
+      const P=[[0,0,1],[R*1.1,-R*.8,.8],[R*1.3,R*.6,.8]];
+      ctx.fillStyle=INK;for(const [x,y,m] of P){ctx.beginPath();ctx.arc(bx+x,by+y,R*m+cell*.035,0,7);ctx.fill()}
+      ctx.fillStyle='#fff3d6';for(const [x,y,m] of P){ctx.beginPath();ctx.arc(bx+x,by+y,R*m,0,7);ctx.fill()}
+      ctx.fillStyle='#f3d27a';ctx.beginPath();ctx.arc(bx+R*.8,by,R*.28,0,7);ctx.fill();
     }
-    if((t.sp===3||t.sp===4)&&t.pop<0){ // ラインのしるし：向きを示す三角
-      const k=(Math.sin(G.clock*8)+1)/2, d=cell*(.33+.04*k), a=cell*.16;
-      ctx.fillStyle='#ec7a74';ctx.strokeStyle=INK;ctx.lineWidth=Math.max(1.5,cell*.04);ctx.lineJoin='round';
-      for(const sg of [-1,1]){ctx.beginPath();
-        if(t.sp===3){const x=cx+sg*d;ctx.moveTo(x+sg*a,cy);ctx.lineTo(x,cy-a);ctx.lineTo(x,cy+a)}
-        else{const y=cy+sg*d;ctx.moveTo(cx,y+sg*a);ctx.lineTo(cx-a,y);ctx.lineTo(cx+a,y)}
-        ctx.closePath();ctx.fill();ctx.stroke()}
+    if((t.sp===3||t.sp===4)&&t.pop<0){ // めんぼうのしるし：転がる向きに置いた小さなめんぼう
+      ctx.save();ctx.translate(cx,cy);if(t.sp===4)ctx.rotate(Math.PI/2);
+      drawPin(ctx,0,cell*.32,cell*1.12,G.clock*6+t.id);
+      ctx.restore();
     }
     if(t.ice&&t.pop<0){ // こおり
       ctx.fillStyle='rgba(196,228,246,.62)';rrect(ctx,cx-cell*.46,cy-cell*.46,cell*.92,cell*.92,cell*.16);ctx.fill();
@@ -843,11 +919,15 @@ function draw(){
   for(const p of G.fx){
     ctx.globalAlpha=Math.max(0,1-p.t/p.life);
     if(p.ring){ctx.strokeStyle='#f3b65f';ctx.lineWidth=cell*.12;ctx.beginPath();ctx.arc(p.x*cell,p.y*cell,cell*(.4+p.t/p.life*1.2),0,7);ctx.stroke();continue}
-    if(p.beam){const k=p.t/p.life, w=cell*(.9-.7*k);
-      ctx.fillStyle='rgba(255,243,201,.95)';
-      if(p.horiz) ctx.fillRect(0,(p.i+.5)*cell-w/2,size,w); else ctx.fillRect((p.i+.5)*cell-w/2,0,w,size);
-      ctx.fillStyle='rgba(236,138,131,.5)';
-      if(p.horiz) ctx.fillRect(0,(p.i+.5)*cell-w/6,size,w/3); else ctx.fillRect((p.i+.5)*cell-w/6,0,w/3,size);
+    if(p.beam){ // めんぼうが左右（上下）にころころ転がって、粉のあとが残る
+      const k=Math.min(1,p.t/(p.life*.85)), e=1-Math.pow(1-k,2), w=cell*.8, o=(p.from+.5)*cell, reach=e*size;
+      ctx.save(); if(!p.horiz) ctx.transform(0,1,1,0,0,0); // たてのときは x と y を入れかえて、同じ描き方で
+      const y=(p.i+.5)*cell, a=Math.max(0,o-reach), b=Math.min(size,o+reach);
+      ctx.fillStyle='rgba(251,240,214,.95)';ctx.fillRect(a,y-w/2,b-a,w);
+      ctx.fillStyle='rgba(225,196,150,.45)';ctx.fillRect(a,y-w/6,b-a,w/3);
+      ctx.globalAlpha=1;
+      for(const sg of [-1,1]) drawPin(ctx,o+sg*reach,y,cell*1.5,sg*reach/cell*2.2);
+      ctx.restore();
       continue}
     ctx.fillStyle=p.col;
     ctx.beginPath();ctx.arc(p.x*cell,p.y*cell,p.sz*cell,0,7);ctx.fill();
@@ -895,8 +975,9 @@ function step(dt){
   if(G.over) return;
   if(G.feverT>0){G.feverT-=dt;G.fever=Math.max(0,100*G.feverT/FEVER_TIME);
     if(G.feverT<=0){G.feverT=0;G.fever=0;$('board').classList.remove('fev');$('feverBar').classList.remove('on');bgmPlay('normal')}}
-  // 時間：ステージの切りかわりとフィーバー中は止まる
-  if(G.feverT<=0&&G.banner<=0&&!G.stageClearPending){
+  // 時間：ステージの切りかわり・やきたてタイム・ひんやり中は止まる
+  if(G.chill>0) G.chill=Math.max(0,G.chill-dt);
+  if(G.feverT<=0&&G.chill<=0&&G.banner<=0&&!G.stageClearPending){
     G.time=Math.max(0,G.time-dt*drainFor(G.stage));
     if(G.time<10&&Math.ceil(G.time)!==G.tick){G.tick=Math.ceil(G.time);sfx.tick()}
   }
@@ -911,13 +992,14 @@ requestAnimationFrame(frame);
 
 /* ===== HUD ===== */
 function buildQuota(){
+  G.kinds=G.quota.map((q,i)=>q>0?i:-1).filter(i=>i>=0);
   $('quota').innerHTML=G.quota.map((q,i)=>q>0?`<div class="q" id="q${i}" role="img" aria-label="${SWEETS[i].name}">${svgOf(i,'aria-hidden="true"')}<b></b></div>`:'').join('');
 }
 function bumpQuota(i){const el=$('q'+i);if(!el)return;el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}
 let hudCache='';
 function renderHud(){
   if(!G) return;
-  const key=[G.stage,G.score,Math.ceil(G.time*4),G.quota.join(),G.combo,Math.round(G.fever),G.feverT>0].join('|');
+  const key=[G.stage,G.score,Math.ceil(G.time*4),G.quota.join(),G.combo,Math.round(G.fever),G.feverT>0,G.chill>0].join('|');
   if(key===hudCache) return; hudCache=key;
   $('stageLbl').textContent=`ステージ ${G.stage}`;
   $('scoreLbl').textContent=G.score.toLocaleString();
@@ -925,6 +1007,7 @@ function renderHud(){
   $('timeTxt').textContent=Math.ceil(G.time);
   $('timebar').classList.toggle('warn',G.time<10&&G.feverT<=0);
   $('timebar').classList.toggle('frozen',G.feverT>0);
+  $('timebar').classList.toggle('chill',G.chill>0&&G.feverT<=0);
   G.quota.forEach((q,i)=>{const el=$('q'+i);if(!el)return;el.classList.toggle('done',q<=0);el.querySelector('b').innerHTML=q>0?`<small>×</small>${q}`:'✓'});
   $('comboLbl').innerHTML=`${G.combo}<small>コンボ</small>`;
   $('comboLbl').classList.toggle('on',G.combo>1);
@@ -1008,8 +1091,8 @@ function showResult(){
   $('rCombo').textContent=S.maxCombo;
   $('rSp').textContent=S.bombs+S.lines+S.eggs;
   $('rCatches').innerHTML=SWEETS.map((a,i)=>`<div>${svgOf(i,`role="img" aria-label="${a.name}"`)}${S.caught[i]}</div>`).join('');
-  $('rFav').textContent=total?`いちばん集めたのは ${SWEETS[fav].name}（${S.caught[fav]}こ）`:'';
-  const text=daily?`ころころおやつ 今日のチャレンジ ${md}\n${S.score.toLocaleString()}点・ステージ${reached}・最大${S.maxCombo}コンボ\n称号は「${rank}」でした${SWEETS[fav].emoji}\nみんな同じ盤面だよ。勝てる？\n#ころころおやつ`:`ころころおやつ ステージ${reached}まで到達！\n${S.score.toLocaleString()}点・最大${S.maxCombo}コンボ\n称号は「${rank}」でした${SWEETS[fav].emoji}\n#ころころおやつ`;
+  $('rFav').textContent=total?`いちばん集めたのは ${SWEETS[fav].name}（${S.caught[fav]}こ）${S.oks?`\nおやつから おかえし ${S.oks}回`:''}`:'';
+  const text=daily?`ころころおやつ 今日のチャレンジ ${md}\n${S.score.toLocaleString()}点・ステージ${reached}・最大${S.maxCombo}コンボ\n称号は「${rank}」でした${SWEETS[fav].emoji}\nみんな同じ盤面だよ。勝てる？\n#ころころおやつ`:`ころころおやつ ステージ${reached}まで到達！\n${S.score.toLocaleString()}点・最大${S.maxCombo}コンボ${S.oks?`・おかえし${S.oks}回`:''}\n称号は「${rank}」でした${SWEETS[fav].emoji}\n#ころころおやつ`;
   lastShare={text,daily,md,rank,reached,score:S.score,combo:S.maxCombo,sps:S.bombs+S.lines+S.eggs,caught:S.caught.slice(),fav,total};
   $('againBtn').textContent=daily?'もういちど（今日のチャレンジ）':'もういちど';
   $('xBtn').href='https://twitter.com/intent/tweet?text='+encodeURIComponent(text)+'&url='+encodeURIComponent(GAME_URL);
@@ -1080,11 +1163,11 @@ $('logo').innerHTML=[...'ころころおやつ'].map((ch,i)=>`<span class="c${i}
 $('parade').innerHTML=SWEETS.map((a,i)=>`<i style="--i:${i}">${svgOf(i)}</i>`).join('');
 const inSv=(inner)=>`<svg viewBox="0 0 100 100" aria-hidden="true">${inner}</svg>`;
 const piece=(i,extra='')=>`<defs>${OUTLINE}</defs><g class="ol"><g transform="translate(10 10) scale(.8)">${SWEETS[i].svg}</g></g><g transform="translate(10 10) scale(.8)">${SWEETS[i].svg}</g>${extra}`;
-const tri=(h)=>h?`<path d="M3 50 l14 -12 v24z M97 50 l-14 -12 v24z" fill="#ec7a74" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"/>`:`<path d="M50 3 l-12 14 h24z M50 97 l-12 -14 h24z" fill="#ec7a74" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"/>`;
+const tri=()=>`<g stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"><rect x="2" y="78" width="20" height="8" rx="4" fill="#b98a5f"/><rect x="78" y="78" width="20" height="8" rx="4" fill="#b98a5f"/><rect x="19" y="73" width="62" height="18" rx="9" fill="#ebc996"/></g><path d="M40 73 V91 M60 73 V91" stroke="#d0a571" stroke-width="3"/>`;
 const SPARK=`<path d="M22 6 l5 11 11 5 -11 5 -5 11 -5 -11 -11 -5 11 -5z" fill="#ffe27a" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`;
 $('specials').innerHTML=[
-  [inSv(BOMB_RING+piece(1,BOMB_STAR)),'ボム','L字・T字で<br>まわり9マス'],
-  [inSv(`<rect x="0" y="32" width="100" height="36" rx="18" fill="rgba(236,122,116,.28)"/>`+piece(3,tri(true))),'ライン','4つそろえると<br>その向きに1列'],
+  [inSv(BOMB_RING+piece(1,BOMB_STAR)),'ポップコーン','L字・T字で<br>まわり9マス'],
+  [inSv(`<rect x="0" y="32" width="100" height="36" rx="18" fill="rgba(214,170,112,.3)"/>`+piece(3,tri(true))),'めんぼう','4つそろえると<br>1列ころころ'],
   [inSv(svgOf(-1).replace(/^<svg[^>]*>|<\/svg>$/g,'')),'ほしクッキー','5つそろえると<br>同じ種類を全部'],
   [inSv(`<circle cx="50" cy="50" r="48" fill="#ffeca0" opacity=".7"/>${piece(0)}${SPARK}`),'キラキラ','たまに出る<br>消すと＋2秒'],
   [inSv(`${piece(5)}<rect x="8" y="8" width="84" height="84" rx="16" fill="rgba(196,228,246,.62)" stroke="#fff" stroke-width="4"/><path d="M22 40 L40 22 M22 56 L56 22" stroke="#fff" stroke-width="4" stroke-linecap="round"/>`),'こおり','ステージ3から<br>となりで割れる'],
