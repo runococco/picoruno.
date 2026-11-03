@@ -166,6 +166,34 @@ button{font-family:inherit;color:inherit}
 .sheet img{-webkit-touch-callout:default;-webkit-user-select:auto;user-select:auto;width:100%;border-radius:14px;border:2px solid var(--line);aspect-ratio:1;background:var(--bg)}
 .sheet p{margin:0;font-size:.8rem;color:var(--sub)}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--card);border-radius:999px;padding:10px 18px;font-size:.85rem;z-index:20;pointer-events:none;white-space:nowrap}
+.rankbtn{min-height:48px;font-size:.95rem}
+/* ---- ランキング ---- */
+.rankbox{width:100%;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:10px 12px;box-sizing:border-box;display:flex;flex-direction:column;gap:8px;text-align:center}
+.rankbox .rmsg{margin:0;font-weight:700;font-size:.88rem}
+.rankbox .rmsg b{font-family:var(--pop);font-weight:400;font-size:1.25rem;color:var(--accent)}
+.rankbox .rsub{margin:0;font-size:.75rem;color:var(--sub)}
+.nameform{display:flex;gap:8px;width:100%}
+.nameform input{flex:1;min-width:0;font:inherit;font-weight:700;font-size:16px;color:var(--ink);background:var(--bg);border:2.5px solid var(--ink);border-radius:14px;padding:10px 12px;-webkit-user-select:text;user-select:text}
+.nameform input:focus{outline:3px solid var(--gold);outline-offset:1px}
+.nameform .btn{width:auto;flex:none;min-height:48px;font-size:.92rem;padding:8px 14px}
+.nameerr{margin:0;font-size:.78rem;color:#c8443c;font-weight:700;min-height:1em}
+.nameerr:empty{display:none}
+.linkbtn{background:none;border:0;padding:0;font:inherit;font-size:.78rem;color:var(--sub);text-decoration:underline;cursor:pointer}
+.rsheet{max-height:calc(100svh - 32px);gap:8px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.tabs button{border:2.5px solid var(--ink);border-radius:999px;background:var(--card);font-family:var(--pop);font-size:.85rem;padding:7px 4px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--card)}
+.rlist{list-style:none;margin:0;padding:0;overflow-y:auto;flex:1;min-height:120px;max-height:56svh;border:2px solid var(--line);border-radius:14px;text-align:left;-webkit-overflow-scrolling:touch}
+.rlist li{display:grid;grid-template-columns:2.6em 1fr auto;align-items:center;gap:6px;padding:7px 10px;border-bottom:1.5px solid var(--line);font-size:.88rem}
+.rlist li:last-child{border-bottom:0}
+.rlist .no{font-family:var(--pop);text-align:center;font-variant-numeric:tabular-nums}
+.rlist .nm{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rlist .pt{font-family:var(--pop);font-variant-numeric:tabular-nums;text-align:right;line-height:1.1}
+.rlist .pt small{display:block;font-family:var(--body);font-size:.68rem;color:var(--sub);font-weight:700}
+.rlist .top1 .no{color:#c9a13b}.rlist .top2 .no{color:#9a9aa6}.rlist .top3 .no{color:#b9825a}
+.rlist .me{background:var(--egg)}
+.rlist .gap{display:block;text-align:center;color:var(--sub);padding:2px;border-bottom:1.5px solid var(--line)}
+.rlist .empty{display:block;text-align:center;color:var(--sub);padding:28px 10px;line-height:1.7}
 @media (prefers-reduced-motion:reduce){.logo span,.parade i,.banner .bicon,.okbox,.okbox i{animation:none}.board.shake,.board.purun{animation:none}}
 </style>
 </head>
@@ -189,6 +217,7 @@ button{font-family:inherit;color:inherit}
   <p class="best" id="bestLine"></p>
   <button class="btn light" id="dailyBtn" type="button">今日のチャレンジ</button>
   <p class="dailyline" id="dailyLine"></p>
+  <button class="btn plain rankbtn" id="rankBtn" type="button">ランキング</button>
   <p class="foot"><a href="https://runococco.github.io/picoruno./">別のゲーム</a><button class="iconbtn" id="muteBtn" type="button" aria-pressed="false">おと：オン</button></p>
 </section>
 
@@ -232,6 +261,16 @@ button{font-family:inherit;color:inherit}
     <p class="fav" id="rFav"></p>
     <p class="site">#ころころおやつ ・ picoruno.</p>
   </div>
+  <div class="rankbox" id="rankBox" hidden>
+    <p class="rmsg" id="rankMsg"></p>
+    <form class="nameform" id="nameForm" hidden autocomplete="off">
+      <input id="nameInput" maxlength="10" placeholder="ニックネーム（10文字まで）" aria-label="ニックネーム" enterkeyhint="send">
+      <button class="btn" type="submit" id="nameGo">のせる</button>
+    </form>
+    <p class="nameerr" id="nameErr"></p>
+    <p class="rsub" id="rankSub"></p>
+    <button class="btn plain rankbtn" id="rankBtn2" type="button">ランキングを見る</button>
+  </div>
   <div class="row">
     <a class="btn dark" id="xBtn" href="https://twitter.com/intent/tweet" target="_blank" rel="noopener">𝕏 に投稿</a>
     <button class="btn sky" id="imgBtn" type="button">画像でシェア</button>
@@ -258,6 +297,24 @@ button{font-family:inherit;color:inherit}
     <button class="btn sky" id="shareGo" type="button">保存・シェアする</button>
     <button class="btn plain" id="copyTxt" type="button">シェア文をコピー</button>
     <button class="btn plain" id="shareClose" type="button">とじる</button>
+  </div>
+</div>
+<div class="modal" id="rankModal" hidden>
+  <div class="sheet rsheet" role="dialog" aria-modal="true" aria-labelledby="rankTitle">
+    <h2 id="rankTitle">ランキング</h2>
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab" id="tabAll" aria-selected="true">いつもの</button>
+      <button type="button" role="tab" id="tabDaily" aria-selected="false">今日のチャレンジ</button>
+    </div>
+    <ol class="rlist" id="rankList"></ol>
+    <p id="rankNote"></p>
+    <form class="nameform" id="renameForm" hidden autocomplete="off">
+      <input id="renameInput" maxlength="10" placeholder="新しいニックネーム" aria-label="新しいニックネーム" enterkeyhint="done">
+      <button class="btn" type="submit">かえる</button>
+    </form>
+    <p class="nameerr" id="renameErr"></p>
+    <button class="linkbtn" id="renameBtn" type="button" hidden>ニックネームをかえる</button>
+    <button class="btn plain" id="rankClose" type="button">とじる</button>
   </div>
 </div>
 <div class="toast" id="toast" hidden></div>
@@ -1097,6 +1154,7 @@ function showResult(){
   $('againBtn').textContent=daily?'もういちど（今日のチャレンジ）':'もういちど';
   $('xBtn').href='https://twitter.com/intent/tweet?text='+encodeURIComponent(text)+'&url='+encodeURIComponent(GAME_URL);
   show('result');
+  rankResult(S);
 }
 function refreshTitle(){
   const b=LS.get(KEY_BEST,0);
@@ -1174,6 +1232,113 @@ $('specials').innerHTML=[
   [inSv(`<g transform="translate(-14 0)">${BOMB_RING}${piece(1,BOMB_STAR)}</g><g transform="translate(30 10) scale(.8)">${piece(3,tri(true))}</g><path d="M50 16 l3 7 7 1 -5 5 1 7 -6 -3 -6 3 1 -7 -5 -5 7 -1z" fill="#f3c24f"/>`),'がったい','とくしゅコマを<br>入れかえる'],
 ].map(([svg,name,desc])=>`<div class="sp">${svg}<b>${name}</b>${desc}</div>`).join('');
 
+/* ===== ランキング =====
+   サーバーは Supabase（supabase/korokoro-ranking.sql を SQL Editor で実行しておく）。
+   NGワード・ありえないスコア・連投はサーバー側で弾くので、ここは見せ方だけ。
+   アプリ版（Game Center）に移すときは RANK_API の4つを差しかえれば、画面はそのまま使えます。 */
+const RANK_LIMIT=50;           // ブラウザ版は上位50位まで表示（サーバーは100まで返せる）
+const KEY_PLAYER='korokoro-player', KEY_NAME='korokoro-name';
+const RANK_API=(()=>{
+  const URL_='https://fymwlpbspigpeaoenhhp.supabase.co/rest/v1/rpc/', KEY='sb_publishable_5hbtIPW-1y5MqsoiLC6X_A_oZMG0Z5Z';
+  async function rpc(name,body){
+    const ac2=new AbortController(), to=setTimeout(()=>ac2.abort(),8000);
+    let r;
+    try{r=await fetch(URL_+name,{method:'POST',signal:ac2.signal,headers:{apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json'},body:JSON.stringify(body)})}
+    catch(e){throw new Error('offline')} finally{clearTimeout(to)}
+    if(!r.ok){let m='';try{m=(await r.json()).message||''}catch(e){}
+      throw new Error(/^korokoro_/.test(m)?m.slice(9):(r.status===404?'notready':'offline'))}
+    return r.json();
+  }
+  return {
+    check:name=>rpc('korokoro_name_check',{p_name:name}),                        // null ならOK
+    submit:(o)=>rpc('korokoro_submit',{p_player:o.player,p_name:o.name,p_daily:o.daily,p_score:o.score,p_stage:o.stage,p_secs:o.secs,p_combo:o.combo}).then(a=>a[0]),
+    top:(daily,player)=>rpc('korokoro_top',{p_daily:daily,p_player:player,p_limit:RANK_LIMIT}),
+    rename:(player,name)=>rpc('korokoro_rename',{p_player:player,p_name:name}),
+  };
+})();
+function playerId(){
+  let id=LS.get(KEY_PLAYER,'');
+  if(!/^[0-9a-f-]{36}$/.test(id)){
+    id=(crypto.randomUUID?crypto.randomUUID():'10000000-1000-4000-8000-100000000000'.replace(/[018]/g,c=>(c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16)));
+    LS.set(KEY_PLAYER,id);
+  }
+  return id;
+}
+const cleanName=v=>String(v||'').replace(/[\u0000-\u001f\u007f\u200b-\u200f\u2028-\u202e\u2060-\u206f\ufeff]/g,'').replace(/\s+/g,' ').trim();
+const RANK_ERR={ng:'その名前は使えません。べつの名前にしてね',word:'その名前は使えません。べつの名前にしてね',link:'URLは名前に使えません',handle:'@から始まるIDは名前に使えません',
+  length:'1〜10文字で入れてね',rate:'少し時間をおいてから、もう一度送ってね',bad:'このスコアは送れませんでした',notready:'ランキングは準備中です',offline:'ランキングにつながりませんでした'};
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let pendingRun=null;   // 名前を入れる前に終わったゲームの結果
+function rankResult(S){
+  // 結果画面のランキング欄。名前があれば自動で送る
+  pendingRun=S.score>0?{daily:S.mode==='daily',score:S.score,stage:S.stage,secs:Math.floor(S.clock),combo:S.maxCombo}:null;
+  $('rankBox').hidden=false; $('nameErr').textContent=''; $('rankSub').textContent='';
+  if(!pendingRun){$('rankMsg').textContent='点数が入ると、ランキングにのせられます';$('nameForm').hidden=true;return}
+  const name=LS.get(KEY_NAME,'');
+  if(name) sendRun(name);
+  else{$('rankMsg').innerHTML='ニックネームを入れて<b>ランキング</b>にのせよう';$('nameForm').hidden=false;$('nameInput').value=''}
+}
+async function sendRun(name){
+  const run=pendingRun; if(!run) return;
+  $('nameForm').hidden=true; $('nameErr').textContent=''; $('rankMsg').textContent='ランキングに送っています…';
+  try{
+    const r=await RANK_API.submit({...run,player:playerId(),name});
+    if(pendingRun!==run) return;
+    pendingRun=null; LS.set(KEY_NAME,name);
+    const label=run.daily?'今日のチャレンジ':'ランキング';
+    $('rankMsg').innerHTML=r.rank<=RANK_LIMIT?`${label} <b>${r.rank}位</b>（${r.total.toLocaleString()}人中）`:`${label} ${r.rank.toLocaleString()}位（${r.total.toLocaleString()}人中）`;
+    $('rankSub').textContent=`${name} さんの記録 ${r.best.toLocaleString()}点`+(r.rank>RANK_LIMIT?` ・ ${RANK_LIMIT}位まで表示されます`:'');
+  }catch(e){
+    if(pendingRun!==run) return;
+    const k=e.message;
+    if(k==='ng'||k==='length'){LS.set(KEY_NAME,'');$('rankMsg').innerHTML='ニックネームを入れて<b>ランキング</b>にのせよう';$('nameForm').hidden=false;$('nameInput').value=name;$('nameErr').textContent=RANK_ERR[k]}
+    else{$('rankMsg').textContent=RANK_ERR[k]||RANK_ERR.offline;if(k==='bad'||k==='notready')pendingRun=null}
+  }
+}
+let rankTab=false, rankReq=0;
+async function openRanking(daily){
+  rankTab=!!daily; $('rankModal').hidden=false;
+  $('tabAll').setAttribute('aria-selected',String(!rankTab)); $('tabDaily').setAttribute('aria-selected',String(rankTab));
+  const name=LS.get(KEY_NAME,'');
+  $('renameBtn').hidden=!name; $('renameForm').hidden=true; $('renameErr').textContent='';
+  $('rankNote').textContent=rankTab?'みんな同じ盤面の、今日（日本時間）だけのランキング':`上位${RANK_LIMIT}位まで`;
+  $('rankNote').className='rsub';
+  const list=$('rankList'), my=++rankReq;
+  list.innerHTML='<li class="empty">よみこみ中…</li>';
+  let rows;
+  try{rows=await RANK_API.top(rankTab,LS.get(KEY_PLAYER,null))}
+  catch(e){if(my===rankReq)list.innerHTML=`<li class="empty">${RANK_ERR[e.message]||RANK_ERR.offline}</li>`;return}
+  if(my!==rankReq) return;
+  if(!rows.length){list.innerHTML=`<li class="empty">まだだれも のっていません<br>1位になるチャンス！</li>`;return}
+  let html='', prev=0;
+  rows.forEach((x,i)=>{
+    if(i&&x.rank>prev+1&&i>=RANK_LIMIT) html+='<li class="gap">…</li>';
+    html+=`<li class="${x.rank<=3?'top'+x.rank:''}${x.is_me?' me':''}"><span class="no">${x.rank}</span><span class="nm">${esc(x.name)}${x.is_me?'（あなた）':''}</span><span class="pt">${x.score.toLocaleString()}<small>ステージ${x.stage}</small></span></li>`;
+    prev=x.rank;
+  });
+  list.innerHTML=html;
+  const me=list.querySelector('.me'); if(me) list.scrollTop=me.offsetTop-list.clientHeight/2+me.offsetHeight/2;
+}
+async function saveName(input,err,done){
+  const name=cleanName(input.value);
+  if(!name||name.length>10){err.textContent=RANK_ERR.length;return}
+  err.textContent='';
+  try{const r=await RANK_API.check(name); if(r){err.textContent=RANK_ERR[r]||RANK_ERR.ng;return}}
+  catch(e){err.textContent=RANK_ERR[e.message]||RANK_ERR.offline;return}
+  done(name);
+}
+$('nameForm').onsubmit=e=>{e.preventDefault();saveName($('nameInput'),$('nameErr'),sendRun)};
+$('renameBtn').onclick=()=>{$('renameForm').hidden=false;$('renameBtn').hidden=true;$('renameInput').value=LS.get(KEY_NAME,'');$('renameInput').focus()};
+$('renameForm').onsubmit=e=>{e.preventDefault();saveName($('renameInput'),$('renameErr'),async name=>{
+  try{await RANK_API.rename(playerId(),name)}catch(er){$('renameErr').textContent=RANK_ERR[er.message]||RANK_ERR.offline;return}
+  LS.set(KEY_NAME,name); toast('ニックネームをかえました'); openRanking(rankTab)})};
+$('rankBtn').onclick=()=>openRanking(false);
+$('rankBtn2').onclick=()=>openRanking(!!(lastShare&&lastShare.daily));
+$('tabAll').onclick=()=>openRanking(false);
+$('tabDaily').onclick=()=>openRanking(true);
+$('rankClose').onclick=()=>$('rankModal').hidden=true;
+$('rankModal').addEventListener('click',e=>{if(e.target.id==='rankModal')$('rankModal').hidden=true});
+
 /* ===== 操作 ===== */
 $('startBtn').onclick=()=>startGame('normal');
 $('dailyBtn').onclick=()=>startGame('daily');
@@ -1193,6 +1358,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden&&G&&!G.over
 document.addEventListener('keydown',e=>{
   if(e.key!=='Escape') return;
   if(!$('shareModal').hidden){$('shareModal').hidden=true;return}
+  if(!$('rankModal').hidden){$('rankModal').hidden=true;return}
   if(G&&!G.over&&!$('play').hidden) pause(!G.paused);
 });
 setMuteLabel(); refreshTitle();
