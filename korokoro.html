@@ -421,7 +421,7 @@ const KEY_DAILY='korokoro-daily';
 
 /* ===== 状態 ===== */
 let G=null, uid=0;
-function newTile(t,r,c,y,gold=false){return {t,r,c,x:c,y:y==null?r:y,vy:0,s:1,pop:-1,id:++uid,sq:0,sp:t<0?2:0,gold,grow:0,ice:0}}
+function newTile(t,r,c,y,gold=false){return {t,r,c,x:c,y:y==null?r:y,vy:0,s:1,pop:-1,id:++uid,sq:0,sqA:0,sqT:0,dx:0,dy:0,sp:t<0?2:0,gold,grow:0,ice:0}}
 function makeOrder(s){
   const k=orderKinds(s), n=orderCount(s), ids=[...Array(NT).keys()].map(i=>[rndOrder(),i]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]).slice(0,k).sort((a,b)=>a-b);
   const q=Array(NT).fill(0); ids.forEach(i=>q[i]=n); return q;
@@ -481,7 +481,12 @@ function findMove(){
 function wait(sec){return new Promise(res=>G.timers.push({t:G.clock+sec,res}))}
 function settled(){for(const row of G.grid)for(const t of row){if(t&&(t.y!==t.r||t.x!==t.c||t.tw))return false}return true}
 function waitSettle(){const g=G;return new Promise(res=>{const chk=()=>{if(G!==g||settled())res();else g.timers.push({t:g.clock+.016,res:chk})};chk()})}
-function tween(t,dur){t.tw={fx:t.x,fy:t.y,t:0,d:dur}}
+function tween(t,dur,ease){t.tw={fx:t.x+(t.dx||0),fy:t.y+(t.dy||0),t:0,d:dur,e:ease||'io'};t.dx=t.dy=0;t.x=t.tw.fx;t.y=t.tw.fy}
+// なめらかに動かすためのイージング
+const EASE={
+  io:p=>p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2,           // ゆっくり→はやく→ゆっくり
+  back:p=>{const k=1.35;return 1+(k+1)*Math.pow(p-1,3)+k*Math.pow(p-1,2)}, // ちょっと行きすぎて戻る
+};
 
 /* ===== 特殊コマの範囲 ===== */
 // sp: 1=ボム(3×3) 2=ほしクッキー 3=よこライン 4=たてライン
@@ -497,7 +502,7 @@ async function trySwap(a,b){
   if(A.ice||B.ice){sfx.bad(); G.sel=null; return}
   const g=G;
   G.busy=true; G.sel=null; G.hint=null; G.idle=0; sfx.swap();
-  rawSwap(a,b); tween(A,.13); tween(B,.13); await waitSettle();
+  rawSwap(a,b); tween(A,.17,'back'); tween(B,.17,'back'); await waitSettle();
   if(G!==g) return;
   if(A.sp===2||B.sp===2){
     // ほしクッキー：相手と同じおやつを全部。ほしクッキー同士なら盤面ぜんぶ。
@@ -522,7 +527,7 @@ async function trySwap(a,b){
     if(s1!==1||s2!==1) beam(true,r), beam(false,c);
     await resolve([a,b],cells,b);
   }else if(!(lineAt(...a)||lineAt(...b))){
-    sfx.bad(); rawSwap(a,b); tween(A,.13); tween(B,.13); await waitSettle();
+    sfx.bad(); await wait(.05); if(G!==g) return; rawSwap(a,b); tween(A,.2,'back'); tween(B,.2,'back'); await waitSettle();
     if(G!==g) return;
     G.busy=false; return;
   }else await resolve([a,b],null);
@@ -592,6 +597,15 @@ async function resolve(moved,preset,origin){
       if(make.has(k)) continue;
       if(flying.has(k)){const f=flying.get(k); fling(t,f[2]==null?r:f[2],f[3]==null?c:f[3]); t.pop=1}
       else{t.pop=0; burst(c,r,t.t>=0?SWEETS[t.t].col:'#f3d27a')}
+    }
+    // となりのおやつが消えたら、こおりもとける
+    for(const k of gone.keys()){
+      if(keep.has(k)) continue;
+      const r=Math.floor(k/N),c=k%N;
+      for(const [rr,cc] of [[r-1,c],[r+1,c],[r,c-1],[r,c+1]]){
+        const n=at(rr,cc); if(!n||!n.ice||gone.has(rr*N+cc)) continue;
+        n.ice=0; crack(cc,rr);
+      }
     }
     if(G.quota.every(q=>q<=0)) G.stageClearPending=true;
     renderHud();
@@ -671,7 +685,7 @@ async function stageClear(){
   G.stage++; G.quota=makeOrder(G.stage);
   buildQuota(); renderHud();
   const iced=freeze(G.stage);
-  showBanner(`ステージ${G.stage}`,iced?'こおりが出たよ！そろえて割ろう':'新しい注文がきたよ',iced?1.4:1); G.banner=iced?1.4:1;
+  showBanner(`ステージ${G.stage}`,iced?'こおりが出たよ！となりを消すととける':'新しい注文がきたよ',iced?1.4:1); G.banner=iced?1.4:1;
   await wait(G.banner>0?G.banner:1);
   if(G!==g) return;
   if(!findMove()) await shuffle();
@@ -741,7 +755,7 @@ const eggImg=toImg(svgOf(-1,'width="200" height="200"')), badgeImg=toImg(BOMB_BA
 function bake(im,px){const c=document.createElement('canvas');c.width=c.height=px;
   try{if(im.complete&&im.naturalWidth)c.getContext('2d').drawImage(im,0,0,px,px)}catch(e){} return c}
 function bakeSprites(){
-  const px=Math.max(8,Math.round(cell*1.04*dpr));
+  const px=Math.max(8,Math.round(cell*1.04*dpr*1.4));
   sprites=svgImgs.map(im=>bake(im,px)); eggSprite=bake(eggImg,px); badgeSprite=bake(badgeImg,Math.round(cell*dpr));
 }
 [...svgImgs,eggImg,badgeImg].forEach(im=>im.addEventListener('load',bakeSprites));
@@ -753,7 +767,7 @@ function resize(){
 window.addEventListener('resize',resize);
 function rrect(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
 function draw(){
-  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.setTransform(dpr,0,0,dpr,0,0); ctx.imageSmoothingQuality='high';
   const fev=G&&G.feverT>0;
   for(let r=0;r<N;r++)for(let c=0;c<N;c++){
     ctx.fillStyle=(r+c)%2?(fev?'#f8e4bd':'#f1e9dc'):(fev?'#fcecd0':'#fbf6ee');
@@ -765,14 +779,14 @@ function draw(){
   for(const row of G.grid)for(const t of row){
     if(!t||t.y<-1.2) continue;
     let s=t.s, a=1;
-    if(t.pop>=0){const p=Math.min(1,t.pop/.2);s=1+.35*p;a=1-p}
-    if(t.grow>0) s+=t.grow*.3;
+    if(t.pop>=0){const p=Math.min(1,t.pop/.2);if(p<.35){const q=p/.35;s=1+.22*(1-(1-q)*(1-q))}else{const q=(p-.35)/.65;s=1.22*(1-q*q*.85);a=1-q*q}}
+    if(t.grow>0) s+=Math.sin(t.grow*Math.PI)*.3;
     if(t.sp===2&&t.pop<0) s+=.07+.05*Math.sin(G.clock*5);
     let oy=0;
     if(hintOn&&G.hint.some(([r,c])=>r===t.r&&c===t.c)){s+=wob*.06;oy=wob*cell*.04}
-    const sq=t.sq>0?t.sq:0;
-    const w=cell*1.04*s*(1+sq*.12), h=cell*1.04*s*(1-sq*.12);
-    const cx=(t.x+.5)*cell, cy=(t.y+.5)*cell+oy+(cell*1.04*s-h)/2;
+    const sq=reduceMotion?0:t.sq;
+    const w=cell*1.04*s*(1+sq*.13), h=cell*1.04*s*(1-sq*.13);
+    const cx=(t.x+(t.dx||0)+.5)*cell, cy=(t.y+(t.dy||0)+.5)*cell+oy+(cell*1.04*s-h)/2;
     ctx.globalAlpha=a;
     if(t.sp===2&&t.pop<0){ // ほしクッキー：まわる光と、ふわっと大きくなる動きで目立たせる
       ctx.save();ctx.translate(cx,cy);ctx.rotate(G.clock*1.2);
@@ -862,12 +876,16 @@ function step(dt){
   const due=G.timers.filter(x=>x.t<=G.clock); G.timers=G.timers.filter(x=>x.t>G.clock); due.forEach(x=>x.res());
   for(const row of G.grid)for(const t of row){
     if(!t) continue;
-    if(t.tw){t.tw.t+=dt;const p=Math.min(1,t.tw.t/t.tw.d),e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+    if(t.tw){t.tw.t+=dt;const p=Math.min(1,t.tw.t/t.tw.d),e=EASE[t.tw.e](p);
       t.x=t.tw.fx+(t.c-t.tw.fx)*e;t.y=t.tw.fy+(t.r-t.tw.fy)*e;if(p>=1){t.x=t.c;t.y=t.r;delete t.tw}}
-    else if(t.y<t.r){t.vy=Math.min(24,t.vy+70*dt);t.y+=t.vy*dt;if(t.y>=t.r){t.y=t.r;t.vy=0;t.sq=1}}
+    else if(t.y<t.r){
+      // 落下：少しずつ速くなって、着地でぽよんと弾む
+      t.vy=Math.min(22,t.vy+62*dt);t.y+=t.vy*dt;
+      if(t.y>=t.r){t.y=t.r;t.sqA=Math.min(1,.35+t.vy/18);t.sqT=0;t.vy=0}}
     else if(t.y>t.r){t.y=t.r}
     if(t.x!==t.c&&!t.tw) t.x=t.c;
-    if(t.sq>0) t.sq=Math.max(0,t.sq-dt*6);
+    if(t.sqA>0){t.sqT+=dt;t.sq=t.sqA*Math.exp(-7*t.sqT)*Math.cos(19*t.sqT);if(t.sqT>.7){t.sq=0;t.sqA=0}}
+    if((t.dx||t.dy)&&!(drag&&drag.tile===t)){const k=Math.exp(-dt*22);t.dx*=k;t.dy*=k;if(Math.abs(t.dx)+Math.abs(t.dy)<.002)t.dx=t.dy=0}
     if(t.grow>0) t.grow=Math.max(0,t.grow-dt*4);
     if(t.pop>=0) t.pop+=dt;
   }
@@ -920,12 +938,17 @@ cv.addEventListener('pointerdown',e=>{
   ac(); if(!G||G.over||G.paused) return;
   const p=cellAt(e); if(!p) return;
   try{cv.setPointerCapture(e.pointerId)}catch(_){}
-  drag={p,x:e.clientX,y:e.clientY,moved:false};
+  drag={p,x:e.clientX,y:e.clientY,moved:false,tile:G.busy?null:at(...p)};
+  if(drag.tile&&drag.tile.ice) drag.tile=null;
 });
 cv.addEventListener('pointermove',e=>{
   if(!drag||drag.moved) return;
-  const dx=e.clientX-drag.x, dy=e.clientY-drag.y, th=cv.getBoundingClientRect().width/N*.35;
-  if(Math.max(Math.abs(dx),Math.abs(dy))<th) return;
+  const dx=e.clientX-drag.x, dy=e.clientY-drag.y, cw=cv.getBoundingClientRect().width/N, th=cw*.35;
+  if(Math.max(Math.abs(dx),Math.abs(dy))<th){
+    // しきい値までは、おやつが指についてくる
+    const t=drag.tile; if(t&&!G.busy){const h=Math.abs(dx)>Math.abs(dy), v=(h?dx:dy)/cw*.7; t.dx=h?v:0; t.dy=h?0:v}
+    return;
+  }
   drag.moved=true;
   const [r,c]=drag.p, d=Math.abs(dx)>Math.abs(dy)?[0,Math.sign(dx)]:[Math.sign(dy),0];
   const q=[r+d[0],c+d[1]];
@@ -939,7 +962,7 @@ cv.addEventListener('pointerup',()=>{
   if(s&&Math.abs(s[0]-p[0])+Math.abs(s[1]-p[1])===1){trySwap(s,p);return}
   G.sel=s&&s[0]===p[0]&&s[1]===p[1]?null:p;
 });
-cv.addEventListener('pointercancel',()=>drag=null);
+cv.addEventListener('pointercancel',()=>{drag=null});
 
 /* ===== 画面 ===== */
 function show(id){['title','play','result'].forEach(s=>$(s).hidden=s!==id);window.scrollTo(0,0)}
@@ -1063,7 +1086,7 @@ $('specials').innerHTML=[
   [inSv(`<rect x="0" y="32" width="100" height="36" rx="18" fill="rgba(236,122,116,.28)"/>`+piece(3,tri(true))),'ライン','4つそろえると<br>その向きに1列'],
   [inSv(svgOf(-1).replace(/^<svg[^>]*>|<\/svg>$/g,'')),'ほしクッキー','5つそろえると<br>同じ種類を全部'],
   [inSv(`<circle cx="50" cy="50" r="48" fill="#ffeca0" opacity=".7"/>${piece(0)}${SPARK}`),'キラキラ','たまに出る<br>消すと＋2秒'],
-  [inSv(`${piece(5)}<rect x="8" y="8" width="84" height="84" rx="16" fill="rgba(196,228,246,.62)" stroke="#fff" stroke-width="4"/><path d="M22 40 L40 22 M22 56 L56 22" stroke="#fff" stroke-width="4" stroke-linecap="round"/>`),'こおり','ステージ3から<br>そろえて割ろう'],
+  [inSv(`${piece(5)}<rect x="8" y="8" width="84" height="84" rx="16" fill="rgba(196,228,246,.62)" stroke="#fff" stroke-width="4"/><path d="M22 40 L40 22 M22 56 L56 22" stroke="#fff" stroke-width="4" stroke-linecap="round"/>`),'こおり','ステージ3から<br>となりを消すととける'],
   [inSv(`<g transform="translate(-14 0)">${BOMB_RING}${piece(1,BOMB_STAR)}</g><g transform="translate(30 10) scale(.8)">${piece(3,tri(true))}</g><path d="M50 16 l3 7 7 1 -5 5 1 7 -6 -3 -6 3 1 -7 -5 -5 7 -1z" fill="#f3c24f"/>`),'がったい','とくしゅコマを<br>入れかえる'],
 ].map(([svg,name,desc])=>`<div class="sp">${svg}<b>${name}</b>${desc}</div>`).join('');
 
