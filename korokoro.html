@@ -169,7 +169,7 @@ button{font-family:inherit;color:inherit}
     <b>②</b> たて・よこに3ついじょう並ぶと消える<br>
     <b>③</b> 時間内に<b>お客さんの注文</b>をそろえるとステージクリア<br>
     <b>④</b> すばやく消し続けると<b>コンボ</b>、たまると<b>フィーバー</b>！<br>
-    <b>⑤</b> とくしゅコマどうしを入れかえると<b>がったい技</b>！
+    <b>⑤</b> とくしゅコマどうしで<b>がったい技</b>！
   </p>
   <div class="specials" id="specials"></div>
   <button class="btn" id="startBtn" type="button">あそぶ</button>
@@ -1086,7 +1086,7 @@ $('specials').innerHTML=[
   [inSv(`<rect x="0" y="32" width="100" height="36" rx="18" fill="rgba(236,122,116,.28)"/>`+piece(3,tri(true))),'ライン','4つそろえると<br>その向きに1列'],
   [inSv(svgOf(-1).replace(/^<svg[^>]*>|<\/svg>$/g,'')),'ほしクッキー','5つそろえると<br>同じ種類を全部'],
   [inSv(`<circle cx="50" cy="50" r="48" fill="#ffeca0" opacity=".7"/>${piece(0)}${SPARK}`),'キラキラ','たまに出る<br>消すと＋2秒'],
-  [inSv(`${piece(5)}<rect x="8" y="8" width="84" height="84" rx="16" fill="rgba(196,228,246,.62)" stroke="#fff" stroke-width="4"/><path d="M22 40 L40 22 M22 56 L56 22" stroke="#fff" stroke-width="4" stroke-linecap="round"/>`),'こおり','ステージ3から<br>となりを消すととける'],
+  [inSv(`${piece(5)}<rect x="8" y="8" width="84" height="84" rx="16" fill="rgba(196,228,246,.62)" stroke="#fff" stroke-width="4"/><path d="M22 40 L40 22 M22 56 L56 22" stroke="#fff" stroke-width="4" stroke-linecap="round"/>`),'こおり','ステージ3から<br>となりで割れる'],
   [inSv(`<g transform="translate(-14 0)">${BOMB_RING}${piece(1,BOMB_STAR)}</g><g transform="translate(30 10) scale(.8)">${piece(3,tri(true))}</g><path d="M50 16 l3 7 7 1 -5 5 1 7 -6 -3 -6 3 1 -7 -5 -5 7 -1z" fill="#f3c24f"/>`),'がったい','とくしゅコマを<br>入れかえる'],
 ].map(([svg,name,desc])=>`<div class="sp">${svg}<b>${name}</b>${desc}</div>`).join('');
 
