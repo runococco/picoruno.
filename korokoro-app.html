@@ -203,6 +203,9 @@ button{font-family:inherit;color:inherit}
 .item .btn:disabled{opacity:.5;cursor:default;transform:none}
 .item .tl{display:flex;gap:10px;align-items:center}
 .item .tl svg{width:52px;height:52px;flex:none}
+.adslot{width:100%;box-sizing:border-box;border:2px dashed var(--line);border-radius:14px;padding:14px 10px;text-align:center;font-size:.75rem;font-weight:700;color:var(--sub);background:var(--bg)}
+.item.paid{border-color:var(--accent);background:#fdf3ef}
+.item .yen{margin-left:auto;font-size:1rem}
 .dbg{font-size:.7rem;color:var(--sub);background:none;border:1px dashed var(--line);border-radius:999px;padding:4px 10px;cursor:pointer;align-self:center}
 @media (prefers-reduced-motion:reduce){.logo span,.parade i,.banner .bicon,.okbox,.okbox i{animation:none}.board.shake,.board.purun{animation:none}}
 </style>
@@ -278,6 +281,7 @@ button{font-family:inherit;color:inherit}
     <p class="site">#ころころおやつ ・ picoruno.</p>
   </div>
   <div class="coinbox" id="coinBox"></div>
+  <div class="adslot" id="adSlot">広告枠（試作のダミー）</div>
   <div class="row">
     <a class="btn dark" id="xBtn" href="https://twitter.com/intent/tweet" target="_blank" rel="noopener">𝕏 に投稿</a>
     <button class="btn sky" id="imgBtn" type="button">画像でシェア</button>
@@ -1211,7 +1215,7 @@ function showResult(){
   lastShare={text,daily,md,rank,reached,score:S.score,combo:S.maxCombo,sps:S.bombs+S.lines+S.eggs,caught:S.caught.slice(),fav,total};
   $('againBtn').textContent=daily?'もういちど（今日のチャレンジ）':'もういちど';
   $('xBtn').href='https://twitter.com/intent/tweet?text='+encodeURIComponent(text)+'&url='+encodeURIComponent(GAME_URL);
-  renderCoinBox(S);
+  renderCoinBox(S); $('adSlot').hidden=isPaid();
   show('result');
 }
 function refreshTitle(){
@@ -1295,7 +1299,8 @@ renderTitleArt();
 /* ===== アプリ版の試作：コイン・どうぐ・着せかえ・デイリー注文（この端末だけに保存） ===== */
 const COIN_SVG=`<svg class="ci" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#e3c26b" stroke="${INK}" stroke-width="2.4"/><circle cx="12" cy="12" r="5.6" fill="none" stroke="#c49a3e" stroke-width="2"/></svg>`;
 const CLOCK_SVG=`<svg viewBox="0 0 100 100" aria-hidden="true"><g stroke="${INK}" stroke-width="5" stroke-linejoin="round"><circle cx="24" cy="22" r="12" fill="#ec7a74"/><circle cx="76" cy="22" r="12" fill="#ec7a74"/><path d="M28 86 L22 94 M72 86 L78 94" stroke-linecap="round"/><circle cx="50" cy="56" r="36" fill="#cfe3ef"/></g><circle cx="50" cy="56" r="27" fill="#fffdf8"/><path d="M50 38 V56 L62 64" fill="none" stroke="${INK}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-const CLOCK_PRICE=40, CLOCK_SEC=10;
+const CLOCK_PRICE=40, CLOCK_SEC=10, KEY_PAID='korokoro-app-paid';
+const isPaid=()=>LS.get(KEY_PAID,false);
 let wallet=LS.get(KEY_COIN,0);
 const setWallet=n=>{wallet=Math.max(0,n);LS.set(KEY_COIN,wallet);renderCoins()};
 const owned=()=>LS.get(KEY_OWN,['yogashi']);
@@ -1396,7 +1401,15 @@ function renderShop(){
   h+=`<div class="item"><h4>とけい<span class="price">${COIN_SVG}${CLOCK_PRICE}</span></h4>
     <div class="tl">${CLOCK_SVG}<p>あそんでいる時に押すと、のこり時間 +${CLOCK_SEC}秒。1プレイで1回まで。<br>もっている数：${clocks}</p></div>
     <button class="btn" data-clock ${wallet<CLOCK_PRICE?'disabled':''}>${wallet<CLOCK_PRICE?`あと ${CLOCK_PRICE-wallet} コイン`:'かう'}</button></div>`;
+  // 100円パック（試作：本当の支払いはしません）
+  const paid=isPaid();
+  h=`<div class="item paid"><h4>100円パック<span class="yen">${paid?'買ったよ':'100円'}</span></h4>
+    ${pv(SET_WAGASHI)}
+    <p>1回きりのお買いもの。<b>広告がなくなって</b>、<b>和菓子セット</b>がすぐ使えます。<br>※試作なので、本当の支払いはありません</p>
+    <button class="btn" data-paid ${paid?'disabled':''}>${paid?'買ったよ':'100円で買う（試作）'}</button></div>`+h;
   $('shopList').innerHTML=h;
+  const pb=$('shopList').querySelector('[data-paid]');
+  if(pb) pb.onclick=()=>{LS.set(KEY_PAID,true);if(!owned().includes('wagashi'))LS.set(KEY_OWN,[...owned(),'wagashi']);applySet('wagashi');sfx.clear();toast('100円パックを買いました（試作）');renderShop()};
   $('shopList').querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{const id=b.dataset.buy,S=SETS[id];if(wallet<S.price)return;
     setWallet(wallet-S.price);LS.set(KEY_OWN,[...owned(),id]);applySet(id);sfx.clear();toast(`${S.name}を手に入れた！`);renderShop()});
   $('shopList').querySelectorAll('[data-use]').forEach(b=>b.onclick=()=>{applySet(b.dataset.use);sfx.make();renderShop()});
