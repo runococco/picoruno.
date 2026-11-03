@@ -87,7 +87,7 @@ button{font-family:inherit;color:inherit}
 .foot a{color:var(--sub)}
 
 /* ---- プレイ ---- */
-#play{gap:8px;margin-inline:-8px;--box:clamp(256px,min(calc(100vw - 16px),calc(100svh - 270px)),520px)}
+#play{gap:8px;margin-inline:-4px;--box:clamp(256px,min(calc(100vw - 40px),calc(100svh - 270px)),520px)}
 .hud{display:flex;align-items:center;gap:8px;width:var(--box);max-width:100%}
 .stage{font-family:var(--pop);font-size:1rem;background:var(--ink);color:var(--card);border-radius:999px;padding:4px 12px;white-space:nowrap}
 .score{font-family:var(--pop);font-size:1.7rem;margin-left:auto;font-variant-numeric:tabular-nums}
@@ -227,7 +227,7 @@ button{font-family:inherit;color:inherit}
     <span class="stage" id="stageLbl">ステージ 1</span>
     <span class="score" id="scoreLbl">0</span>
   </div>
-  <div class="timebar" id="timebar" role="progressbar" aria-label="のこり時間"><i id="timeFill"></i><b id="timeTxt">60</b></div>
+  <div class="timebar" id="timebar" role="progressbar" aria-label="のこり時間"><i id="timeFill"></i><b id="timeTxt">40</b></div>
   <div class="order"><span>ちゅうもん</span><div class="quota" id="quota"></div></div>
   <div class="meters">
     <span class="combo" id="comboLbl">0<small>コンボ</small></span>
@@ -482,7 +482,7 @@ function bgmStop(){BGM.on=false;clearInterval(BGM.iv)}
 function setMuteLabel(){['muteBtn','muteBtn2'].forEach(id=>{$(id).textContent='おと：'+(muted?'オフ':'オン');$(id).setAttribute('aria-pressed',String(muted))})}
 
 /* ===== ルール ===== */
-const N=8, TIME_MAX=60, CLEAR_BONUS=20, COMBO_WIN=2.2, FEVER_TIME=8, GOLD_RATE=.035;
+const N=8, TIME_MAX=40, CLEAR_BONUS=20, COMBO_WIN=2.2, FEVER_TIME=8, GOLD_RATE=.035;
 // 注文：ステージごとに 3〜5 種類のおやつを、それぞれ何個か
 const orderKinds=s=>Math.min(3+Math.floor((s-1)/2),5);
 const orderCount=s=>Math.min(8+s*2,26);
@@ -1115,7 +1115,7 @@ function startGame(mode='normal'){
   const g=G; G.busy=true; showBanner(mode==='daily'?'今日のチャレンジ':'スタート！',mode==='daily'?'みんな同じ盤面・同じ注文':'注文のおやつを集めよう',1.2); G.banner=1.2;
   wait(1.2).then(()=>{if(G===g)G.busy=false});
   BGM.mode='normal'; BGM.step=0; bgmPlay('normal');
-  pingPlay();
+  pingPlay(); guardHistory();
 }
 function pause(on){
   if(!G||G.over) return;
@@ -1240,10 +1240,10 @@ const RANK_LIMIT=50;           // ブラウザ版は上位50位まで表示（�
 const KEY_PLAYER='korokoro-player', KEY_NAME='korokoro-name';
 const RANK_API=(()=>{
   const URL_='https://fymwlpbspigpeaoenhhp.supabase.co/rest/v1/rpc/', KEY='sb_publishable_5hbtIPW-1y5MqsoiLC6X_A_oZMG0Z5Z';
-  async function rpc(name,body){
+  async function rpc(name,body,keep){
     const ac2=new AbortController(), to=setTimeout(()=>ac2.abort(),8000);
     let r;
-    try{r=await fetch(URL_+name,{method:'POST',signal:ac2.signal,headers:{apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json'},body:JSON.stringify(body)})}
+    try{r=await fetch(URL_+name,{method:'POST',signal:ac2.signal,keepalive:!!keep,headers:{apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json'},body:JSON.stringify(body)})}
     catch(e){throw new Error('offline')} finally{clearTimeout(to)}
     if(!r.ok){let m='';try{m=(await r.json()).message||''}catch(e){}
       throw new Error(/^korokoro_/.test(m)?m.slice(9):(r.status===404?'notready':'offline'))}
@@ -1251,7 +1251,7 @@ const RANK_API=(()=>{
   }
   return {
     check:name=>rpc('korokoro_name_check',{p_name:name}),                        // null ならOK
-    submit:(o)=>rpc('korokoro_submit',{p_player:o.player,p_name:o.name,p_daily:o.daily,p_score:o.score,p_stage:o.stage,p_secs:o.secs,p_combo:o.combo}).then(a=>a[0]),
+    submit:(o,keep)=>rpc('korokoro_submit',{p_player:o.player,p_name:o.name,p_daily:o.daily,p_score:o.score,p_stage:o.stage,p_secs:o.secs,p_combo:o.combo},keep).then(a=>a[0]),
     top:(daily,player)=>rpc('korokoro_top',{p_daily:daily,p_player:player,p_limit:RANK_LIMIT}),
     rename:(player,name)=>rpc('korokoro_rename',{p_player:player,p_name:name}),
   };
@@ -1360,6 +1360,32 @@ document.addEventListener('keydown',e=>{
   if(!$('shareModal').hidden){$('shareModal').hidden=true;return}
   if(!$('rankModal').hidden){$('rankModal').hidden=true;return}
   if(G&&!G.over&&!$('play').hidden) pause(!G.paused);
+});
+/* ===== スワイプで前のページに戻らないように =====
+   1. プレイ中は画面の左右の端から始まるタッチを止める（iPhoneの「端からスワイプで戻る」対策）
+   2. それでも戻る操作が来たら、ページは離れずに「いちじ停止」にする（履歴にプレイ中の1段を足しておく） */
+const playing=()=>G&&!G.over&&!$('play').hidden;
+document.addEventListener('touchstart',e=>{
+  if(!playing()) return;
+  const t=e.touches[0], edge=28;
+  if(t&&(t.clientX<edge||t.clientX>innerWidth-edge)) e.preventDefault();
+},{passive:false});
+// それでもページを離れてしまったら、そこまでの点を自己ベストとランキングに残す
+window.addEventListener('pagehide',()=>{
+  if(!playing()||G.score<=0) return;
+  const S=G, daily=S.mode==='daily';
+  if(daily){const d=LS.get(KEY_DAILY,{}),today=jstDate();LS.set(KEY_DAILY,{date:today,best:Math.max(d.date===today?d.best:0,S.score)})}
+  else if(S.score>LS.get(KEY_BEST,0)) LS.set(KEY_BEST,S.score);
+  const name=LS.get(KEY_NAME,'');
+  if(name&&S.clock>=5) RANK_API.submit({player:playerId(),name,daily,score:S.score,stage:S.stage,secs:Math.floor(S.clock),combo:S.maxCombo},true).catch(()=>{});
+});
+let guarded=false;
+function guardHistory(){if(guarded)return;try{history.pushState({korokoro:'play'},'');guarded=true}catch(e){}}
+window.addEventListener('popstate',()=>{
+  if(!guarded) return;
+  guarded=false;
+  if(playing()){pause(true);guardHistory()}
+  else if(!$('rankModal').hidden||!$('shareModal').hidden){$('rankModal').hidden=true;$('shareModal').hidden=true;guardHistory()}
 });
 setMuteLabel(); refreshTitle();
 window.__oyatsu={get G(){return G},findMove,trySwap,startGame};
