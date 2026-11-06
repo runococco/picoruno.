@@ -1,0 +1,3 @@
+{"key": [0, 2, 4, 7, 9], "sounds": {
+ "wind": ["uisfx:dreamy/swipe", -8], "tap": ["uisfx:soft/press", -10], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM, the five chime notes and jingles (ok / ng / over): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
