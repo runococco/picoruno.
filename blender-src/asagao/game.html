@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<script src="count.js" defer></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#9cc86a">
+<title>おはよう あさがお</title>
+<meta name="description" content="朝日の ひかりを かがみで はねかえして、ねぼすけの あさがおを ぜんぶ さかせよう。かがみを タップで くるり。12の花だんと きょうの一問。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="おはよう あさがお">
+<meta property="og:description" content="かがみで 朝日を はねかえして、あさがおを ぜんぶ さかせよう。">
+<meta property="og:url" content="https://picoruno.com/asagao.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://picoruno.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://picoruno.com/og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%239cc86a'/%3E%3Ccircle cx='16' cy='16' r='10' fill='%234a7ae0' stroke='%234a2c1d' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%23fff' stroke='%234a2c1d' stroke-width='1.5'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<style>
+/* Summer morning garden: leaf green, morning-glory blue, sun yellow, dark-brown outlined flat UI. */
+:root{
+  --ink:#4a2c1d;
+  --ink2:#7a5440;
+  --paper:#fffaf2;
+  --blue:#4a7ae0;
+  --red:#c4432e;
+  --sky:#5f8a2a;
+  --gold:#f2c14e;
+  --display:"Dela Gothic One","Zen Maru Gothic","Hiragino Sans",sans-serif;
+  --body:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%;margin:0;background:#9cc86a}
+[hidden]{display:none!important}
+body{color:var(--ink);font-family:var(--body);overflow:hidden;overscroll-behavior:none;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+#app{position:relative;height:100%;height:100dvh;max-width:560px;margin:0 auto;overflow:hidden}
+#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+button{font-family:inherit;color:inherit;cursor:pointer}
+.hud{position:absolute;left:0;right:0;top:env(safe-area-inset-top);z-index:2;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;pointer-events:none}
+.pill{font-family:var(--display);font-size:1rem;background:var(--paper);color:var(--ink);border:2.5px solid var(--ink);border-radius:12px;padding:4px 10px;box-shadow:0 3px 0 var(--ink);white-space:nowrap}
+.pill.t{min-width:3.6em;text-align:center}
+.pill.t.low{background:#ffd9c8;color:var(--red)}
+.ib{pointer-events:auto;width:40px;height:40px;border-radius:12px;border:2.5px solid var(--ink);background:var(--paper);display:grid;place-items:center;padding:0;box-shadow:0 3px 0 var(--ink)}
+.ib svg{width:22px;height:22px}
+.ov{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(74,44,29,.28)}
+.card{background:var(--paper);color:var(--ink);border:3px solid var(--ink);border-radius:22px;box-shadow:0 6px 0 var(--ink);padding:18px 18px 14px;width:100%;max-width:360px;box-sizing:border-box;text-align:center;max-height:100%;overflow:auto}
+.logo{font-family:var(--display);font-size:1.2rem;line-height:1.1;margin:4px 0 0;color:var(--sky)}
+.logo2{font-family:var(--display);font-size:2.6rem;line-height:1.1;margin:0 0 6px;color:var(--red)}
+.sub{font-size:.9rem;color:var(--ink2);margin:0 0 10px;font-weight:700}
+.how{font-size:.86rem;font-weight:700;background:#fff;border:2px dashed #b8d49a;border-radius:12px;padding:8px 10px;margin:0 0 12px;line-height:1.6;text-align:left}
+.how ol{margin:0;padding-left:1.3em}
+.how em{font-style:normal;color:var(--red)}
+.how .kinds{display:flex;justify-content:space-around;margin:6px 0 0;font-size:.74rem;text-align:center;color:var(--ink2)}
+.how .kinds img{display:block;width:62px;height:auto;margin:0 auto -4px}
+.big{display:block;width:100%;font-family:var(--display);font-size:1.2rem;padding:13px 10px;border-radius:16px;border:3px solid var(--ink);
+  background:var(--blue);color:#fff;box-shadow:0 5px 0 var(--ink);margin:0 0 12px;letter-spacing:.04em;text-decoration:none;box-sizing:border-box}
+.big:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.big.sec{background:#fff;color:var(--ink)}
+.best{font-size:.85rem;color:var(--ink2);margin:-4px 0 10px;font-weight:700}
+.back{margin:6px 0 0;font-size:.85rem}
+.back a{color:var(--ink2);font-weight:700}
+.bag{display:flex;justify-content:center;gap:10px;margin:6px 0 8px}
+.bag div{width:84px;font-size:.78rem;font-weight:900;line-height:1.3}
+.bag img{display:block;width:76px;height:auto;margin:0 auto -6px}
+.bag b{font-family:var(--display);font-weight:400;font-size:1.25rem}
+.res-big{font-family:var(--display);font-size:2.6rem;line-height:1.05;margin:2px 0}
+.res-rank{display:inline-block;font-family:var(--display);font-size:1rem;background:var(--gold);border:2.5px solid var(--ink);border-radius:999px;padding:4px 14px;margin:4px 0 6px}
+.res-note{font-size:.84rem;font-weight:700;color:var(--ink2);margin:0 0 12px;line-height:1.6}
+.pause-t{font-family:var(--display);font-size:1.6rem;margin:4px 0 12px}
+.levels{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 12px}
+.levels button{font-family:var(--display);font-size:1.05rem;padding:8px 0 4px;border:2.5px solid var(--ink);border-radius:12px;background:#fff;box-shadow:0 3px 0 var(--ink);line-height:1.1}
+.levels button small{display:block;font-family:var(--body);font-weight:900;font-size:.68rem;color:#e0a020;letter-spacing:.05em;min-height:1em}
+.levels button.lock{background:#eee;color:#aaa;box-shadow:0 3px 0 #aaa;border-color:#aaa}
+.levels button.next{background:#fff3c8}
+.stars{font-size:1.8rem;letter-spacing:.1em;color:#e0a020;margin:0 0 4px}
+.stars i{font-style:normal;color:#ddd}
+.bar2{position:absolute;left:0;right:0;bottom:calc(10px + env(safe-area-inset-bottom));z-index:2;display:flex;justify-content:center;gap:10px;pointer-events:none}
+.bar2 button{pointer-events:auto;font-family:var(--display);font-size:.95rem;padding:9px 14px;border-radius:14px;border:2.5px solid var(--ink);background:var(--paper);box-shadow:0 3px 0 var(--ink)}
+.bar2 button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.taps{font-family:var(--display);font-size:.95rem}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="cv"></canvas>
+  <div class="hud"><div class="pill" id="lvP">1 / 12</div><div class="pill taps" id="tapP">てま 0</div><button class="ib" id="pauseBtn" aria-label="メニュー"><svg viewBox="0 0 24 24" fill="#4a2c1d"><rect x="4" y="5" width="16" height="3" rx="1.5"/><rect x="4" y="10.5" width="16" height="3" rx="1.5"/><rect x="4" y="16" width="16" height="3" rx="1.5"/></svg></button></div>
+  <div class="bar2" id="bar2" hidden><button id="resetBtn">↺ はじめから</button><button id="hintBtn">💡 ヒント</button></div>
+
+  <div class="ov" id="titleOv">
+    <div class="card">
+      <div class="logo">おはよう</div>
+      <div class="logo2">あさがお</div>
+      <p class="sub">朝日を とどけて、ぜんぶ さかせよう</p>
+      <div class="how">お日さまの ひかりが まっすぐ のびるよ。<em>かがみを タップ</em> すると くるりと向きがかわって、ひかりが まがる。<br>ねぼすけの <em>つぼみ ぜんぶ</em> に ひかりを とおしたら クリア。<em>石</em> は ひかりを とめちゃう。</div>
+      <div class="levels" id="levels"></div>
+      <button class="big" id="dailyBtn">きょうの 一問</button>
+      <button class="big sec" id="muteBtn" style="font-size:.95rem;padding:9px">♪ 音あり</button>
+      <p class="back"><a href="https://picoruno.com/">← picoruno. のゲーム一覧へ</a></p>
+    </div>
+  </div>
+  <div class="ov" id="pauseOv" hidden>
+    <div class="card">
+      <div class="pause-t">ひとやすみ</div>
+      <button class="big" id="resumeBtn">つづける</button>
+      <button class="big sec" id="quitBtn">花だんを えらぶ</button>
+    </div>
+  </div>
+  <div class="ov" id="resultOv" hidden>
+    <div class="card">
+      <div class="logo" id="rTitle">花だん 1</div>
+      <div class="res-big">ぜんぶ さいた！</div>
+      <div class="stars" id="rStars">★★★</div>
+      <p class="res-note" id="resNote"></p>
+      <button class="big" id="nextBtn">つぎの 花だん</button>
+      <a class="big sec" id="shareBtn" href="https://twitter.com/intent/tweet" target="_blank" rel="noopener" style="font-size:1rem">X でじまん</a>
+      <button class="big sec" id="menuBtn" style="font-size:.95rem;padding:9px">花だんを えらぶ</button>
+    </div>
+  </div>
+</div>
+<script>
+/*ART*/const ART={},LAYER={},SCENE={pxu:160,elev:65,cols:6,rows:8,tile:92,origin:[130,348.2],step:[92,83.38],sprite:{res:160,scale:.66},sun:{res:180,scale:1}};/*/ART*/
+/*AUDIO*/const AUD={};/*/AUDIO*/
+</script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const W0=720,H0=1280,C=SCENE.cols,R=SCENE.rows,NLV=12;
+const OXg=SCENE.origin[0],OYg=SCENE.origin[1],SX=SCENE.step[0],SY=SCENE.step[1],BDY=-19;
+const cx=i=>OXg+i*SX,cy=j=>OYg+j*SY;
+const SPS=SCENE.pxu/(SCENE.sprite.res/SCENE.sprite.scale),SUNS=SCENE.pxu/(SCENE.sun.res/SCENE.sun.scale);
+const COLS3=['blue','pink','purple'];
+
+/* ---------- art ---------- */
+const IMG={};
+function loadImg(src){return new Promise(r=>{if(!src)return r(null);const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
+function outlined(im,px,thr){
+  const c=document.createElement('canvas');c.width=im.width+px*2;c.height=im.height+px*2;const x=c.getContext('2d');
+  const m=document.createElement('canvas');m.width=im.width;m.height=im.height;const mx=m.getContext('2d');mx.drawImage(im,0,0);
+  const d=mx.getImageData(0,0,m.width,m.height),a=d.data;for(let i=0;i<a.length;i+=4){const on=a[i+3]>thr;a[i]=74;a[i+1]=44;a[i+2]=29;a[i+3]=on?255:0}mx.putImageData(d,0,0);
+  for(let k=0;k<16;k++){const t=k/16*Math.PI*2;x.drawImage(m,px+Math.cos(t)*px,px+Math.sin(t)*px)}
+  x.drawImage(im,px,px);c.pad=px;return c}
+async function loadArt(){await Promise.all(Object.keys(ART).map(k=>loadImg(ART[k]).then(i=>{if(!i)return;IMG[k]=k==='bg'?i:outlined(i,k==='sun'?4:3,110)})))}
+function spr(c,k,x,y,s,sx=1,sy=1,a=1){const im=IMG[k];if(!im)return;const p=im.pad||0,res=k==='sun'?SCENE.sun.res:SCENE.sprite.res;c.save();c.globalAlpha*=a;c.translate(x,y);c.scale(s*sx,s*sy);c.drawImage(im,-res/2-p,-res/2-p);c.restore()}
+
+/* ---------- audio ---------- */
+const AC=window.AudioContext||window.webkitAudioContext;
+let ac=null,master=null,bgmGain=null,bgmSrc=null,decoding=null;const BUF={};
+let muted=LS.get('asagao-mute',false);
+function b64buf(u){const b=atob(u.split(',')[1]);const a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a.buffer}
+function audioInit(){if(ac||!AC)return;ac=new AC();master=ac.createGain();master.gain.value=muted?0:1;master.connect(ac.destination);bgmGain=ac.createGain();bgmGain.gain.value=.4;bgmGain.connect(master);
+  decoding=Promise.all(Object.keys(AUD).map(k=>new Promise((r,j)=>{const p=ac.decodeAudioData(b64buf(AUD[k]),r,j);if(p&&p.then)p.then(r,j)}).then(b=>{BUF[k]=b}).catch(()=>{})))}
+function unlock(){audioInit();if(ac&&ac.state==='suspended')ac.resume()}
+function snapRate(r){const st=12*Math.log2(r);let b=0;for(const a of [-12,-7,-5,0,5,7,12])if(Math.abs(a-st)<Math.abs(b-st))b=a;return Math.pow(2,b/12)}
+function sfx(k,vol=1,rate=1){if(!ac||!BUF[k]||muted)return;const s=ac.createBufferSource();s.buffer=BUF[k];s.playbackRate.value=snapRate(rate);const g=ac.createGain();g.gain.value=vol;s.connect(g);g.connect(master);s.start()}
+function bgm(on){if(!ac)return;if(on){if(bgmSrc||!BUF.bgm)return;bgmSrc=ac.createBufferSource();bgmSrc.buffer=BUF.bgm;bgmSrc.loop=true;bgmSrc.connect(bgmGain);bgmSrc.start()}else if(bgmSrc){try{bgmSrc.stop()}catch(e){}bgmSrc=null}}
+function setMute(m){muted=m;LS.set('asagao-mute',m);if(master)master.gain.value=m?0:1;$('muteBtn').textContent=m?'♪ 音なし':'♪ 音あり'}
+
+/* ---------- puzzle ---------- */
+function rng(seed){let s=seed>>>0||1;return ()=>{s^=s<<13;s>>>=0;s^=s>>17;s^=s<<5;s>>>=0;return s/4294967296}}
+const REF={a:(d)=>[-d[1],-d[0]],b:(d)=>[d[1],d[0]]};   // a = '/', b = '\' (screen y down)
+const inside=(i,j)=>i>=0&&j>=0&&i<C&&j<R;
+// trace the beam: returns the list of points (cell coords) and the lit buds
+function trace(P,ori){
+  const pts=[[P.sun.i,P.sun.j]];let i=P.sun.i+P.sun.d[0],j=P.sun.j+P.sun.d[1],d=P.sun.d;const lit=new Set(),seen=new Set();let stop=null;
+  while(inside(i,j)){const key=i+','+j+','+d;if(seen.has(key))break;seen.add(key);const c=P.grid[j*C+i];
+    if(c.t==='rock'){stop=[i,j];pts.push([i-d[0]*.42,j-d[1]*.42]);return {pts,lit,stop}}
+    if(c.t==='bud')lit.add(j*C+i);
+    if(c.t==='mirror'){pts.push([i,j]);d=REF[ori[c.m]](d)}
+    i+=d[0];j+=d[1]}
+  pts.push([i-d[0]*.45,j-d[1]*.45]);return {pts,lit,stop:null}}
+function solved(P,ori){return trace(P,ori).lit.size===P.buds.length}
+function generate(level,seed){
+  const rnd=rng(seed);const nM=Math.min(9,3+Math.floor(level*.55)),nB=Math.min(7,3+Math.floor(level/3)),nRock=2+Math.floor(level/3),nDecoy=Math.min(4,Math.floor(level/2));
+  for(let at=0;at<4000;at++){
+    const side=Math.floor(rnd()*4);let sun,d;
+    if(side===0){const i=Math.floor(rnd()*C);sun={i,j:-1};d=[0,1]}else if(side===1){const i=Math.floor(rnd()*C);sun={i,j:R};d=[0,-1]}
+    else if(side===2){const j=Math.floor(rnd()*R);sun={i:-1,j};d=[1,0]}else{const j=Math.floor(rnd()*R);sun={i:C,j};d=[-1,0]}
+    sun.d=d;const grid=Array.from({length:C*R},()=>({t:'empty'}));const path=[],sol=[];let i=sun.i+d[0],j=sun.j+d[1],run=0,ok=true;const vis=new Set();
+    while(inside(i,j)){const k=j*C+i;if(vis.has(k)){ok=false;break}vis.add(k);path.push(k);run++;
+      if(sol.length<nM&&run>=1&&rnd()<.42){const turn=rnd()<.5?'a':'b';grid[k]={t:'mirror',m:sol.length};sol.push(turn);d=REF[turn](d);run=0}
+      i+=d[0];j+=d[1]}
+    if(!ok||sol.length!==nM||path.length<nM+nB+2)continue;
+    const free=path.filter(k=>grid[k].t==='empty');if(free.length<nB)continue;
+    for(let k=free.length-1;k>0;k--){const r=Math.floor(rnd()*(k+1));[free[k],free[r]]=[free[r],free[k]]}
+    const buds=free.slice(0,nB);buds.forEach((k,n)=>grid[k]={t:'bud',col:COLS3[Math.floor(rnd()*3)]});
+    const off=[];for(let k=0;k<C*R;k++)if(!vis.has(k))off.push(k);for(let k=off.length-1;k>0;k--){const r=Math.floor(rnd()*(k+1));[off[k],off[r]]=[off[r],off[k]]}
+    let oi=0;const all=sol.slice();for(let n=0;n<nDecoy&&oi<off.length;n++){grid[off[oi++]]={t:'mirror',m:all.length};all.push(rnd()<.5?'a':'b')}
+    for(let n=0;n<nRock&&oi<off.length;n++)grid[off[oi++]]={t:'rock'};
+    const P={sun,grid,buds,n:all.length};
+    // scramble, then find the fewest taps to a solution (brute force over all mirror states)
+    const start=all.map(()=>rnd()<.5?'a':'b');if(solved(P,start))continue;
+    let par=99;const N=all.length;for(let m=0;m<(1<<N);m++){const o=start.map((v,q)=>(m>>q)&1?(v==='a'?'b':'a'):v);let pc=0;for(let q=0;q<N;q++)if((m>>q)&1)pc++;if(pc<par&&solved(P,o)){par=pc}}
+    if(par<Math.max(level?2:1,Math.floor(nM*(level<3?.5:.7))))continue;
+    P.start=start;P.par=par;return P}
+  return null}
+function bestFix(P,ori){ // a mirror that differs from the closest solution
+  const N=P.n;let best=null,bc=99;for(let m=0;m<(1<<N);m++){const o=ori.map((v,q)=>(m>>q)&1?(v==='a'?'b':'a'):v);let pc=0;for(let q=0;q<N;q++)if((m>>q)&1)pc++;if(pc<bc&&solved(P,o)){bc=pc;best=m}}
+  if(!best)return -1;for(let q=0;q<N;q++)if((best>>q)&1)return q;return -1}
+
+/* ---------- game state ---------- */
+const G={phase:'title',P:null,ori:[],taps:0,level:0,daily:false,beam:null,bloom:{},spin:{},t:0,winT:0,fx:[],texts:[],hint:-1,hintT:0,used:0};
+let prog=LS.get('asagao-prog',{});   // level -> stars
+const dayKey=()=>{const d=new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate()};
+function load(level,daily){
+  G.level=level;G.daily=daily;const seed=daily?dayKey()*7+13:1000+level*37;G.P=generate(daily?8:level,seed);G.ori=G.P.start.slice();G.taps=0;G.used=0;G.bloom={};G.spin={};G.winT=0;G.fx=[];G.texts=[];G.hint=-1;
+  G.beam=trace(G.P,G.ori);for(const k of G.beam.lit)G.bloom[k]=1;
+  $('lvP').textContent=daily?'きょうの一問':`${level+1} / ${NLV}`;hud()}
+function hud(){$('tapP').textContent=`てま ${G.taps}（めやす ${G.P?G.P.par:0}）`}
+function relight(){const before=new Set(G.beam.lit);G.beam=trace(G.P,G.ori);let n=0;
+  // newly lit buds bloom one after another along the beam
+  const order=[];let [i,j]=[G.P.sun.i,G.P.sun.j];
+  for(const k of G.beam.lit)if(!before.has(k))order.push(k);
+  order.forEach((k,q)=>{setTimeout(()=>{if(G.beam.lit.has(k)){sfx('bloom'+Math.min(5,G.beam.lit.size-order.length+q),.6)}},90*q)});
+  if(G.beam.lit.size===G.P.buds.length&&G.phase==='play'){G.phase='win';G.winT=0}}
+function tapCell(i,j){if(G.phase!=='play')return;const c=G.P.grid[j*C+i];
+  if(c.t!=='mirror'){if(c.t==='bud'||c.t==='rock'){G.spin['x'+(j*C+i)]=.25;sfx('block',.3)}return}
+  G.ori[c.m]=G.ori[c.m]==='a'?'b':'a';G.spin[c.m]=.22;G.taps++;sfx(Math.random()<.5?'turn':'turn2',.7);if(G.hint===c.m)G.hint=-1;hud();relight()}
+function stars(){return G.taps+G.used*2<=G.P.par?3:G.taps+G.used*2<=G.P.par+3?2:1}
+function win(){
+  const s=stars();if(!G.daily){const k=G.level;prog[k]=Math.max(prog[k]||0,s);LS.set('asagao-prog',prog)}else{LS.set('asagao-daily',{d:dayKey(),s})}
+  $('rTitle').textContent=G.daily?'きょうの一問':`花だん ${G.level+1}`;$('rStars').innerHTML='★'.repeat(s)+'<i>'+'★'.repeat(3-s)+'</i>';
+  $('resNote').innerHTML=`てま ${G.taps} ／ めやす ${G.P.par}`+(G.used?`（ヒント ${G.used}回）`:'')+'<br>'+(s===3?'さいしょうの てまで ぜんぶ さいた！':s===2?'あさがおたちが「おはよう」って。':'ぜんぶ さいた！ もっと少ない てまでも できるかな。');
+  $('nextBtn').hidden=G.daily||G.level>=NLV-1;
+  $('shareBtn').href='https://twitter.com/intent/tweet?text='+encodeURIComponent(`おはよう あさがお🌺 ${G.daily?'きょうの一問':'花だん'+(G.level+1)} ${'★'.repeat(s)}（てま${G.taps}）\n#あさがお #picoruno`)+'&url='+encodeURIComponent('https://picoruno.com/asagao.html');
+  $('resultOv').hidden=false;$('bar2').hidden=true}
+function step(dt){
+  G.t+=dt;for(const k in G.spin){G.spin[k]-=dt;if(G.spin[k]<=0)delete G.spin[k]}
+  if(G.P)for(const k of G.P.buds){const on=G.beam&&G.beam.lit.has(k);G.bloom[k]=Math.max(0,Math.min(1,(G.bloom[k]||0)+(on?dt*4:-dt*3)))}
+  if(G.hintT>0)G.hintT-=dt;
+  if(G.phase==='win'){G.winT+=dt;if(G.winT>.5&&G.winT-dt<=.5){sfx(stars()===3?'perfect':'clear',.8);for(const k of G.P.buds){const x=cx(k%C),y=cy(Math.floor(k/C))+BDY;for(let q=0;q<8;q++){const a=Math.random()*Math.PI*2,v=80+Math.random()*160;G.fx.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-120,t:0,life:1+Math.random()*.6,c:['#f08ab0','#6a9af0','#b07ae0','#fff3a0'][q%4],r:Math.random()*6})}}}
+    if(G.winT>1.9){G.phase='done';win()}}
+  for(let i=G.fx.length-1;i>=0;i--){const p=G.fx[i];p.t+=dt;if(p.t>p.life){G.fx.splice(i,1);continue}p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=220*dt;p.vx*=1-dt*1.5}
+}
+
+/* ---------- draw ---------- */
+const cv=$('cv'),ctx=cv.getContext('2d');let CW=0,CH=0,DPR=1,S=1,OX=0,OY=0;
+function resize(){DPR=Math.min(devicePixelRatio||1,2.5);const r=cv.getBoundingClientRect();CW=r.width;CH=r.height;cv.width=Math.round(CW*DPR);cv.height=Math.round(CH*DPR);
+  S=Math.min(CW/W0,Math.max(CH/H0,CW/W0*.92));OX=(CW-W0*S)/2;OY=(CH-H0*S)*.5}
+function toFrame(e){const r=cv.getBoundingClientRect();return {x:(e.clientX-r.left-OX)/S,y:(e.clientY-r.top-OY)/S}}
+function beamPath(c){const B=G.beam;if(!B)return;const pts=B.pts.map(([i,j])=>[cx(i),cy(j)+BDY]);
+  c.save();c.lineJoin='round';c.lineCap='round';
+  c.strokeStyle='rgba(255,220,90,.35)';c.lineWidth=26;c.beginPath();pts.forEach((p,k)=>k?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.stroke();
+  c.strokeStyle='rgba(255,236,150,.85)';c.lineWidth=10;c.stroke();c.strokeStyle='#fffbe8';c.lineWidth=4;c.stroke();
+  // sparkles running along the beam
+  let L=0;const seg=[];for(let k=1;k<pts.length;k++){const l=Math.hypot(pts[k][0]-pts[k-1][0],pts[k][1]-pts[k-1][1]);seg.push(l);L+=l}
+  for(let q=0;q<Math.floor(L/70);q++){let d=(q*70+G.t*160)%L,k=0;while(k<seg.length&&d>seg[k]){d-=seg[k];k++}if(k>=seg.length)continue;const u=d/seg[k];
+    const x=pts[k][0]+(pts[k+1][0]-pts[k][0])*u,y=pts[k][1]+(pts[k+1][1]-pts[k][1])*u;c.fillStyle='#fff';c.beginPath();c.arc(x,y,3.2,0,7);c.fill()}
+  if(B.stop){const p=pts[pts.length-1];c.fillStyle='rgba(255,240,170,.7)';c.beginPath();c.arc(p[0],p[1],10+Math.sin(G.t*8)*2,0,7);c.fill()}
+  c.restore()}
+function drawCell(c,k){const P=G.P,cell=P.grid[k];const i=k%C,j=Math.floor(k/C),x=cx(i),y=cy(j);
+  if(cell.t==='mirror'){const sp=G.spin[cell.m]||0,u=sp>0?sp/.22:0;const sx=sp>0?Math.abs(Math.cos(u*Math.PI)):1;
+    const key='mirror_'+(sp>.11?(G.ori[cell.m]==='a'?'b':'a'):G.ori[cell.m]);
+    if(G.hint===cell.m&&G.hintT>0){c.save();c.strokeStyle='#ffe27a';c.lineWidth=6;c.globalAlpha=.6+.4*Math.sin(G.t*10);c.beginPath();c.ellipse(x,y,44,36,0,0,7);c.stroke();c.restore()}
+    spr(c,key,x,y,SPS,Math.max(.15,sx),1)}
+  else if(cell.t==='rock'){const sh=G.spin['x'+k]?Math.sin(G.spin['x'+k]*60)*3:0;spr(c,'rock',x+sh,y,SPS)}
+  else if(cell.t==='bud'){const b=G.bloom[k]||0,sh=G.spin['x'+k]?Math.sin(G.spin['x'+k]*60)*3:0;const win=G.phase==='win'||G.phase==='done'?Math.abs(Math.sin(G.t*6+i+j))*.08:0;
+    if(b<1)spr(c,'bud',x+sh,y,SPS,1,1,1-b);if(b>0){const s=.6+.4*b+(b<1?Math.sin(b*Math.PI)*.15:0)+win;spr(c,'bloom_'+cell.col,x+sh,y,SPS*s,1,1,b)}
+    if(b<.05){c.save();c.font='18px "Dela Gothic One",sans-serif';c.fillStyle='rgba(255,255,255,.9)';c.textAlign='center';c.lineWidth=4;c.strokeStyle='#4a2c1d';c.lineJoin='round';const zy=y-46-Math.sin(G.t*2+i)*4;c.strokeText('z',x+22,zy);c.fillText('z',x+22,zy);c.restore()}}}
+function draw(dt){
+  const c=ctx;c.setTransform(DPR,0,0,DPR,0,0);c.fillStyle='#9cc86a';c.fillRect(0,0,CW,CH);c.save();c.translate(OX,OY);c.scale(S,S);
+  if(IMG.bg)c.drawImage(IMG.bg,0,0,W0,H0);
+  if(G.P){
+    // farther rows first; the beam sits between the mounds and the pieces
+    beamPath(c);
+    for(let j=0;j<R;j++)for(let i=0;i<C;i++)drawCell(c,j*C+i);
+    const s=G.P.sun,bob=Math.sin(G.t*2)*4,win=G.phase==='win'||G.phase==='done'?1.12:1;spr(c,'sun',cx(s.i),cy(s.j)+BDY*.6+bob,SUNS*.85*win);
+  }
+  for(const p of G.fx){c.save();c.globalAlpha=1-p.t/p.life;c.fillStyle=p.c;c.translate(p.x,p.y);c.rotate(p.t*4+p.r);c.beginPath();c.ellipse(0,0,7,4,0,0,7);c.fill();c.restore()}
+  c.restore();
+}
+let last=performance.now();
+function frame(n){const dt=Math.min(.05,(n-last)/1000);last=n;if(G.phase!=='pause')step(dt);draw(dt);requestAnimationFrame(frame)}
+
+/* ---------- input / screens ---------- */
+cv.addEventListener('pointerdown',e=>{e.preventDefault();unlock();if(G.phase!=='play')return;const p=toFrame(e);
+  const i=Math.round((p.x-OXg)/SX),j=Math.round((p.y-BDY*.5-OYg)/SY);if(inside(i,j))tapCell(i,j)},{passive:false});
+function play(level,daily){unlock();guardHistory();for(const id of ['titleOv','resultOv','pauseOv'])$(id).hidden=true;load(level,daily);G.phase='play';$('bar2').hidden=false;
+  if(ac)Promise.resolve(decoding).then(()=>{bgm(true);sfx('start',.5)});pingPlay()}
+function levels(){const box=$('levels');box.innerHTML='';const open=Object.keys(prog).length;
+  for(let k=0;k<NLV;k++){const b=document.createElement('button');const st=prog[k]||0;const lock=k>open;b.className=lock?'lock':(k===open?'next':'');b.innerHTML=`${k+1}<small>${st?'★'.repeat(st):''}</small>`;
+    b.onclick=()=>{if(lock){sfx('block',.4);return}play(k,false)};box.appendChild(b)}
+  const d=LS.get('asagao-daily',null);$('dailyBtn').textContent=d&&d.d===dayKey()?`きょうの 一問 ${'★'.repeat(d.s)}`:'きょうの 一問'}
+function pause(on){if(on){if(G.phase!=='play')return;G.phase='pause';$('pauseOv').hidden=false}else{if(G.phase!=='pause')return;$('pauseOv').hidden=true;G.phase='play'}}
+function toTitle(){bgm(false);G.phase='title';for(const id of ['pauseOv','resultOv'])$(id).hidden=true;$('bar2').hidden=true;$('titleOv').hidden=false;levels();preview()}
+function preview(){load(0,false);G.phase='title'}
+$('dailyBtn').onclick=()=>play(0,true);$('nextBtn').onclick=()=>play(G.level+1,false);$('menuBtn').onclick=toTitle;
+$('pauseBtn').onclick=()=>pause(true);$('resumeBtn').onclick=()=>pause(false);$('quitBtn').onclick=toTitle;
+$('resetBtn').onclick=()=>{if(G.phase!=='play')return;G.ori=G.P.start.slice();G.taps=0;sfx('undo',.6);hud();relight()};
+$('hintBtn').onclick=()=>{if(G.phase!=='play')return;const q=bestFix(G.P,G.ori);if(q<0)return;G.hint=q;G.hintT=3;G.used++;sfx('undo',.4)};
+$('muteBtn').onclick=()=>{unlock();setMute(!muted)};
+let guarded=false;function guardHistory(){if(guarded)return;try{history.pushState({asagao:1},'');guarded=true}catch(e){}}
+window.addEventListener('popstate',()=>{if(!guarded)return;guarded=false;if(G.phase==='play'){pause(true);guardHistory()}});
+document.addEventListener('touchstart',e=>{const x=e.touches[0].clientX;if(G.phase==='play'&&(x<24||x>innerWidth-24))e.preventDefault()},{passive:false});
+window.addEventListener('resize',resize);
+setMute(muted);resize();levels();preview();loadArt();requestAnimationFrame(frame);
+window.__T={G,play,tapCell,trace,generate,solved,bestFix,toFrame:()=>({S,OX,OY})};
+</script>
+<script>
+function pingPlay(){
+  var G="おはよう あさがお", K="picoruno-played:"+G;
+  try{ if(sessionStorage.getItem(K)) return; sessionStorage.setItem(K,"1"); }catch(e){}
+  var KEY="sb_publishable_5hbtIPW-1y5MqsoiLC6X_A_oZMG0Z5Z";
+  fetch("https://fymwlpbspigpeaoenhhp.supabase.co/rest/v1/rpc/add_play",{method:"POST",keepalive:true,
+    headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify({g:G})})
+  .then(function(r){ if(!r.ok) throw 0; })
+  .catch(function(){ try{ var d=JSON.parse(localStorage.getItem("picoruno-stats")||"{}"); d[G]=d[G]||{plays:0,likes:0}; d[G].plays++; localStorage.setItem("picoruno-stats",JSON.stringify(d)); }catch(e){} });
+}
+</script>
+</body>
+</html>
