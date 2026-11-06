@@ -1,0 +1,4 @@
+{"key": [0, 2, 4, 7, 9], "sounds": {
+ "step": ["kenney:impact-sounds__footstep_snow_002.ogg", -8], "swish": ["kenney:rpg-audio__cloth2.ogg", -2], "crack": ["kenney:impact-sounds__impactWood_heavy_001.ogg", -2],
+ "thud": ["kenney:impact-sounds__impactSoft_heavy_001.ogg", -2], "meow": ["uisfx:rubber/notification", -8], "spin": ["uisfx:dreamy/swipe", -8], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (perfect / nice / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
