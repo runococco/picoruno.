@@ -64,6 +64,9 @@ button{font-family:inherit;color:inherit;cursor:pointer}
 .res-big{font-family:var(--display);font-size:2.4rem;line-height:1.05;margin:4px 0}
 .res-big small{font-size:1.1rem}
 .res-rank{display:inline-block;font-family:var(--display);font-size:1rem;background:var(--gold);border:2.5px solid var(--ink);border-radius:999px;padding:4px 14px;margin:4px 0 6px}
+.taisho{background:#fff;border:2.5px solid var(--ink);border-radius:14px;padding:8px 12px 10px;margin:0 0 10px;text-align:left;position:relative}
+.taisho b{display:inline-block;font-family:var(--display);font-size:.78rem;background:var(--red);color:#fff;border:2px solid var(--ink);border-radius:999px;padding:1px 10px;margin:-20px 0 4px}
+.taisho p{margin:0;font-size:.92rem;font-weight:900;line-height:1.55}
 .res-note{font-size:.84rem;font-weight:700;color:var(--ink2);margin:0 0 12px;line-height:1.6}
 .pause-t{font-family:var(--display);font-size:1.6rem;margin:4px 0 12px}
 </style>
@@ -96,6 +99,7 @@ button{font-family:inherit;color:inherit;cursor:pointer}
       <img class="res-img" id="resImg" alt="すくった金魚">
       <div class="res-big" id="resPct">0<small>ひき</small></div>
       <div class="res-rank" id="resRank">金魚すくい名人</div>
+      <div class="taisho"><b>🏮 屋台の大将</b><p id="taisho">…</p></div>
       <p class="res-note" id="resNote"></p>
       <button class="big" id="againBtn">もういちど すくう</button>
       <div class="row">
@@ -341,9 +345,24 @@ function finish(why){
   const cnt={};for(const k of G.caught)cnt[k]=(cnt[k]||0)+1;
   $('resPct').innerHTML=n+'<small>ひき</small>';$('resRank').textContent=rank(G.score);
   const list=Object.keys(KIND).filter(k=>cnt[k]).map(k=>`${KIND[k].name} ${cnt[k]}`).join('　')||'きょうは 0ひき';
+  $('taisho').textContent=taisho(n,cnt,why);
   $('resNote').innerHTML=`${list}<br>スコア ${G.score}${G.multi?`　いっきに ${G.multi}回`:''}${nb&&G.score?'　<span style="color:#e2553a">じこベスト！</span>':''}`;
   $('shareBtn').href='https://twitter.com/intent/tweet?text='+encodeURIComponent(`金魚すくいで ${n}ひき すくった！🐟 スコア ${G.score}「${rank(G.score)}」${cnt.kin?'\n金色の金魚もゲット✨':''}\n#ぽいっと金魚すくい #picoruno`)+'&url='+encodeURIComponent('https://picoruno.com/kingyo.html');
   setTimeout(()=>{$('resImg').src=bowlImage().toDataURL('image/png');$('resultOv').hidden=false},1500);
+}
+function taisho(n,cnt,why){
+  // the stall owner's parting words: picked from what actually happened
+  const pick=a=>a[Math.floor(Math.random()*a.length)];
+  if(n===0)return pick(['ポイ3本、お風呂に入れただけだったな！金魚たちも「がんばれ」って顔してたぞ。','0匹！？大丈夫、おじさんも最初はそうだった。…いや、おじさんはすくえたな。']);
+  if(cnt.kin)return pick(['おいおい、金ちゃん持ってくのかい…あいつ、うちの看板娘なんだよ…大事にしてやってくれよな。','金ちゃんすくわれたの、店はじまって以来だよ！写真撮らせてくれ！']);
+  if(n>=15)return pick(['もう勘弁してくれ！明日から金魚じゃなくて スーパーボールすくいにするわ！','お客さん、うちの店つぶしに来たのかい！？ポイ、もう売らないよ！']);
+  if(G.multi>=2)return pick(['いっきに何匹も！？そのポイ、網かなんか仕込んでないだろうな？','2匹どりを何回も…お客さん、どこで修行してきたんだい？']);
+  if((cnt.ranchu||0)>=2)return pick(['らんちゅうばっかり持ってくねぇ…さては重いのが好きだな？','らんちゅう好きとは渋いねぇ。あいつら、食いしん坊だから気をつけな。']);
+  if(why==='poi'&&G.t<TIME*.5)return pick(['ちょっとちょっと！ポイは掃除機じゃないんだよ！もっとそーっと！','はやい、はやい！ポイが3本とも秒で天国いったぞ！']);
+  if(why==='time'&&G.poisLeft>0)return pick(['時間切れ！ポイはまだ元気だ。慎重派だねぇ。','ポイ、まだ残ってるぞ？やさしい子だねぇ。']);
+  if(n>=8)return pick(['お客さん、プロだね？今日はこのへんで…な？','こりゃ参った！袋、3つにしとくかい？']);
+  if(n>=3)return pick(['なかなかやるねぇ。袋、ふたつにしとくかい？','いい手つきだ！来年も来てくれよ。']);
+  return pick(['1匹でも立派なもんだ。名前つけてやんな！','その子は運命の1匹だな。大事にしてやってくれよ。']);
 }
 function rank(s){if(s>=450)return'金魚すくい名人';if(s>=280)return'屋台のおじさん公認';if(s>=150)return'ポイさばき上手';if(s>=50)return'はじめての金魚';return'また来年も来てね'}
 function bowlImage(){const k=document.createElement('canvas');k.width=k.height=420;const c=k.getContext('2d');
