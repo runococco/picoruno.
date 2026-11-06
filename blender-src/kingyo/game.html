@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<script src="count.js" defer></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2a6fa8">
+<title>ぽいっと金魚すくい</title>
+<meta name="description" content="夏まつりの金魚すくい。そっと水に入れて、さっとすくう。紙がやぶれる前に、何匹すくえるかな。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ぽいっと金魚すくい">
+<meta property="og:description" content="そっと入れて、さっとすくう。紙がやぶれる前に何匹すくえるかな。">
+<meta property="og:url" content="https://picoruno.com/kingyo.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://picoruno.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://picoruno.com/og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232a6fa8'/%3E%3Cpath d='M6 16c5-7 13-7 17 0-4 7-12 7-17 0z' fill='%23ec4a26' stroke='%234a2c1d' stroke-width='2'/%3E%3Cpath d='M23 16l5-5v10z' fill='%23f26a3a' stroke='%234a2c1d' stroke-width='2' stroke-linejoin='round'/%3E%3Ccircle cx='10' cy='15' r='1.4' fill='%234a2c1d'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<style>
+/* Summer festival stall: water blue, goldfish red, paper white, dark-brown outlined flat UI. */
+:root{
+  --water:#2a6fa8;
+  --ink:#4a2c1d;
+  --ink2:#7a5440;
+  --paper:#fffaf2;
+  --red:#e2553a;
+  --gold:#f2c14e;
+  --display:"Dela Gothic One","Zen Maru Gothic","Hiragino Sans",sans-serif;
+  --body:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%;margin:0;background:#8a5d3b}
+[hidden]{display:none!important}
+body{color:var(--ink);font-family:var(--body);overflow:hidden;overscroll-behavior:none;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+#app{position:relative;height:100%;height:100dvh;max-width:560px;margin:0 auto;overflow:hidden}
+#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+button{font-family:inherit;color:inherit;cursor:pointer}
+.hud{position:absolute;left:0;right:0;top:env(safe-area-inset-top);z-index:2;display:flex;justify-content:space-between;align-items:center;padding:10px 12px;pointer-events:none;gap:8px}
+.sc{font-family:var(--display);font-size:1.15rem;background:var(--paper);color:var(--ink);border:2.5px solid var(--ink);border-radius:12px;padding:3px 10px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tm{flex:1;height:14px;border:2.5px solid var(--ink);border-radius:99px;background:var(--paper);overflow:hidden;max-width:220px}
+.tm i{display:block;height:100%;width:100%;background:var(--gold);transform-origin:left;border-right:2px solid var(--ink);box-sizing:border-box}
+.ib{pointer-events:auto;width:40px;height:40px;border-radius:12px;border:2.5px solid var(--ink);background:var(--paper);display:grid;place-items:center;padding:0;box-shadow:0 3px 0 var(--ink);flex:none}
+.ib svg{width:22px;height:22px}
+.ov{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(20,50,80,.35)}
+.card{background:var(--paper);color:var(--ink);border:3px solid var(--ink);border-radius:22px;box-shadow:0 6px 0 var(--ink);padding:18px 18px 14px;width:100%;max-width:360px;box-sizing:border-box;text-align:center;max-height:100%;overflow:auto}
+.logo{font-family:var(--display);font-size:2.1rem;line-height:1.12;margin:4px 0 6px}
+.logo span{color:var(--red)}
+.sub{font-size:.9rem;color:var(--ink2);margin:0 0 10px;font-weight:700}
+.how{font-size:.86rem;font-weight:700;background:#fff;border:2px dashed #d9b99a;border-radius:12px;padding:8px 10px;margin:0 0 12px;line-height:1.65;text-align:left}
+.how em{font-style:normal;color:var(--red)}
+.big{display:block;width:100%;font-family:var(--display);font-size:1.2rem;padding:13px 10px;border-radius:16px;border:3px solid var(--ink);
+  background:var(--red);color:#fff;box-shadow:0 5px 0 var(--ink);margin:0 0 12px;letter-spacing:.04em;text-decoration:none;box-sizing:border-box}
+.big:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.big.sec{background:#fff;color:var(--ink)}
+.row{display:flex;gap:8px}
+.best{font-size:.85rem;color:var(--ink2);margin:-4px 0 10px;font-weight:700}
+.back{margin:6px 0 0;font-size:.85rem}
+.back a{color:var(--ink2);font-weight:700}
+.res-img{width:70%;display:block;margin:0 auto 2px;aspect-ratio:1}
+.res-big{font-family:var(--display);font-size:2.4rem;line-height:1.05;margin:4px 0}
+.res-big small{font-size:1.1rem}
+.res-rank{display:inline-block;font-family:var(--display);font-size:1rem;background:var(--gold);border:2.5px solid var(--ink);border-radius:999px;padding:4px 14px;margin:4px 0 6px}
+.res-note{font-size:.84rem;font-weight:700;color:var(--ink2);margin:0 0 12px;line-height:1.6}
+.pause-t{font-family:var(--display);font-size:1.6rem;margin:4px 0 12px}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="cv"></canvas>
+  <div class="hud"><div class="sc" id="score">0てん</div><div class="tm"><i id="timeBar"></i></div><button class="ib" id="pauseBtn" aria-label="一時停止"><svg viewBox="0 0 24 24" fill="#4a2c1d"><rect x="6" y="5" width="4.2" height="14" rx="1.5"/><rect x="13.8" y="5" width="4.2" height="14" rx="1.5"/></svg></button></div>
+
+  <div class="ov" id="titleOv">
+    <div class="card">
+      <div class="logo">ぽいっと<br><span>金魚すくい</span></div>
+      <p class="sub">夏まつりの屋台で、60秒の勝負</p>
+      <div class="how"><em>指を置く</em>と ポイが水に入る。金魚の下にすべりこませて、<em>はなす</em>と すくえる！<br>水の中で長く・速く動かすと紙がやぶれる。大きい金魚ほど重いよ。ポイは3本。</div>
+      <button class="big" id="startBtn">すくいはじめる</button>
+      <p class="best" id="bestLine"></p>
+      <button class="big sec" id="muteBtn" style="font-size:.95rem;padding:9px">♪ 音あり</button>
+      <p class="back"><a href="https://picoruno.com/">← picoruno. のゲーム一覧へ</a></p>
+    </div>
+  </div>
+  <div class="ov" id="pauseOv" hidden>
+    <div class="card">
+      <div class="pause-t">ひとやすみ</div>
+      <button class="big" id="resumeBtn">つづける</button>
+      <button class="big sec" id="quitBtn">タイトルへ</button>
+    </div>
+  </div>
+  <div class="ov" id="resultOv" hidden>
+    <div class="card">
+      <img class="res-img" id="resImg" alt="すくった金魚">
+      <div class="res-big" id="resPct">0<small>ひき</small></div>
+      <div class="res-rank" id="resRank">金魚すくい名人</div>
+      <p class="res-note" id="resNote"></p>
+      <button class="big" id="againBtn">もういちど すくう</button>
+      <div class="row">
+        <a class="big sec" id="shareBtn" href="https://twitter.com/intent/tweet" target="_blank" rel="noopener" style="font-size:1rem">X でじまん</a>
+        <button class="big sec" id="saveBtn" style="font-size:1rem">画像をほぞん</button>
+      </div>
+      <p class="back"><a href="https://picoruno.com/">← picoruno. のゲーム一覧へ</a></p>
+    </div>
+  </div>
+</div>
+<script>
+/*ART*/const ART={},SPR={};/*/ART*/
+/*AUDIO*/const AUD={};/*/AUDIO*/
+</script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const W0=720,H0=1280,PXU=100;              // scene frame: 100 px per Blender unit, tub centre at (360,640)
+const TUB={x0:42+14,x1:678-14,y0:45+14,y1:1235-14};
+const POI_R=92,BOWL={x:360,y:1112,r:96};
+const TIME=60,POIS=3;
+const KIND={
+  aka:{pts:10,w:14,sc:.7,sp:[45,75],flee:230,name:'赤い和金'},
+  kohaku:{pts:30,w:18,sc:.74,sp:[40,65],flee:210,name:'紅白'},
+  kuro:{pts:30,w:22,sc:.74,sp:[32,55],flee:180,name:'黒出目金'},
+  ranchu:{pts:50,w:30,sc:.76,sp:[22,38],flee:120,name:'らんちゅう'},
+  kin:{pts:120,w:24,sc:.74,sp:[55,85],flee:280,name:'金色の金魚'},
+};
+
+/* ---------- art ---------- */
+const IMG={},SHADOW={};
+function loadImg(src){return new Promise(r=>{if(!src)return r(null);const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
+async function loadArt(){await Promise.all(Object.keys(ART).map(k=>loadImg(ART[k]).then(i=>IMG[k]=i)));
+  for(const k in KIND){const im=IMG[k+'1'];if(!im)continue;const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d');
+    x.drawImage(im,0,0);x.globalCompositeOperation='source-in';x.fillStyle='rgba(18,62,104,.32)';x.fillRect(0,0,c.width,c.height);SHADOW[k]=c}}
+function spr(c,k,x,y,a,s,alpha=1,img){const im=img||IMG[k],M=SPR[k];if(!im||!M)return;
+  c.save();c.translate(x,y);if(a)c.rotate(a);c.scale(s,s);c.globalAlpha=alpha;c.drawImage(im,-M.ax*M.w*PXU,-M.ay*M.h*PXU,M.w*PXU,M.h*PXU);c.restore()}
+
+/* ---------- audio ---------- */
+const AC=window.AudioContext||window.webkitAudioContext;
+let ac=null,master=null,musicGain=null,bgmSrc=null;const BUF={};
+let muted=LS.get('kingyo-mute',false);
+function b64buf(u){const b=atob(u.split(',')[1]);const a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a.buffer}
+let decoding=null;
+function audioInit(){if(ac||!AC)return;ac=new AC();master=ac.createGain();master.gain.value=muted?0:1;master.connect(ac.destination);musicGain=ac.createGain();musicGain.gain.value=.5;musicGain.connect(master);
+  decoding=Promise.all(Object.keys(AUD).map(k=>new Promise((r,j)=>{const p=ac.decodeAudioData(b64buf(AUD[k]),r,j);if(p&&p.then)p.then(r,j)}).then(b=>{BUF[k]=b}).catch(()=>{})))}
+function unlock(){audioInit();if(ac&&ac.state==='suspended')ac.resume()}
+function sfx(k,vol=1,rate=1){if(!ac||!BUF[k]||muted)return;const s=ac.createBufferSource();s.buffer=BUF[k];s.playbackRate.value=rate;const g=ac.createGain();g.gain.value=vol;s.connect(g);g.connect(master);s.start()}
+function bgm(on){if(bgmSrc){try{bgmSrc.stop()}catch(e){}bgmSrc=null}if(!on||!ac)return;const go=()=>{if(!BUF.bgm||bgmSrc)return;bgmSrc=ac.createBufferSource();bgmSrc.buffer=BUF.bgm;bgmSrc.loop=true;bgmSrc.connect(musicGain);bgmSrc.start()};if(BUF.bgm)go();else if(decoding)decoding.then(()=>{if(G.phase==='play')go()})}
+function setMute(m){muted=m;LS.set('kingyo-mute',m);if(master)master.gain.value=m?0:1;$('muteBtn').textContent=m?'♪ 音なし':'♪ 音あり'}
+
+/* ---------- state ---------- */
+const cv=$('cv'),ctx=cv.getContext('2d');let CW=0,CH=0,DPR=1,S=1,OX=0,OY=0;
+function resize(){DPR=Math.min(devicePixelRatio||1,2.5);const r=cv.getBoundingClientRect();CW=r.width;CH=r.height;cv.width=Math.round(CW*DPR);cv.height=Math.round(CH*DPR);
+  S=Math.max(CW/W0,CH/H0);OX=(CW-W0*S)/2;OY=(CH-H0*S)/2}
+const G={phase:'title',t:0,fish:[],caught:[],flying:[],rip:[],drops:[],texts:[],score:0,poisLeft:POIS,kinDone:false,spawnT:0,bowlFish:[],
+  poi:{x:360,y:800,down:false,life:100,wet:0,torn:0,tornT:0,hole:null,vx:0,vy:0,sp:0,show:false,dipT:0}};
+const R=(a,b)=>a+Math.random()*(b-a);
+function newFish(kind,fade){const K=KIND[kind];let x,y,ok=false;
+  for(let i=0;i<40&&!ok;i++){x=R(TUB.x0+40,TUB.x1-40);y=R(TUB.y0+60,TUB.y1-60);ok=Math.hypot(x-BOWL.x,y-BOWL.y)>BOWL.r+70&&Math.hypot(x-G.poi.x,y-G.poi.y)>140}
+  const sp=R(K.sp[0],K.sp[1]);
+  return {kind,x,y,a:R(0,6.28),want:R(0,6.28),sp,base:sp,turnT:R(.5,2.5),flee:0,ph:R(0,9),s:K.sc*R(.9,1.1),alpha:fade?0:1,id:Math.random()}}
+function stockFish(){const n={aka:0,kohaku:0,kuro:0,ranchu:0,kin:0};for(const f of G.fish)n[f.kind]++;return n}
+function refill(fade){const n=stockFish();const want={aka:7,kohaku:2,kuro:2,ranchu:1};
+  for(const k in want)while(n[k]<want[k]){G.fish.push(newFish(k,fade));n[k]++}}
+function start(){
+  unlock();guardHistory();
+  for(const id of ['titleOv','resultOv','pauseOv'])$(id).hidden=true;
+  Object.assign(G,{phase:'play',t:0,fish:[],caught:[],flying:[],rip:[],drops:[],texts:[],score:0,poisLeft:POIS,kinDone:false,bowlFish:[],multi:0,best1:null});
+  Object.assign(G.poi,{down:false,life:100,wet:0,torn:0,tornT:0,hole:null,show:false,x:360,y:800});
+  refill(false);updHud();bgm(true);sfx('start',.6);pingPlay();
+}
+function updHud(){$('score').textContent=G.score+'てん';$('timeBar').style.transform=`scaleX(${Math.max(0,1-G.t/TIME)})`}
+
+/* ---------- poi ---------- */
+function toScene(e){const r=cv.getBoundingClientRect();return {x:((e.clientX-r.left)-OX)/S,y:((e.clientY-r.top)-OY)/S}}
+let ptr=null;
+function poiTarget(p,touch){return {x:Math.min(TUB.x1-10,Math.max(TUB.x0+10,p.x)),y:Math.min(TUB.y1-10,Math.max(TUB.y0+10,p.y-(touch?120:0)))}}
+function dip(p,touch){const P=G.poi;if(G.phase!=='play'||P.torn)return;const q=poiTarget(p,touch);
+  if(Math.hypot(q.x-BOWL.x,q.y-BOWL.y)<BOWL.r+POI_R*.6){P.x=q.x;P.y=q.y;P.show=true;return}
+  P.x=q.x;P.y=q.y;P.vx=P.vy=0;P.sp=0;P.down=true;P.show=true;P.dipT=0;P.life-=3;sfx('dip',.55,R(.9,1.1));ripple(P.x,P.y,POI_R*.9,1);
+  // fish right next to the splash dart away
+  for(const f of G.fish){const d=Math.hypot(f.x-P.x,f.y-P.y);if(d<POI_R*1.6&&Math.random()<.45)scare(f,P.x,P.y)}}
+function scare(f,x,y){f.want=Math.atan2(f.y-y,f.x-x)+R(-.5,.5);f.flee=R(.5,.9)}
+function movePoi(p,touch,dt){const P=G.poi;const q=poiTarget(p,touch);
+  if(P.down&&Math.hypot(q.x-BOWL.x,q.y-BOWL.y)<BOWL.r+POI_R*.55){const a=Math.atan2(q.y-BOWL.y,q.x-BOWL.x);q.x=BOWL.x+Math.cos(a)*(BOWL.r+POI_R*.55);q.y=BOWL.y+Math.sin(a)*(BOWL.r+POI_R*.55)}
+  P.tx=q.x;P.ty=q.y;P.show=true}
+function lift(){const P=G.poi;if(!P.down)return;P.down=false;
+  const inside=G.fish.filter(f=>f.alpha>.6&&Math.hypot(f.x-P.x,f.y-P.y)<POI_R*.82);
+  if(!inside.length){sfx('plop',.4,R(.9,1.1));ripple(P.x,P.y,POI_R*.7,.6);splash(P.x,P.y,5);return}
+  // fish near the rim may wriggle off
+  const kept=[],slipped=[];
+  for(const f of inside){const d=Math.hypot(f.x-P.x,f.y-P.y)/POI_R;if(d>.58&&Math.random()<(d-.5)*1.3)slipped.push(f);else kept.push(f)}
+  const wt=kept.reduce((s,f)=>s+KIND[f.kind].w*f.s/KIND[f.kind].sc,0)+slipped.length*5;
+  const dmg=wt*(1+P.sp/700)*(1+P.wet*.35);
+  for(const f of slipped){scare(f,P.x,P.y);f.flee=1.2}
+  if(slipped.length&&!kept.length){P.life-=dmg;sfx('slip',.7);text('にげた！',P.x,P.y-POI_R,'#bfe6ff');splash(P.x,P.y,10);ripple(P.x,P.y,POI_R,1);if(P.life<=0)tear();return}
+  if(dmg>=P.life){P.life=0;for(const f of kept){scare(f,P.x,P.y);f.flee=1.3}tear();text('やぶれた…',P.x,P.y-POI_R,'#fffaf2');splash(P.x,P.y,16);return}
+  P.life-=dmg;
+  let pts=0;for(const f of kept){G.fish.splice(G.fish.indexOf(f),1);pts+=KIND[f.kind].pts;
+    G.flying.push({f,x0:f.x,y0:f.y,t:0,dur:.55+Math.random()*.15,tx:BOWL.x+R(-40,40),ty:BOWL.y+R(-36,36)});G.caught.push(f.kind)}
+  if(kept.length>1){pts=Math.round(pts*1.5);text(kept.length+'ひき いっきに！',P.x,P.y-POI_R-10,'#f2c14e');G.multi++}
+  else text('+'+pts,P.x,P.y-POI_R,kept[0].kind==='kin'?'#f2c14e':'#fffaf2');
+  G.score+=pts;updHud();splash(P.x,P.y,14);ripple(P.x,P.y,POI_R,1.1);
+  if(kept.some(f=>f.kind==='kin'))sfx('rare',.9);else if(kept.some(f=>f.kind==='ranchu'||f.kind==='kuro'||f.kind==='kohaku'))sfx('big',.6);else sfx('catch',.6,R(.95,1.08));
+  sfx('plop',.5,1.2);
+  setTimeout(()=>{if(G.phase==='play')refill(true)},900);
+}
+function tear(){const P=G.poi;P.down=false;P.torn=1;P.tornT=0;P.life=0;sfx('tear',.8);G.poisLeft--;
+  const pts=[];const n=14;for(let i=0;i<n;i++){const a=i/n*6.283+R(-.15,.15);pts.push([Math.cos(a)*R(.45,.92),Math.sin(a)*R(.45,.92)])}P.hole=pts;updHud()}
+function newPoi(){const P=G.poi;Object.assign(P,{torn:0,tornT:0,life:100,wet:0,hole:null,down:false});text('あたらしいポイ',P.x,P.y-POI_R,'#fffaf2')}
+
+/* ---------- effects ---------- */
+function ripple(x,y,r,s){G.rip.push({x,y,r,t:0,s})}
+function splash(x,y,n){for(let i=0;i<n;i++){const a=R(0,6.28),v=R(80,220);G.drops.push({x:x+Math.cos(a)*POI_R*.6,y:y+Math.sin(a)*POI_R*.6,vx:Math.cos(a)*v,vy:Math.sin(a)*v-120,z:0,vz:R(150,280),t:0})}}
+function text(s,x,y,c){G.texts.push({s,x,y,c,t:0})}
+
+/* ---------- update ---------- */
+function update(dt){
+  if(G.phase==='pause')return;
+  const P=G.poi;
+  if(G.phase==='play'){
+    G.t+=dt;updHud();
+    if(G.t>=TIME){finish('time');return}
+    if(G.t>18&&!G.kinDone){G.kinDone=true;const f=newFish('kin',true);G.fish.push(f);text('金色の金魚が来た！',360,200,'#f2c14e');sfx('rare',.5,1.2)}
+    // poi follows the finger with a little lag; speed in water wears the paper
+    if(P.tx!=null){const k=Math.min(1,dt*22);const nx=P.x+(P.tx-P.x)*k,ny=P.y+(P.ty-P.y)*k;const vx=(nx-P.x)/Math.max(dt,1e-3),vy=(ny-P.y)/Math.max(dt,1e-3);P.x=nx;P.y=ny;P.sp+=(Math.hypot(vx,vy)-P.sp)*Math.min(1,dt*10)}
+    if(P.down){P.dipT+=dt;P.wet=Math.min(1,P.wet+dt*.25);P.life-=dt*(2.2+Math.max(0,P.sp-260)*.035);
+      if(P.sp>380&&Math.random()<dt*8)ripple(P.x,P.y,POI_R*.8,.5);
+      for(const f of G.fish){const d=Math.hypot(f.x-P.x,f.y-P.y);if(P.sp>330&&d<POI_R*1.9&&f.flee<=0)scare(f,P.x,P.y)}
+      if(P.life<=0){tear();text('やぶれた…',P.x,P.y-POI_R,'#fffaf2')}}
+    if(P.torn){P.tornT+=dt;if(P.tornT>1.3){if(G.poisLeft>0)newPoi();else{finish('poi');return}}}
+  }
+  // fish
+  for(const f of G.fish){const K=KIND[f.kind];
+    if(f.alpha<1)f.alpha=Math.min(1,f.alpha+dt*.8);
+    f.turnT-=dt;if(f.turnT<=0){f.turnT=R(1,3.2);f.want=f.a+R(-1.4,1.4);f.base=R(K.sp[0],K.sp[1])*(Math.random()<.2?.3:1)}
+    // keep away from the walls and the bowl
+    const m=70;let ax=0,ay=0;if(f.x<TUB.x0+m)ax+=1;if(f.x>TUB.x1-m)ax-=1;if(f.y<TUB.y0+m)ay+=1;if(f.y>TUB.y1-m)ay-=1;
+    const db=Math.hypot(f.x-BOWL.x,f.y-BOWL.y);if(db<BOWL.r+60){ax+=(f.x-BOWL.x)/db*1.5;ay+=(f.y-BOWL.y)/db*1.5}
+    if(ax||ay)f.want=Math.atan2(ay,ax)*.6+f.want*.4+(Math.abs(angDiff(Math.atan2(ay,ax),f.want))>1.6?(Math.atan2(ay,ax)-f.want)*.5:0);
+    let da=angDiff(f.want,f.a);const tr=f.flee>0?6:1.6;f.a+=Math.max(-tr*dt,Math.min(tr*dt,da));
+    const tsp=f.flee>0?K.flee:f.base;f.sp+=(tsp-f.sp)*Math.min(1,dt*(f.flee>0?6:1.5));if(f.flee>0)f.flee-=dt;
+    // a resting fish drifts slowly under the paper, so a calm hand can wait for it
+    f.x+=Math.cos(f.a)*f.sp*dt;f.y+=Math.sin(f.a)*f.sp*dt;f.x=Math.min(TUB.x1,Math.max(TUB.x0,f.x));f.y=Math.min(TUB.y1,Math.max(TUB.y0,f.y));
+    f.ph+=dt*(3+f.sp/18)}
+  // flying catches
+  for(let i=G.flying.length-1;i>=0;i--){const q=G.flying[i];q.t+=dt;if(q.t>=q.dur){G.flying.splice(i,1);G.bowlFish.push({kind:q.f.kind,x:q.tx-BOWL.x,y:q.ty-BOWL.y,a:R(0,6.28),want:R(0,6.28),ph:R(0,9),s:q.f.s*.62,tt:R(.5,2)});sfx('plop',.35,1.4);ripple(q.tx,q.ty,40,.6)}}
+  for(const b of G.bowlFish){b.tt-=dt;if(b.tt<0){b.tt=R(1,2.5);b.want=b.a+R(-1.5,1.5)}const d=Math.hypot(b.x,b.y);if(d>BOWL.r*.55)b.want=Math.atan2(-b.y,-b.x);
+    b.a+=Math.max(-2*dt,Math.min(2*dt,angDiff(b.want,b.a)));b.x+=Math.cos(b.a)*14*dt;b.y+=Math.sin(b.a)*14*dt;b.ph+=dt*4}
+  for(let i=G.rip.length-1;i>=0;i--){const r=G.rip[i];r.t+=dt;if(r.t>1.1)G.rip.splice(i,1)}
+  for(let i=G.drops.length-1;i>=0;i--){const d=G.drops[i];d.t+=dt;d.x+=d.vx*dt;d.y+=d.vy*dt;d.vy+=200*dt;d.z+=d.vz*dt;d.vz-=900*dt;if(d.z<0){G.drops.splice(i,1);ripple(d.x,d.y,10,.4)}}
+  for(let i=G.texts.length-1;i>=0;i--){const x=G.texts[i];x.t+=dt;if(x.t>1.1)G.texts.splice(i,1)}
+}
+function angDiff(a,b){let d=a-b;while(d>Math.PI)d-=6.2832;while(d<-Math.PI)d+=6.2832;return d}
+function frameOf(ph){const k=Math.floor(ph)%4;return k===3?1:k}
+
+/* ---------- draw ---------- */
+let clock=0;
+function draw(dt){
+  clock+=dt;const c=ctx;c.setTransform(DPR,0,0,DPR,0,0);c.fillStyle='#8a5d3b';c.fillRect(0,0,CW,CH);
+  c.save();c.translate(OX,OY);c.scale(S,S);
+  if(IMG.bg)c.drawImage(IMG.bg,0,0,W0,H0);
+  const P=G.poi;
+  // poi under water (beneath the fish)
+  if(P.show&&P.down)drawPoi(c,P,true);
+  if(P.show&&P.torn&&!P.down)drawPoi(c,P,true);
+  // fish shadows then fish
+  for(const f of G.fish)if(SHADOW[f.kind])spr(c,f.kind+'1',f.x+9,f.y+15,f.a,f.s*.97,.9*f.alpha,SHADOW[f.kind]);
+  for(const f of G.fish){spr(c,f.kind+frameOf(f.ph),f.x,f.y,f.a,f.s,f.alpha);
+    if(f.kind==='kin'&&Math.random()<dt*6)G.drops.length<80&&sparkle(f)}
+  waterLight(c);
+  // ripples
+  c.lineWidth=2.5;for(const r of G.rip){const k=r.t/1.1;c.strokeStyle=`rgba(255,255,255,${(1-k)*.55*r.s})`;c.beginPath();c.ellipse(r.x,r.y,r.r*(.5+k*.9),r.r*(.5+k*.9)*.92,0,0,7);c.stroke()}
+  // bowl + its fish
+  if(IMG.bowl){spr(c,'bowl',BOWL.x+6,BOWL.y+10,0,1.62,.25,SHADOWBOWL());spr(c,'bowl',BOWL.x,BOWL.y,0,1.62)}
+  c.save();c.beginPath();c.arc(BOWL.x,BOWL.y,BOWL.r*.86,0,7);c.clip();
+  for(const b of G.bowlFish)spr(c,b.kind+frameOf(b.ph),BOWL.x+b.x,BOWL.y+b.y,b.a,b.s);
+  c.fillStyle='rgba(120,190,230,.16)';c.fillRect(BOWL.x-BOWL.r,BOWL.y-BOWL.r,BOWL.r*2,BOWL.r*2);c.restore();
+  // flying fish (lifted out of the water, a bit bigger)
+  for(const q of G.flying){const k=q.t/q.dur;const e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;const x=q.x0+(q.tx-q.x0)*e,y=q.y0+(q.ty-q.y0)*e-Math.sin(k*Math.PI)*120;
+    spr(c,q.f.kind+frameOf(q.t*14),x,y,q.f.a+k*3,q.f.s*(1+Math.sin(k*Math.PI)*.35))}
+  // poi in the air
+  if(P.show&&!P.down&&!P.torn)drawPoi(c,P,false);
+  // drops
+  c.fillStyle='rgba(235,248,255,.9)';for(const d of G.drops){c.beginPath();c.arc(d.x,d.y-d.z*.5,d.sp?2.5:3.5,0,7);c.fill()}
+  // texts
+  for(const x of G.texts){const a=x.t>.8?(1.1-x.t)/.3:1;c.save();c.globalAlpha=a;c.font='30px "Dela Gothic One",sans-serif';c.textAlign='center';c.lineJoin='round';c.lineWidth=8;c.strokeStyle='#4a2c1d';
+    const y=Math.max(170,x.y-x.t*50);const xx=Math.min(W0-120,Math.max(120,x.x));c.strokeText(x.s,xx,y);c.fillStyle=x.c;c.fillText(x.s,xx,y);c.restore()}
+  c.restore();
+  if(G.phase==='play'||G.phase==='pause')drawPoiIcons(c);
+}
+let _sb=null;function SHADOWBOWL(){if(_sb||!IMG.bowl)return _sb;const im=IMG.bowl;const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d');x.drawImage(im,0,0);x.globalCompositeOperation='source-in';x.fillStyle='#0c3558';x.fillRect(0,0,c.width,c.height);_sb=c;return c}
+function sparkle(f){G.drops.push({x:f.x+R(-20,20),y:f.y+R(-14,14),vx:0,vy:-20,z:30,vz:60,t:0,sp:1})}
+const LIGHTS=[[.2,.3,180],[.7,.25,220],[.45,.6,200],[.8,.75,170],[.25,.85,190]];
+function waterLight(c){
+  // slow drifting light on the water + a soft blue tint, so the tub reads as water
+  c.save();c.globalCompositeOperation='lighter';
+  for(let i=0;i<LIGHTS.length;i++){const L=LIGHTS[i];const x=TUB.x0+(TUB.x1-TUB.x0)*(L[0]+Math.sin(clock*.13+i*2)*.06),y=TUB.y0+(TUB.y1-TUB.y0)*(L[1]+Math.cos(clock*.11+i)*.04);
+    const g=c.createRadialGradient(x,y,0,x,y,L[2]);g.addColorStop(0,'rgba(190,235,255,.10)');g.addColorStop(1,'rgba(190,235,255,0)');c.fillStyle=g;c.fillRect(x-L[2],y-L[2],L[2]*2,L[2]*2)}
+  c.restore();
+  c.fillStyle='rgba(40,120,190,.08)';c.fillRect(TUB.x0-14,TUB.y0-14,TUB.x1-TUB.x0+28,TUB.y1-TUB.y0+28);
+  // wavy glints
+  c.save();c.strokeStyle='rgba(255,255,255,.13)';c.lineWidth=3;c.lineCap='round';
+  for(let i=0;i<9;i++){const bx=TUB.x0+40+((i*137)%560),by=TUB.y0+80+((i*263+clock*14)%(TUB.y1-TUB.y0-160));c.beginPath();
+    for(let k=0;k<5;k++){const x=bx+k*14,y=by+Math.sin(clock*1.6+i+k*.9)*4;k?c.lineTo(x,y):c.moveTo(x,y)}c.stroke()}
+  c.restore();
+}
+function drawPoi(c,P,under){
+  const s=POI_R/50;
+  c.save();
+  if(!under){spr(c,'poi',P.x+10,P.y+18,0,s,.25,SHADOWPOI())}
+  // paper
+  c.beginPath();c.arc(P.x,P.y,POI_R*.93,0,7);
+  if(P.hole){c.moveTo(P.x+P.hole[0][0]*POI_R,P.y+P.hole[0][1]*POI_R);for(const h of P.hole)c.lineTo(P.x+h[0]*POI_R,P.y+h[1]*POI_R);c.closePath()}
+  const wet=P.wet,life=Math.max(0,P.life)/100;
+  c.fillStyle=under?`rgba(250,252,255,${.42-wet*.16})`:`rgba(255,255,255,${.7-wet*.25})`;c.fill('evenodd');
+  // wear: faint creases as the paper weakens
+  if(life<.55&&!P.hole){c.strokeStyle=`rgba(120,150,170,${(.55-life)*.9})`;c.lineWidth=1.6;c.beginPath();
+    for(let i=0;i<5;i++){const a=i*1.3+.4;c.moveTo(P.x+Math.cos(a)*POI_R*.15,P.y+Math.sin(a)*POI_R*.15);c.lineTo(P.x+Math.cos(a+.3)*POI_R*.7,P.y+Math.sin(a+.3)*POI_R*.7)}c.stroke()}
+  if(under){c.fillStyle='rgba(60,140,200,.12)';c.beginPath();c.arc(P.x,P.y,POI_R*1.05,0,7);c.fill()}
+  spr(c,'poi',P.x,P.y,0,s,under?.82:1);
+  c.restore();
+}
+let _sp=null;function SHADOWPOI(){if(_sp||!IMG.poi)return _sp;const im=IMG.poi;const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d');x.drawImage(im,0,0);x.globalCompositeOperation='source-in';x.fillStyle='#0c3558';x.fillRect(0,0,c.width,c.height);_sp=c;return c}
+function drawPoiIcons(c){
+  const y=$('score').getBoundingClientRect().bottom-cv.getBoundingClientRect().top+20;
+  for(let i=0;i<POIS;i++){const x=22+i*30;const alive=i<G.poisLeft;
+    c.save();c.globalAlpha=alive?1:.3;c.lineWidth=3;c.strokeStyle='#4a2c1d';c.fillStyle='#fffaf2';c.beginPath();c.arc(x,y,10,0,7);c.fill();c.stroke();
+    c.beginPath();c.moveTo(x,y+10);c.lineTo(x,y+20);c.stroke();
+    if(alive&&i===G.poisLeft-1){const l=Math.max(0,G.poi.life)/100;c.fillStyle=l>.5?'#8fd0f4':l>.25?'#f2c14e':'#e2553a';c.beginPath();c.moveTo(x,y);c.arc(x,y,7,-Math.PI/2,-Math.PI/2+6.283*l);c.closePath();c.fill()}
+    c.restore()}
+}
+let last=performance.now();
+function loop(n){const dt=Math.min(.05,(n-last)/1000);last=n;const d=G.phase==='pause'?0:dt;update(d);draw(d);requestAnimationFrame(loop)}
+
+/* ---------- finish ---------- */
+function finish(why){
+  if(G.phase!=='play')return;G.phase='result';G.poi.down=false;bgm(false);sfx('finish',.9);
+  text(why==='time'?'そこまで！':'ポイがなくなった',360,560,'#fffaf2');
+  const n=G.caught.length;const best=LS.get('kingyo-best',0);const nb=G.score>best;if(nb)LS.set('kingyo-best',G.score);
+  const cnt={};for(const k of G.caught)cnt[k]=(cnt[k]||0)+1;
+  $('resPct').innerHTML=n+'<small>ひき</small>';$('resRank').textContent=rank(G.score);
+  const list=Object.keys(KIND).filter(k=>cnt[k]).map(k=>`${KIND[k].name} ${cnt[k]}`).join('　')||'きょうは 0ひき';
+  $('resNote').innerHTML=`${list}<br>スコア ${G.score}${G.multi?`　いっきに ${G.multi}回`:''}${nb&&G.score?'　<span style="color:#e2553a">じこベスト！</span>':''}`;
+  $('shareBtn').href='https://twitter.com/intent/tweet?text='+encodeURIComponent(`金魚すくいで ${n}ひき すくった！🐟 スコア ${G.score}「${rank(G.score)}」${cnt.kin?'\n金色の金魚もゲット✨':''}\n#ぽいっと金魚すくい #picoruno`)+'&url='+encodeURIComponent('https://picoruno.com/kingyo.html');
+  setTimeout(()=>{$('resImg').src=bowlImage().toDataURL('image/png');$('resultOv').hidden=false},1500);
+}
+function rank(s){if(s>=450)return'金魚すくい名人';if(s>=280)return'屋台のおじさん公認';if(s>=150)return'ポイさばき上手';if(s>=50)return'はじめての金魚';return'また来年も来てね'}
+function bowlImage(){const k=document.createElement('canvas');k.width=k.height=420;const c=k.getContext('2d');
+  c.translate(210,210);const sc=420/(BOWL.r*2.3);c.scale(sc,sc);
+  if(IMG.bowl)spr(c,'bowl',0,0,0,1.62);
+  c.save();c.beginPath();c.arc(0,0,BOWL.r*.86,0,7);c.clip();
+  const fs=G.bowlFish.length?G.bowlFish:[];for(const b of fs)spr(c,b.kind+'1',b.x,b.y,b.a,b.s);
+  c.fillStyle='rgba(120,190,230,.16)';c.fillRect(-BOWL.r,-BOWL.r,BOWL.r*2,BOWL.r*2);c.restore();return k}
+function shareImage(){
+  const k=document.createElement('canvas');k.width=1200;k.height=630;const c=k.getContext('2d');
+  if(IMG.bg)c.drawImage(IMG.bg,0,-500,1200,1200*H0/W0);c.fillStyle='rgba(20,60,100,.35)';c.fillRect(0,0,1200,630);
+  const b=bowlImage();c.drawImage(b,700,95,440,440);
+  c.lineJoin='round';const T=(s,x,y,f,col,lw=10)=>{c.font=f;c.lineWidth=lw;c.strokeStyle='#4a2c1d';c.strokeText(s,x,y);c.fillStyle=col;c.fillText(s,x,y)};
+  T('ぽいっと',60,120,'64px "Dela Gothic One",sans-serif','#fffaf2');T('金魚すくい',60,200,'72px "Dela Gothic One",sans-serif','#ec4a26');
+  T(G.caught.length+'ひき',60,370,'130px "Dela Gothic One",sans-serif','#fffaf2',12);
+  T(rank(G.score),66,450,'700 40px "Zen Maru Gothic",sans-serif','#f2c14e',8);
+  T(`スコア ${G.score}　picoruno.com`,66,520,'700 28px "Zen Maru Gothic",sans-serif','#fffaf2',7);return k}
+
+/* ---------- input ---------- */
+cv.addEventListener('pointerdown',e=>{e.preventDefault();unlock();if(G.phase!=='play')return;ptr={id:e.pointerId,touch:e.pointerType!=='mouse'};try{cv.setPointerCapture(e.pointerId)}catch(_){}
+  const p=toScene(e);const q=poiTarget(p,ptr.touch);G.poi.x=G.poi.tx=q.x;G.poi.y=G.poi.ty=q.y;dip(p,ptr.touch)},{passive:false});
+cv.addEventListener('pointermove',e=>{if(G.phase!=='play')return;const touch=e.pointerType!=='mouse';const p=toScene(e);
+  if(ptr&&ptr.id===e.pointerId)movePoi(p,ptr.touch);else if(!touch&&!ptr){const q=poiTarget(p,false);G.poi.tx=q.x;G.poi.ty=q.y;G.poi.show=true}});
+function up(e){if(!ptr||ptr.id!==e.pointerId)return;ptr=null;if(G.phase==='play')lift()}
+cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+function pause(on){if(on){if(G.phase!=='play')return;if(G.poi.down){G.poi.down=false}ptr=null;G.phase='pause';$('pauseOv').hidden=false;if(ac)ac.suspend()}
+  else{if(G.phase!=='pause')return;$('pauseOv').hidden=true;G.phase='play';if(ac)ac.resume()}}
+function toTitle(){bgm(false);G.phase='title';G.poi.show=false;for(const id of ['pauseOv','resultOv'])$(id).hidden=true;$('titleOv').hidden=false;refreshTitle();if(ac&&ac.state==='suspended')ac.resume()}
+function refreshTitle(){const b=LS.get('kingyo-best',0);$('bestLine').textContent=b?`ベストスコア ${b}`:''}
+$('startBtn').onclick=start;$('againBtn').onclick=start;
+$('pauseBtn').onclick=()=>pause(true);$('resumeBtn').onclick=()=>pause(false);$('quitBtn').onclick=toTitle;
+$('muteBtn').onclick=()=>{unlock();setMute(!muted)};
+$('saveBtn').onclick=async()=>{const k=shareImage();const blob=await new Promise(r=>k.toBlob(r,'image/png'));const file=new File([blob],'kingyo.png',{type:'image/png'});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file]});return}catch(e){if(e&&e.name==='AbortError')return}}
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='kingyo.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),3000)};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pause(true)});
+let guarded=false;function guardHistory(){if(guarded)return;try{history.pushState({kingyo:1},'');guarded=true}catch(e){}}
+window.addEventListener('popstate',()=>{if(!guarded)return;guarded=false;if(G.phase==='play'){pause(true);guardHistory()}});
+document.addEventListener('touchstart',e=>{const x=e.touches[0].clientX;if(G.phase==='play'&&(x<24||x>innerWidth-24))e.preventDefault()},{passive:false});
+window.addEventListener('resize',resize);
+// title screen: fish already swimming behind the card
+setMute(muted);refreshTitle();resize();refill(false);G.phase='demo';loadArt();requestAnimationFrame(loop);
+window.__T={G,dip,lift,movePoi,start,KIND,BOWL,POI_R};
+</script>
+<script>
+function pingPlay(){
+  var G="ぽいっと金魚すくい", K="picoruno-played:"+G;
+  try{ if(sessionStorage.getItem(K)) return; sessionStorage.setItem(K,"1"); }catch(e){}
+  var KEY="sb_publishable_5hbtIPW-1y5MqsoiLC6X_A_oZMG0Z5Z";
+  fetch("https://fymwlpbspigpeaoenhhp.supabase.co/rest/v1/rpc/add_play",{method:"POST",keepalive:true,
+    headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify({g:G})})
+  .then(function(r){ if(!r.ok) throw 0; })
+  .catch(function(){ try{ var d=JSON.parse(localStorage.getItem("picoruno-stats")||"{}"); d[G]=d[G]||{plays:0,likes:0}; d[G].plays++; localStorage.setItem("picoruno-stats",JSON.stringify(d)); }catch(e){} });
+}
+</script>
+</body>
+</html>
