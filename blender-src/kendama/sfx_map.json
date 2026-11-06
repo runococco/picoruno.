@@ -1,0 +1,4 @@
+{"key": [2, 4, 6, 9, 11], "sounds": {
+ "clack": ["kenney:impact-sounds__impactWood_light_002.ogg", -2], "clack2": ["kenney:impact-sounds__impactWood_light_004.ogg", -3],
+ "toss": ["uisfx:rubber/swipe", -8], "miss": ["uisfx:soft/warning", -8], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (ok / spike / mission / over): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
