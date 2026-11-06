@@ -1,0 +1,7 @@
+{"key": [2, 4, 6, 9, 11], "sounds": {
+ "sweep1": ["kenney:impact-sounds__footstep_grass_000.ogg", -2], "sweep2": ["kenney:impact-sounds__footstep_grass_002.ogg", -2],
+ "sweep3": ["kenney:impact-sounds__footstep_grass_004.ogg", -2], "swish": ["kenney:rpg-audio__cloth2.ogg", 0],
+ "flutter": ["kenney:rpg-audio__bookFlip2.ogg", -4], "cat": ["kenney:interface-sounds__pluck_002.ogg", -2],
+ "crack1": ["kenney:impact-sounds__footstep_wood_000.ogg", -4], "crack2": ["kenney:impact-sounds__footstep_wood_002.ogg", -4],
+ "start": ["kenney:interface-sounds__confirmation_001.ogg", -2], "pile": ["kenney:impact-sounds__impactSoft_medium_000.ogg", -4]},
+ "extra": "BGM, finish / found / ready jingles and wind gust: original (music.py), FluidSynth + FluidR3_GM (MIT)."}
