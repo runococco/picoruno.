@@ -1,0 +1,5 @@
+{"key": [9, 11, 1, 4, 6], "sounds": {
+ "clash": ["kenney:impact-sounds__impactMetal_light_002.ogg", -4], "clang": ["kenney:impact-sounds__impactMetal_medium_001.ogg", -4], "dash": ["uisfx:dreamy/swipe", -8],
+ "launch": ["kenney:impact-sounds__impactWood_light_002.ogg", -2], "fall": ["kenney:impact-sounds__impactWood_heavy_001.ogg", -4], "out": ["kenney:impact-sounds__impactPlank_medium_000.ogg", -4],
+ "tick": ["kenney:interface-sounds__click_002.ogg", -6], "meow": ["uisfx:rubber/notification", -8], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (win / lose / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
