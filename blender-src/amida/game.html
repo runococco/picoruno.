@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<script src="count.js" defer></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#c89868">
+<title>ねこの あみだくじ</title>
+<meta name="description" content="ねこが あみだくじを てくてく あるくよ。えんぴつで よこせんを 1ぽん かきたして、いちばん おおきな さかなの おさらへ みちびこう。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ねこの あみだくじ">
+<meta property="og:description" content="よこせんを 1ぽん かきたして、ねこを おおきな さかなへ">
+<meta property="og:url" content="https://picoruno.com/amida.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://picoruno.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://picoruno.com/og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23efe6d2'/%3E%3Cpath d='M9 5V27M16 5V27M23 5V27M9 11H16M16 17H23M9 22H16' stroke='%234a2c1d' stroke-width='2.6' stroke-linecap='round' fill='none'/%3E%3Cpath d='M16 17H23' stroke='%23d8603a' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<style>
+/* Desk and washi paper: pencil grey lines, red pencil accents, dark-brown outlined flat UI. */
+:root{
+  --ink:#4a2c1d;
+  --ink2:#7a5440;
+  --paper:#fffaf2;
+  --blue:#d8603a;
+  --red:#d8603a;
+  --sky:#7a8a5a;
+  --gold:#f2c14e;
+  --display:"Dela Gothic One","Zen Maru Gothic","Hiragino Sans",sans-serif;
+  --body:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%;margin:0;background:#c89868}
+[hidden]{display:none!important}
+body{color:var(--ink);font-family:var(--body);overflow:hidden;overscroll-behavior:none;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+#app{position:relative;height:100%;height:100dvh;max-width:560px;margin:0 auto;overflow:hidden}
+#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+button{font-family:inherit;color:inherit;cursor:pointer}
+.hud{position:absolute;left:0;right:0;top:env(safe-area-inset-top);z-index:2;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;pointer-events:none}
+.pill{font-family:var(--display);font-size:1rem;background:var(--paper);color:var(--ink);border:2.5px solid var(--ink);border-radius:12px;padding:4px 10px;box-shadow:0 3px 0 var(--ink);white-space:nowrap}
+.pill.t{min-width:3.6em;text-align:center}
+.pill.t.low{background:#ffd9c8;color:var(--red)}
+.ib{pointer-events:auto;width:40px;height:40px;border-radius:12px;border:2.5px solid var(--ink);background:var(--paper);display:grid;place-items:center;padding:0;box-shadow:0 3px 0 var(--ink)}
+.ib svg{width:22px;height:22px}
+.ov{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(74,44,29,.28)}
+.card{background:var(--paper);color:var(--ink);border:3px solid var(--ink);border-radius:22px;box-shadow:0 6px 0 var(--ink);padding:18px 18px 14px;width:100%;max-width:360px;box-sizing:border-box;text-align:center;max-height:100%;overflow:auto}
+.logo{font-family:var(--display);font-size:1.2rem;line-height:1.1;margin:4px 0 0;color:var(--sky)}
+.logo2{font-family:var(--display);font-size:2.6rem;line-height:1.1;margin:0 0 6px;color:var(--red)}
+.sub{font-size:.9rem;color:var(--ink2);margin:0 0 10px;font-weight:700}
+.how{font-size:.86rem;font-weight:700;background:#fff;border:2px dashed #e0c8a0;border-radius:12px;padding:8px 10px;margin:0 0 12px;line-height:1.6;text-align:left}
+.how ol{margin:0;padding-left:1.3em}
+.how em{font-style:normal;color:var(--red)}
+.how .kinds{display:flex;justify-content:space-around;margin:6px 0 0;font-size:.74rem;text-align:center;color:var(--ink2)}
+.how .kinds img{display:block;width:62px;height:auto;margin:0 auto -4px}
+.big{display:block;width:100%;font-family:var(--display);font-size:1.2rem;padding:13px 10px;border-radius:16px;border:3px solid var(--ink);
+  background:var(--blue);color:#fff;box-shadow:0 5px 0 var(--ink);margin:0 0 12px;letter-spacing:.04em;text-decoration:none;box-sizing:border-box}
+.big:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.big.sec{background:#fff;color:var(--ink)}
+.best{font-size:.85rem;color:var(--ink2);margin:-4px 0 10px;font-weight:700}
+.back{margin:6px 0 0;font-size:.85rem}
+.back a{color:var(--ink2);font-weight:700}
+.bag{display:flex;justify-content:center;gap:10px;margin:6px 0 8px}
+.bag div{width:84px;font-size:.78rem;font-weight:900;line-height:1.3}
+.bag img{display:block;width:76px;height:auto;margin:0 auto -6px}
+.bag b{font-family:var(--display);font-weight:400;font-size:1.25rem}
+.res-big{font-family:var(--display);font-size:2.6rem;line-height:1.05;margin:2px 0}
+.res-rank{display:inline-block;font-family:var(--display);font-size:1rem;background:var(--gold);border:2.5px solid var(--ink);border-radius:999px;padding:4px 14px;margin:4px 0 6px}
+.res-note{font-size:.84rem;font-weight:700;color:var(--ink2);margin:0 0 12px;line-height:1.6}
+.pause-t{font-family:var(--display);font-size:1.6rem;margin:4px 0 12px}
+.res-row{display:flex;justify-content:center;gap:14px;margin:4px 0 6px;font-size:.84rem;font-weight:900;color:var(--ink2)}
+.res-row b{display:block;font-family:var(--display);font-weight:400;font-size:1.3rem;color:var(--ink)}
+.logo2{font-size:1.9rem}
+.mis{display:flex;gap:6px;justify-content:center;align-items:center;margin:0 0 4px}
+.kinds3{display:flex;justify-content:space-around;margin:6px 0 0;font-size:.76rem;text-align:center;color:var(--ink2);font-weight:900}
+.kinds3 b{display:block;font-family:var(--display);font-weight:400;font-size:1rem;color:var(--red)}
+.logo2{font-size:1.9rem}
+.xx{position:relative;width:110px;height:20px;border:2.5px solid var(--ink);border-radius:10px;background:var(--paper);overflow:hidden;box-shadow:0 3px 0 var(--ink)}
+.wet b{position:absolute;left:0;top:0;bottom:0;width:0;background:#5aa8e8}
+.wet span{position:absolute;inset:0;font-size:.7rem;font-weight:900;text-align:center;line-height:16px}
+.pill.n{min-width:4.6em;text-align:center}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="cv"></canvas>
+  <div class="hud"><div class="pill n" id="lvP">1 / 12</div><div class="pill" id="scoreP">0 てん</div><button class="ib" id="pauseBtn" aria-label="一時停止"><svg viewBox="0 0 24 24" fill="#4a2c1d"><rect x="6" y="5" width="4.2" height="14" rx="1.2"/><rect x="13.8" y="5" width="4.2" height="14" rx="1.2"/></svg></button></div>
+
+  <div class="ov" id="titleOv">
+    <div class="card">
+      <div class="logo">えんぴつ 1ぽんで</div>
+      <div class="logo2">ねこの あみだくじ</div>
+      <p class="sub">よこせんで、おおきな さかなへ</p>
+      <div class="how"><ol>
+        <li>ねこが あみだくじを <em>てくてく</em> あるくよ</li>
+        <li>せんと せんの あいだを <em>タップ</em> すると、えんぴつで <em>よこせん</em> が かける。ねこが あるいている あいだも かけるよ</li>
+        <li><em>おおきな さかな</em> の おさらに つけば だいせいこう。<em>からっぽ</em> の おさらだと ハートが へる</li></ol>
+        <div class="kinds3"><div><b>300</b>おおきな さかな</div><div><b>100</b>こざかな</div><div><b>150</b>おだんご<br>ハート+1</div></div></div>
+      <button class="big" id="startBtn">あみだを はじめる</button>
+      <p class="best" id="bestLine"></p>
+      <button class="big sec" id="muteBtn" style="font-size:.95rem;padding:9px">♪ 音あり</button>
+      <p class="back"><a href="https://picoruno.com/">← picoruno. のゲーム一覧へ</a></p>
+    </div>
+  </div>
+  <div class="ov" id="pauseOv" hidden>
+    <div class="card">
+      <div class="pause-t">ひとやすみ</div>
+      <button class="big" id="resumeBtn">つづける</button>
+      <button class="big sec" id="quitBtn">タイトルへ</button>
+    </div>
+  </div>
+  <div class="ov" id="resultOv" hidden>
+    <div class="card">
+      <div class="logo" id="resHead">きょうの あみだくじ</div>
+      <div class="res-big" id="resScore">0 てん</div>
+      <div class="res-row"><div>おおきな さかな<b id="rBig">0</b></div><div>こざかな<b id="rSmall">0</b></div><div>おだんご<b id="rDango">0</b></div></div>
+      <div class="res-rank" id="resRank"></div>
+      <p class="res-note" id="resNote"></p>
+      <button class="big" id="againBtn">もういちど</button>
+      <a class="big sec" id="shareBtn" href="https://twitter.com/intent/tweet" target="_blank" rel="noopener" style="font-size:1rem">X でじまん</a>
+      <p class="back"><a href="https://picoruno.com/">← picoruno. のゲーム一覧へ</a></p>
+    </div>
+  </div>
+</div>
+<script>
+/*ART*/const ART={},LAYER={},SCENE={paper:[40,120,640,1008]};/*/ART*/
+/*AUDIO*/const AUD={};/*/AUDIO*/
+</script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const W0=720,H0=1280,TOP=300,BOT=960,PLY=1052,LEVELS=12,GAP=28;
+const KIND={big:{n:'おおきな さかな',p:300,img:'plate_big'},small:{n:'こざかな',p:100,img:'plate_small'},dango:{n:'おだんご',p:150,img:'plate_dango'},empty:{n:'からっぽ',p:0,img:'plate_empty'}};
+
+/* ---------- art ---------- */
+const IMG={};
+function loadImg(src){return new Promise(r=>{if(!src)return r(null);const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
+async function loadArt(){await Promise.all(Object.keys(ART).map(k=>loadImg(ART[k]).then(i=>{if(i)IMG[k]=i})))}
+
+/* ---------- audio ---------- */
+const AC=window.AudioContext||window.webkitAudioContext;
+let ac=null,master=null,bgmGain=null,bgmSrc=null,decoding=null;const BUF={};
+let muted=LS.get('amida-mute',false);
+function b64buf(u){const b=atob(u.split(',')[1]);const a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a.buffer}
+function audioInit(){if(ac||!AC)return;ac=new AC();master=ac.createGain();master.gain.value=muted?0:1;master.connect(ac.destination);bgmGain=ac.createGain();bgmGain.gain.value=.3;bgmGain.connect(master);
+  decoding=Promise.all(Object.keys(AUD).map(k=>new Promise((r,j)=>{const p=ac.decodeAudioData(b64buf(AUD[k]),r,j);if(p&&p.then)p.then(r,j)}).then(b=>{BUF[k]=b}).catch(()=>{})))}
+function unlock(){audioInit();if(ac&&ac.state==='suspended')ac.resume()}
+function snapRate(r){const st=12*Math.log2(r);let b=0;for(const a of [-12,-7,-5,0,5,7,12])if(Math.abs(a-st)<Math.abs(b-st))b=a;return Math.pow(2,b/12)}
+function sfx(k,vol=1,rate=1){if(!ac||!BUF[k]||muted)return;const s=ac.createBufferSource();s.buffer=BUF[k];s.playbackRate.value=snapRate(rate);const g=ac.createGain();g.gain.value=vol;s.connect(g);g.connect(master);s.start()}
+function bgm(on){if(!ac)return;if(on){if(bgmSrc||!BUF.bgm)return;bgmSrc=ac.createBufferSource();bgmSrc.buffer=BUF.bgm;bgmSrc.loop=true;bgmSrc.connect(bgmGain);bgmSrc.start()}else if(bgmSrc){try{bgmSrc.stop()}catch(e){}bgmSrc=null}}
+function duck(v,t=.25){if(bgmGain&&ac)bgmGain.gain.setTargetAtTime(v,ac.currentTime,t)}
+function setMute(m){muted=m;LS.set('amida-mute',m);if(master)master.gain.value=m?0:1;$('muteBtn').textContent=m?'♪ 音なし':'♪ 音あり'}
+
+/* ---------- state ---------- */
+function rnd(a,b){return a+Math.random()*(b-a)}
+function ri(a,b){return Math.floor(rnd(a,b+1))}
+const G={phase:'title',t:0,texts:[],rungs:[],X:[],plates:[],trail:[],marks:[]};
+function fresh(){return {phase:'play',t:0,score:0,lv:0,lives:3,N:4,X:[],rungs:[],plates:[],start:0,state:'look',stT:0,look:3,v:240,pencil:1,eraser:0,
+  cat:null,trail:[],marks:[],texts:[],say:'',sayT:0,endT:0,bigN:0,smallN:0,dangoN:0,emptyN:0,stepT:0,got:null}}
+function reset(){Object.assign(G,fresh());G.phase='title';hud()}
+function hud(){$('lvP').textContent=Math.min(G.lv+1,LEVELS)+' / '+LEVELS;$('scoreP').textContent=G.score+' てん'}
+function text(s,x,y,c,small){G.texts.push({s,x,y,c,small,t:0})}
+function say(s){G.say=s;G.sayT=1.6}
+
+/* ---------- ladder ---------- */
+function okAt(rungs,a,y,skip){if(y<TOP+34||y>BOT-34)return false;for(const r of rungs)if(r!==skip&&Math.abs(r.a-a)<=1&&Math.abs(r.y-y)<GAP)return false;return true}
+function trace(col,rungs){let y=-1;for(;;){let nx=null;for(const r of rungs)if((r.a===col||r.a+1===col)&&r.y>y&&(!nx||r.y<nx.y))nx=r;if(!nx)return col;y=nx.y;col=nx.a===col?col+1:nx.a}}
+function newLevel(){const L=G.lv;G.N=L<3?4:L<7?5:6;const N=G.N;G.X=[];for(let i=0;i<N;i++)G.X.push(N===1?360:130+460*i/(N-1));
+  for(let tries=0;tries<60;tries++){const rungs=[];const per=Math.min(5,2+Math.floor(L/3));
+    for(let a=0;a<N-1;a++){const n=per+ri(0,1);for(let k=0,t=0;k<n&&t<40;t++){const y=Math.round(rnd(TOP+50,BOT-50));if(okAt(rungs,a,y)){rungs.push({a,y,own:false});k++}}}
+    const s=ri(0,N-1),e0=trace(s,rungs);const reach=new Set();
+    for(let a=0;a<N-1;a++)for(let y=TOP+90;y<BOT-40;y+=10){if(!okAt(rungs,a,y))continue;const e=trace(s,rungs.concat([{a,y}]));if(e!==e0)reach.add(e)}
+    if(!reach.size)continue;const rr=[...reach],big=rr[ri(0,rr.length-1)];
+    const kinds=[];for(let i=0;i<N;i++)kinds.push(i===big?'big':i===e0?'empty':null);
+    const rest=['small'];if(L>=2&&Math.random()<.55)rest.push('dango');while(rest.length<N)rest.push(Math.random()<.5?'empty':'small');
+    rest.sort(()=>Math.random()-.5);for(let i=0;i<N;i++)if(!kinds[i])kinds[i]=rest.pop();
+    G.rungs=rungs;G.start=s;G.plates=kinds.map((k,i)=>({k,i,pop:0}));break}
+  G.pencil=L<4?1:2;G.eraser=L>=3?1:0;G.look=Math.max(1.6,3-L*.12);G.v=Math.min(380,240+L*13);
+  G.cat={col:G.start,x:G.X[G.start],y:TOP-56,mode:'sit',to:0,bob:0};G.trail=[[G.cat.x,TOP]];G.marks=[];G.state='look';G.stT=0;G.got=null;hud()}
+
+/* ---------- input: tap between two lines = draw a rung, tap a rung = undo / erase ---------- */
+function canEdit(){return G.phase==='play'&&(G.state==='look'||G.state==='walk')}
+function aheadY(){return G.state==='walk'?G.cat.y+56:TOP+34}
+function tapAt(x,y){if(!canEdit())return false;const X=G.X;
+  // touch an existing rung?
+  let hit=null,hd=1e9;for(const r of G.rungs){if(x<X[r.a]-6||x>X[r.a+1]+6)continue;const d=Math.abs(r.y-y);if(d<26&&d<hd){hit=r;hd=d}}
+  if(hit){if(hit.y<=aheadY()||hit.used){nope(x,y,'もう とおったよ');return false}
+    if(hit.own){G.rungs.splice(G.rungs.indexOf(hit),1);G.pencil++;sfx('erase',.6);text('けした',x,y-40,'#fff',true);return true}
+    if(G.eraser>0){G.rungs.splice(G.rungs.indexOf(hit),1);G.eraser--;sfx('erase',.7);G.marks.push({x0:X[hit.a],x1:X[hit.a+1],y:hit.y,t:0});text('けしゴム！',x,y-40,'#fff',true);return true}
+    nope(x,y,G.lv>=3?'けしゴムは つかったよ':'えんぴつの せんだけ けせるよ');return false}
+  let a=-1;for(let i=0;i<X.length-1;i++)if(x>X[i]+8&&x<X[i+1]-8)a=i;if(a<0||y<TOP-10||y>BOT+10)return false;
+  y=Math.round(Math.max(TOP+34,Math.min(BOT-34,y)));
+  if(G.pencil<=0){nope(x,y,'えんぴつは もう ないよ');return false}
+  if(y<=aheadY()){nope(x,y,'ねこより したに かいてね');return false}
+  if(!okAt(G.rungs,a,y)){nope(x,y,'ほかの せんに ちかすぎ');return false}
+  G.rungs.push({a,y,own:true,t:0});G.pencil--;sfx('draw',.7);return true}
+function nope(x,y,m){sfx('no',.5);text(m,x,y-40,'#ffd0c0',true)}
+
+/* ---------- flow ---------- */
+function step(dt){
+  G.t+=dt;G.stT+=dt;G.sayT=Math.max(0,G.sayT-dt);for(const r of G.rungs)if(r.own&&r.t<1)r.t+=dt*5;for(const m of G.marks)m.t+=dt;
+  if(G.phase!=='play'){if(G.phase==='end'){G.endT+=dt;if(G.endT>1.4&&$('resultOv').hidden)showResult()}return}
+  const c=G.cat;
+  if(G.state==='look'){const k=Math.ceil(G.look-G.stT),k0=Math.ceil(G.look-G.stT+dt);if(k!==k0&&k>0)sfx('turn',.5,1.5);if(G.stT>=G.look){G.state='walk';G.stT=0;c.mode='down';sfx('start',.5)}}
+  else if(G.state==='walk'){let d=G.v*dt;c.bob+=dt*12;G.stepT-=dt;if(G.stepT<=0){G.stepT=.32;sfx('step',.32,1+Math.random()*.1)}
+    while(d>0){if(c.mode==='down'){const y0=Math.max(c.y,TOP-1);let nx=null;for(const r of G.rungs)if((r.a===c.col||r.a+1===c.col)&&r.y>y0&&r.y<=y0+d&&(!nx||r.y<nx.y))nx=r;
+        if(c.y<TOP){const k=Math.min(d,TOP-c.y);c.y+=k;d-=k;continue}
+        if(nx){d-=nx.y-c.y;c.y=nx.y;nx.used=true;G.trail.push([c.x,c.y]);c.to=nx.a===c.col?c.col+1:nx.a;c.mode='across';sfx('turn',.45)}
+        else{const k=Math.min(d,BOT-c.y);c.y+=k;d-=k;if(c.y>=BOT){G.trail.push([c.x,BOT]);c.mode='plate';d=0}}}
+      else if(c.mode==='across'){const tx=G.X[c.to],k=Math.min(d,Math.abs(tx-c.x));c.x+=Math.sign(tx-c.x)*k;d-=k;if(Math.abs(tx-c.x)<.01){c.x=tx;c.col=c.to;G.trail.push([c.x,c.y]);c.mode='down'}}
+      else{const k=Math.min(d,PLY-60-c.y);c.y+=k;d-=k;if(c.y>=PLY-60.5){arrive();d=0}}}}
+  else if(G.state==='eat'){if(G.stT>1.7){if(G.lives<=0||G.lv+1>=LEVELS)finish();else{G.lv++;newLevel();text((G.lv+1)+'まいめ',360,620,'#fff')}}}}
+function arrive(){const p=G.plates[G.cat.col],K=KIND[p.k];G.state='eat';G.stT=0;G.got=p;p.pop=1;let pts=K.p;
+  if(p.k==='big'){pts+=20*G.lv;G.bigN++;sfx('yum',.7);sfx('levelup',.55);say(['ごちそう！','おおきい〜','にゃ〜ん'][G.bigN%3])}
+  else if(p.k==='small'){G.smallN++;sfx('yum',.6);say('ちいさい…')}
+  else if(p.k==='dango'){G.dangoN++;if(G.lives<3)G.lives++;sfx('yum',.6,1.5);say('おだんご！')}
+  else{G.emptyN++;G.lives--;sfx('empty',.6);say('からっぽ…')}
+  G.score+=pts;text(pts?`${K.n} +${pts}`:'からっぽ…',360,PLY-150,p.k==='big'?'#ffe27a':'#fff');if(p.k==='dango'&&G.lives<=3)text('ハート +1',360,PLY-200,'#ffd0c0',true);hud()}
+function finish(){if(G.phase!=='play')return;G.phase='end';G.endT=0;duck(.08,.2);sfx('over',.7)}
+function rank(n){return n>=4200?'あみだ めいじん':n>=3200?'よこせん マイスター':n>=2200?'さかな さがしの たつじん':n>=1200?'てくてく あんないがかり':'はじめての あみだくじ'}
+function showResult(){const n=G.score,best=LS.get('amida-best',0),nb=n>best;if(nb){LS.set('amida-best',n);if(n>0)sfx('best',.6)}
+  $('resHead').textContent=G.lives>0?'12まい ぜんぶ クリア！':(G.lv+1)+'まいめで おしまい';
+  $('resScore').textContent=n+' てん';$('rBig').textContent=G.bigN;$('rSmall').textContent=G.smallN;$('rDango').textContent=G.dangoN;$('resRank').textContent=rank(n);
+  $('resNote').innerHTML=(nb&&n>0?'ベスト更新！<br>':'')+(G.bigN>=10?'ねこは おなか いっぱい。おみごと！':'ねこの いる せんから したへ ゆびで たどってみて。よこせんに ぶつかったら まがるよ。');
+  $('shareBtn').href='https://twitter.com/intent/tweet?text='+encodeURIComponent(`ねこの あみだくじ🐟 ${n}てん（おおきな さかな ${G.bigN}/12）「${rank(n)}」\n#ねこのあみだくじ #picoruno`)+'&url='+encodeURIComponent('https://picoruno.com/amida.html');
+  $('resultOv').hidden=false;bgm(false);refreshTitle()}
+
+/* ---------- draw ---------- */
+const cv=$('cv'),ctx=cv.getContext('2d');let CW=0,CH=0,DPR=1,S=1,OX=0,OY=0;
+function resize(){DPR=Math.min(devicePixelRatio||1,2.5);const r=cv.getBoundingClientRect();CW=r.width;CH=r.height;cv.width=Math.round(CW*DPR);cv.height=Math.round(CH*DPR);
+  S=Math.min(CW/W0,Math.max(CH/H0,CW/W0*.92));OX=(CW-W0*S)/2;OY=(CH-H0*S)*.5}
+function outlineText(c,s,x,y,sz,fill,lw){c.font=`${sz}px "Dela Gothic One",sans-serif`;c.lineJoin='round';c.lineWidth=lw||sz*.28;c.strokeStyle='#4a2c1d';c.strokeText(s,x,y);c.fillStyle=fill;c.fillText(s,x,y)}
+function pencilLine(c,x0,y0,x1,y1,col,w){c.strokeStyle=col;c.lineWidth=w;c.lineCap='round';c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke()}
+function drawPencil(c,x,y,k){c.save();c.translate(x,y);c.rotate(-.5);c.scale(k,k);c.strokeStyle='#4a2c1d';c.lineWidth=3;c.fillStyle='#f2c14e';c.beginPath();c.rect(-26,-7,40,14);c.fill();c.stroke();
+  c.fillStyle='#f4dcb0';c.beginPath();c.moveTo(14,-7);c.lineTo(28,0);c.lineTo(14,7);c.closePath();c.fill();c.stroke();c.fillStyle='#d8603a';c.beginPath();c.moveTo(23,-2.5);c.lineTo(28,0);c.lineTo(23,2.5);c.fill();c.restore()}
+function drawEraser(c,x,y,k){c.save();c.translate(x,y);c.rotate(-.3);c.scale(k,k);c.strokeStyle='#4a2c1d';c.lineWidth=3;c.fillStyle='#f4a8b8';c.beginPath();c.roundRect(-20,-11,40,22,4);c.fill();c.stroke();c.fillStyle='#fff';c.fillRect(-6,-9.5,12,19);c.restore()}
+function draw(dt){
+  const c=ctx;c.setTransform(DPR,0,0,DPR,0,0);c.fillStyle='#c89868';c.fillRect(0,0,CW,CH);
+  c.save();c.translate(OX,OY);c.scale(S,S);
+  if(IMG.bg)c.drawImage(IMG.bg,0,0,W0,H0);else{c.fillStyle='#efe6d2';c.fillRect(40,120,640,1008)}
+  if(G.phase!=='title'&&G.X.length){const X=G.X,N=G.N,ps=N>=6?92:N>=5?104:116;
+    // walked trail
+    if(G.trail.length){c.strokeStyle='rgba(242,193,78,.75)';c.lineWidth=18;c.lineCap='round';c.lineJoin='round';c.beginPath();c.moveTo(G.trail[0][0],G.trail[0][1]);for(const p of G.trail)c.lineTo(p[0],p[1]);if(G.cat)c.lineTo(G.cat.x,Math.max(TOP,Math.min(BOT,G.cat.y)));c.stroke()}
+    for(let i=0;i<N;i++)pencilLine(c,X[i],TOP,X[i],BOT,'#5a5560',6);
+    for(const r of G.rungs){const x0=X[r.a],x1=X[r.a+1];if(r.own){const k=Math.min(1,r.t||0);pencilLine(c,x0,r.y,x0+(x1-x0)*k,r.y,'#d8603a',7)}else pencilLine(c,x0,r.y,x1,r.y,'#5a5560',6)}
+    for(const m of G.marks)if(m.t<.6){c.globalAlpha=1-m.t/.6;pencilLine(c,m.x0,m.y,m.x1,m.y,'#5a5560',6);c.globalAlpha=1}
+    // plates
+    for(const p of G.plates){const x=X[p.i],im=IMG[KIND[p.k].img],k=1+(p.pop?Math.sin(Math.min(1,G.stT*3)*Math.PI)*.15:0),s=ps*k;
+      pencilLine(c,x,BOT,x,PLY-ps*.42,'#5a5560',6);if(im)c.drawImage(im,x-s/2,PLY-s/2,s,s);else{c.fillStyle='#fff';c.beginPath();c.arc(x,PLY,s/2.3,0,7);c.fill()}}
+    // start mark
+    if(G.state==='look'){const x=X[G.start];c.fillStyle='#d8603a';c.beginPath();c.moveTo(x-14,TOP-6);c.lineTo(x+14,TOP-6);c.lineTo(x,TOP+12);c.closePath();c.fill()}
+    // cat
+    if(G.cat){const ct=G.cat,sz=N>=6?84:96,b=G.state==='walk'?Math.abs(Math.sin(ct.bob))*6:0,yy=Math.min(ct.y,PLY-60);if(IMG.cat)c.drawImage(IMG.cat,ct.x-sz/2,yy-sz*.62-b,sz,sz);else{c.fillStyle='#fff';c.beginPath();c.arc(ct.x,yy-20,30,0,7);c.fill()}}
+    // countdown
+    if(G.state==='look'&&G.phase==='play'){const k=Math.ceil(G.look-G.stT);c.save();c.textAlign='center';c.textBaseline='middle';const bx=Math.min(620,G.X[G.start]+92);c.fillStyle='#fffaf2';c.strokeStyle='#4a2c1d';c.lineWidth=4;c.beginPath();c.arc(bx,TOP-62,34,0,7);c.fill();c.stroke();outlineText(c,String(Math.max(1,k)),bx,TOP-58,46,'#d8603a',0.01);c.restore()}}
+  // bottom row: hearts, pencil, eraser
+  if(G.phase!=='title'){c.save();for(let i=0;i<3;i++){c.globalAlpha=i<G.lives?1:.22;heart(c,100+i*58,1196,1)}c.globalAlpha=1;drawPencil(c,440,1196,1.2);c.textAlign='left';c.textBaseline='middle';outlineText(c,'×'+G.pencil,480,1198,34,G.pencil?'#fff':'#c8b8a8',8);
+    if(G.lv>=3){drawEraser(c,580,1196,1.1);outlineText(c,'×'+G.eraser,612,1198,34,G.eraser?'#fff':'#c8b8a8',8)}c.restore()}
+  if(G.sayT>0&&G.cat){c.save();c.globalAlpha=Math.min(1,G.sayT*4);const x=Math.max(130,Math.min(590,G.cat.x)),y=PLY-200-60;c.translate(x,y);c.fillStyle='#fffaf2';c.strokeStyle='#4a2c1d';c.lineWidth=4;c.beginPath();c.roundRect(-96,-30,192,56,22);c.fill();c.stroke();
+    c.textAlign='center';c.textBaseline='middle';c.fillStyle='#4a2c1d';c.font='26px "Dela Gothic One",sans-serif';c.fillText(G.say,0,-2);c.restore()}
+  for(let i=G.texts.length-1;i>=0;i--){const x=G.texts[i];x.t+=dt;if(x.t>1.3){G.texts.splice(i,1);continue}
+    c.save();const sz=x.small?28:38;c.textAlign='center';c.textBaseline='middle';c.translate(Math.max(170,Math.min(W0-170,x.x)),x.y-x.t*24);c.globalAlpha=x.t>1?(1.3-x.t)/.3:1;outlineText(c,x.s,0,0,sz,x.c);c.restore()}
+  if(G.phase==='play'){const hint=G.state==='look'?(G.lv===0?'せんの あいだを タップして よこせんを かこう':'おおきな さかなへの みちを かこう'):G.state==='walk'?'あるいている あいだも かけるよ':'';if(hint){c.save();c.textAlign='center';outlineText(c,hint,360,166,25,'#fff',8);c.restore()}}
+  c.restore()}
+function heart(c,x,y,k){c.save();c.translate(x,y);c.scale(k,k);c.fillStyle='#d8603a';c.strokeStyle='#4a2c1d';c.lineWidth=3.5;c.beginPath();c.moveTo(0,16);c.bezierCurveTo(-30,-4,-16,-26,0,-10);c.bezierCurveTo(16,-26,30,-4,0,16);c.closePath();c.fill();c.stroke();c.restore()}
+let last=performance.now();
+function frame(n){const dt=Math.min(.033,(n-last)/1000);last=n;if(G.phase!=='pause'&&G.phase!=='title')step(dt);draw(G.phase==='pause'?0:dt);requestAnimationFrame(frame)}
+
+function toGame(e){const r=cv.getBoundingClientRect();return [(e.clientX-r.left-OX)/S,(e.clientY-r.top-OY)/S]}
+cv.addEventListener('pointerdown',e=>{e.preventDefault();unlock();if(G.phase!=='play')return;const [x,y]=toGame(e);tapAt(x,y)},{passive:false});
+function start(){unlock();guardHistory();for(const id of ['titleOv','resultOv','pauseOv'])$(id).hidden=true;Object.assign(G,fresh());newLevel();hud();
+  if(ac)Promise.resolve(decoding).then(()=>{duck(.3,.01);bgm(true)});pingPlay()}
+function pause(on){if(on){if(G.phase!=='play')return;G.phase='pause';$('pauseOv').hidden=false;if(ac)ac.suspend()}else{if(G.phase!=='pause')return;$('pauseOv').hidden=true;G.phase='play';last=performance.now();if(ac)ac.resume()}}
+function toTitle(){bgm(false);reset();for(const id of ['pauseOv','resultOv'])$(id).hidden=true;$('titleOv').hidden=false;refreshTitle();if(ac&&ac.state==='suspended')ac.resume()}
+function refreshTitle(){const b=LS.get('amida-best',0);$('bestLine').textContent=b?`ベスト ${b}てん`:''}
+$('startBtn').onclick=start;$('againBtn').onclick=start;
+$('pauseBtn').onclick=()=>pause(true);$('resumeBtn').onclick=()=>pause(false);$('quitBtn').onclick=toTitle;
+$('muteBtn').onclick=()=>{unlock();setMute(!muted)};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pause(true)});
+let guarded=false;function guardHistory(){if(guarded)return;try{history.pushState({amida:1},'');guarded=true}catch(e){}}
+window.addEventListener('popstate',()=>{if(!guarded)return;guarded=false;if(G.phase==='play'){pause(true);guardHistory()}});
+document.addEventListener('touchstart',e=>{const x=e.touches[0].clientX;if(G.phase==='play'&&(x<24||x>innerWidth-24))e.preventDefault()},{passive:false});
+window.addEventListener('resize',resize);
+setMute(muted);refreshTitle();resize();reset();loadArt();requestAnimationFrame(frame);
+window.__T={G,tapAt,trace,okAt,TOP,BOT};
+</script>
+<script>
+function pingPlay(){
+  var G="ねこの あみだくじ", K="picoruno-played:"+G;
+  try{ if(sessionStorage.getItem(K)) return; sessionStorage.setItem(K,"1"); }catch(e){}
+  var KEY="sb_publishable_5hbtIPW-1y5MqsoiLC6X_A_oZMG0Z5Z";
+  fetch("https://fymwlpbspigpeaoenhhp.supabase.co/rest/v1/rpc/add_play",{method:"POST",keepalive:true,
+    headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify({g:G})})
+  .then(function(r){ if(!r.ok) throw 0; })
+  .catch(function(){ try{ var d=JSON.parse(localStorage.getItem("picoruno-stats")||"{}"); d[G]=d[G]||{plays:0,likes:0}; d[G].plays++; localStorage.setItem("picoruno-stats",JSON.stringify(d)); }catch(e){} });
+}
+</script>
+</body>
+</html>
