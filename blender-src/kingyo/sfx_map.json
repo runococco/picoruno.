@@ -1,0 +1,5 @@
+{"key": [2, 4, 7, 9, 11], "sounds": {
+ "dip": ["uisfx:organic/drop", 0], "plop": ["uisfx:zen/drop", 0],
+ "catch": ["kenney:interface-sounds__drop_003.ogg", -1], "big": ["kenney:impact-sounds__impactGlass_medium_000.ogg", -3],
+ "tear": ["kenney:interface-sounds__scratch_004.ogg", 0], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2],
+ "slip": ["kenney:impact-sounds__impactSoft_medium_000.ogg", 0]}}

@@ -1,7 +1,14 @@
 # Sound effects source
 
-Unmodified CC0 1.0 sounds from the UI SFX library (https://github.com/romainsimon/uisfx, commit 2001f3d), via npm `@wubbleai/community-sfx@0.1.0`. No attribution or fee required.
+Effects are CC0 1.0 (public domain) sounds: Kenney sound packs (https://kenney.nl, mirrored in github.com/series-ai/jam-ready-assets)
+and the UI SFX library (github.com/romainsimon/uisfx via npm `@wubbleai/community-sfx`). No attribution or fee required.
+Pitched sounds are tuned by `common/sfxbuild.py` to the nearest note of the BGM key (F G A C D) so they never clash with the music.
 
-tick=organic/typing, tear=organic/snap, perfect=glass/reward, start=organic/start, plate and next: marimba and wood block played with FluidSynth + FluidR3_GM (MIT), see sfx.py
+| file | pack | original | change |
+|---|---|---|---|
+| tick.mp3 | Kenney Ui Audio | click3.ogg | unpitched / unchanged |
+| tear.mp3 | Kenney Rpg Audio | cloth3.ogg | unpitched / unchanged |
+| perfect.mp3 | Kenney Impact Sounds | impactGlass_medium_004.ogg | pitched -0.34 semitones |
+| start.mp3 | Kenney Interface Sounds | confirmation_001.ogg | pitched +0.02 semitones |
 
-BGM and jingles: original (music.py), FluidSynth + FluidR3_GM (MIT).
+plate.mp3 and next.mp3: marimba and wood block played with FluidSynth + FluidR3_GM (MIT), see sfx.py.

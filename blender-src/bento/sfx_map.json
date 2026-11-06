@@ -1,0 +1,6 @@
+{"key": [5, 7, 9, 0, 2], "sounds": {
+ "pick": ["kenney:ui-audio__rollover2.ogg", -2], "place": ["kenney:impact-sounds__impactWood_light_003.ogg", 0],
+ "place2": ["kenney:impact-sounds__impactWood_light_001.ogg", 0], "turn": ["kenney:ui-audio__click3.ogg", -2],
+ "bad": ["kenney:impact-sounds__impactSoft_medium_001.ogg", 0], "lid": ["kenney:impact-sounds__impactWood_medium_002.ogg", 0],
+ "start": ["kenney:interface-sounds__confirmation_001.ogg", -2], "hint": ["kenney:interface-sounds__glass_006.ogg", -3],
+ "drop": ["kenney:impact-sounds__impactSoft_medium_003.ogg", 0]}}

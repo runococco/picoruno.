@@ -1,21 +1,17 @@
 # Sound effects source
 
-All files in this folder are unmodified CC0 1.0 (public domain) sounds from the UI SFX library
-(https://github.com/romainsimon/uisfx, commit 2001f3dac2d1cf86ad99cbad5cef222c3a8b9082),
-taken from the npm package `@wubbleai/community-sfx@0.1.0` (catalog/sounds/...).
-No attribution or licence fee is required. See LICENSE-AUDIO.txt.
+Effects are CC0 1.0 (public domain) sounds: Kenney sound packs (https://kenney.nl, mirrored in github.com/series-ai/jam-ready-assets)
+and the UI SFX library (github.com/romainsimon/uisfx via npm `@wubbleai/community-sfx`). No attribution or fee required.
+Pitched sounds are tuned by `common/sfxbuild.py` to the nearest note of the BGM key (F G A C D) so they never clash with the music.
 
-| file | original |
-|---|---|
-| pick.mp3 | rubber/select.mp3 |
-| place.mp3 | organic/drop.mp3 |
-| place2.mp3 | rubber/drop.mp3 |
-| turn.mp3 | rubber/swipe.mp3 |
-| bad.mp3 | organic/invalid-drop.mp3 |
-| lid.mp3 | organic/close.mp3 |
-| start.mp3 | organic/start.mp3 |
-| hint.mp3 | organic/reward.mp3 |
-| drop.mp3 | rubber/snap.mp3 |
-
-BGM and jingles (../audio) are original compositions (music.py) rendered with FluidSynth
-using the FluidR3_GM soundfont (MIT licence).
+| file | pack | original | change |
+|---|---|---|---|
+| pick.mp3 | Kenney Ui Audio | rollover2.ogg | unpitched / unchanged |
+| place.mp3 | Kenney Impact Sounds | impactWood_light_003.ogg | pitched +0.18 semitones |
+| place2.mp3 | Kenney Impact Sounds | impactWood_light_001.ogg | pitched +0.25 semitones |
+| turn.mp3 | Kenney Ui Audio | click3.ogg | unpitched / unchanged |
+| bad.mp3 | Kenney Impact Sounds | impactSoft_medium_001.ogg | pitched -0.39 semitones |
+| lid.mp3 | Kenney Impact Sounds | impactWood_medium_002.ogg | pitched +0.44 semitones |
+| start.mp3 | Kenney Interface Sounds | confirmation_001.ogg | pitched +0.02 semitones |
+| hint.mp3 | Kenney Interface Sounds | glass_006.ogg | pitched -0.69 semitones |
+| drop.mp3 | Kenney Impact Sounds | impactSoft_medium_003.ogg | pitched +0.48 semitones |

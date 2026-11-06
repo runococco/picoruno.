@@ -142,7 +142,8 @@ let decoding=null;
 function audioInit(){if(ac||!AC)return;ac=new AC();master=ac.createGain();master.gain.value=muted?0:1;master.connect(ac.destination);musicGain=ac.createGain();musicGain.gain.value=.5;musicGain.connect(master);
   decoding=Promise.all(Object.keys(AUD).map(k=>new Promise((r,j)=>{const p=ac.decodeAudioData(b64buf(AUD[k]),r,j);if(p&&p.then)p.then(r,j)}).then(b=>{BUF[k]=b}).catch(()=>{})))}
 function unlock(){audioInit();if(ac&&ac.state==='suspended')ac.resume()}
-function sfx(k,vol=1,rate=1){if(!ac||!BUF[k]||muted)return;const s=ac.createBufferSource();s.buffer=BUF[k];s.playbackRate.value=rate;const g=ac.createGain();g.gain.value=vol;s.connect(g);g.connect(master);s.start()}
+function snapRate(r){/* keep pitched effects in the music's key: only octave/4th/5th shifts */const st=12*Math.log2(r);let b=0;for(const a of [-12,-7,-5,0,5,7,12])if(Math.abs(a-st)<Math.abs(b-st))b=a;return Math.pow(2,b/12)}
+function sfx(k,vol=1,rate=1){rate=snapRate(rate);if(!ac||!BUF[k]||muted)return;const s=ac.createBufferSource();s.buffer=BUF[k];s.playbackRate.value=rate;const g=ac.createGain();g.gain.value=vol;s.connect(g);g.connect(master);s.start()}
 function bgm(on){if(bgmSrc){try{bgmSrc.stop()}catch(e){}bgmSrc=null}if(!on||!ac)return;const go=()=>{if(!BUF.bgm||bgmSrc)return;bgmSrc=ac.createBufferSource();bgmSrc.buffer=BUF.bgm;bgmSrc.loop=true;bgmSrc.connect(musicGain);bgmSrc.start()};if(BUF.bgm)go();else if(decoding)decoding.then(()=>{if(G.phase!=='title')go()})}
 function setMute(m){muted=m;LS.set('mikan-mute',m);if(master)master.gain.value=m?0:1;$('muteBtn').textContent=m?'♪ 音なし':'♪ 音あり'}
 

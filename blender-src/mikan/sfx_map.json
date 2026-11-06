@@ -1,0 +1,4 @@
+{"key": [5, 7, 9, 0, 2], "sounds": {
+ "tick": ["kenney:ui-audio__click3.ogg", -4], "tear": ["kenney:rpg-audio__cloth3.ogg", 0],
+ "perfect": ["kenney:impact-sounds__impactGlass_medium_004.ogg", -3], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "plate.mp3 and next.mp3: marimba and wood block played with FluidSynth + FluidR3_GM (MIT), see sfx.py."}

@@ -1,0 +1,5 @@
+{"key": [9, 2, 4], "sounds": {
+ "chime": ["kenney:impact-sounds__impactGlass_medium_002.ogg", -2], "crack1": ["kenney:ui-audio__click4.ogg", -2],
+ "crack2": ["kenney:ui-audio__click5.ogg", -2], "drop": ["kenney:impact-sounds__impactSoft_medium_002.ogg", 0],
+ "done": ["kenney:impact-sounds__impactGlass_medium_000.ogg", -3], "start": ["kenney:rpg-audio__knifeSlice2.ogg", -4],
+ "phase": ["kenney:interface-sounds__glass_002.ogg", -4]}}

@@ -1,7 +1,15 @@
 # Sound effects source
 
-Unmodified CC0 1.0 sounds from the UI SFX library (https://github.com/romainsimon/uisfx, commit 2001f3d), via npm `@wubbleai/community-sfx@0.1.0`. No attribution or fee required.
+Effects are CC0 1.0 (public domain) sounds: Kenney sound packs (https://kenney.nl, mirrored in github.com/series-ai/jam-ready-assets)
+and the UI SFX library (github.com/romainsimon/uisfx via npm `@wubbleai/community-sfx`). No attribution or fee required.
+Pitched sounds are tuned by `common/sfxbuild.py` to the nearest note of the BGM key (D E G A B) so they never clash with the music.
 
-dip=organic/drop, plop=zen/drop, catch=soft/success, big=glass/reward, tear=organic/delete, start=organic/start, slip=rubber/press
-
-BGM, finish and rare jingles: original (music.py), FluidSynth + FluidR3_GM (MIT).
+| file | pack | original | change |
+|---|---|---|---|
+| dip.mp3 | UI SFX library | organic/drop | pitched -0.97 semitones |
+| plop.mp3 | UI SFX library | zen/drop | pitched -1.48 semitones |
+| catch.mp3 | Kenney Interface Sounds | drop_003.ogg | pitched +1.02 semitones |
+| big.mp3 | Kenney Impact Sounds | impactGlass_medium_000.ogg | pitched -0.39 semitones |
+| tear.mp3 | Kenney Interface Sounds | scratch_004.ogg | unpitched / unchanged |
+| start.mp3 | Kenney Interface Sounds | confirmation_001.ogg | pitched +0.02 semitones |
+| slip.mp3 | Kenney Impact Sounds | impactSoft_medium_000.ogg | pitched +0.79 semitones |

@@ -269,7 +269,8 @@ function audioInit(){
   for(const k in AUD){new Promise((r,j)=>{const p=ac.decodeAudioData(b64buf(AUD[k]),r,j);if(p&&p.then)p.then(r,j)}).then(b=>{BUF[k]=b;if(k==='bgm'&&wantBgm)bgmStart()}).catch(()=>{})}
 }
 function unlock(){audioInit();if(ac&&ac.state==='suspended')ac.resume()}
-function sfx(k,vol=1,rate=1){if(!ac||!BUF[k]||muted)return;const s=ac.createBufferSource();s.buffer=BUF[k];s.playbackRate.value=rate;const g=ac.createGain();g.gain.value=vol;s.connect(g);g.connect(master);s.start()}
+function snapRate(r){/* keep pitched effects in the music's key: only octave/4th/5th shifts */const st=12*Math.log2(r);let b=0;for(const a of [-12,-7,-5,0,5,7,12])if(Math.abs(a-st)<Math.abs(b-st))b=a;return Math.pow(2,b/12)}
+function sfx(k,vol=1,rate=1){rate=snapRate(rate);if(!ac||!BUF[k]||muted)return;const s=ac.createBufferSource();s.buffer=BUF[k];s.playbackRate.value=rate;const g=ac.createGain();g.gain.value=vol;s.connect(g);g.connect(master);s.start()}
 function bgmStart(){wantBgm=true;if(!ac||!BUF.bgm||bgmSrc)return;bgmSrc=ac.createBufferSource();bgmSrc.buffer=BUF.bgm;bgmSrc.loop=true;bgmSrc.connect(bgmGain);bgmSrc.start()}
 function bgmStop(){wantBgm=false;if(bgmSrc){try{bgmSrc.stop()}catch(e){}bgmSrc=null}}
 function duck(sec){if(!ac)return;const t=ac.currentTime;bgmGain.gain.cancelScheduledValues(t);bgmGain.gain.setTargetAtTime(.1,t,.05);bgmGain.gain.setTargetAtTime(.45,t+sec,.5)}

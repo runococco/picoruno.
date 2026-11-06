@@ -1,0 +1,5 @@
+{"key": [0, 2, 4, 7, 9], "sounds": {
+ "on": ["kenney:interface-sounds__toggle_001.ogg", -1], "off": ["kenney:ui-audio__switch9.ogg", -1],
+ "spark": ["kenney:impact-sounds__impactGlass_light_000.ogg", -4], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2],
+ "undo": ["kenney:interface-sounds__back_003.ogg", -1], "retry": ["kenney:rpg-audio__bookFlip3.ogg", 0],
+ "hint": ["kenney:interface-sounds__glass_006.ogg", -3]}}
