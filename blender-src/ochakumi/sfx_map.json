@@ -1,0 +1,5 @@
+{"key": [9, 0, 2, 4, 7], "sounds": {
+ "drip": ["uisfx:zen/drop", -2], "plop": ["uisfx:organic/drop", -2],
+ "spill": ["kenney:impact-sounds__impactSoft_medium_001.ogg", -2], "pick": ["kenney:impact-sounds__impactPlate_light_000.ogg", -6],
+ "set": ["kenney:impact-sounds__impactPlate_light_002.ogg", -4], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM, jingles (clear / finish / just) and the pouring loop: original (music.py), FluidSynth + FluidR3_GM (MIT)."}

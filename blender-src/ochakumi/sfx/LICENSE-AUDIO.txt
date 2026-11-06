@@ -1,0 +1,2 @@
+All sound effects here are CC0 1.0 Universal (public domain dedication): https://creativecommons.org/publicdomain/zero/1.0/
+Sources: Kenney (kenney.nl) and the UI SFX library (github.com/romainsimon/uisfx).
