@@ -1,0 +1,4 @@
+{"key": [2, 4, 6, 9, 11], "sounds": {
+ "shave": ["kenney:impact-sounds__footstep_snow_001.ogg", -4], "drip": ["uisfx:glass/drop", -10], "pick": ["kenney:impact-sounds__impactGlass_light_001.ogg", -4],
+ "crumble": ["kenney:impact-sounds__impactSoft_heavy_002.ogg", -2], "meow": ["uisfx:rubber/notification", -8], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (thanks / great / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
