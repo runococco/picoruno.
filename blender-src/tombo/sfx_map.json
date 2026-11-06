@@ -1,0 +1,5 @@
+{"key": [2, 4, 6, 9, 11], "sounds": {
+ "flee": ["kenney:rpg-audio__cloth1.ogg", -4], "flee2": ["kenney:rpg-audio__cloth3.ogg", -4],
+ "swish": ["uisfx:soft/swipe", -8], "cage": ["kenney:rpg-audio__bookClose.ogg", -4],
+ "land": ["uisfx:soft/drop", -10], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (catch / dizzy / rare / finish): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
