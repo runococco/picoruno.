@@ -1,0 +1,5 @@
+out/
+shots/
+audio/*.wav
+audio/*.mid
+*.log
