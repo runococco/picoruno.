@@ -1,0 +1,4 @@
+{"key": [0, 2, 4, 7, 9], "sounds": {
+ "shoot": ["uisfx:organic/release", -2], "hit": ["kenney:impact-sounds__impactPlank_medium_000.ogg", -2], "thud": ["kenney:impact-sounds__impactSoft_heavy_001.ogg", -2],
+ "cloth": ["kenney:rpg-audio__cloth2.ogg", -4], "load": ["kenney:interface-sounds__click_002.ogg", -6], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (get / gold / last / over): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
