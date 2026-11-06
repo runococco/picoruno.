@@ -204,7 +204,9 @@ function genAhead(){
     if(rnd()<.8){const sx=x0+rnd()*len*.6,sy=2.5+rnd()*6,m=4+Math.floor(rnd()*3),arc=(rnd()-.4)*2.4;
       for(let i=0;i<m;i++)G.stars.push({x:sx+i*.85,y:Math.min(CEIL-1,sy+Math.sin(i/(m-1)*Math.PI)*arc),got:0})}
     // hot-air balloon (from 60 m)
-    if(x0>60&&rnd()<Math.min(.55,.15+d*.08)){G.balloons.push({x:x0+len*rnd(),y:4+rnd()*6,ph:rnd()*6,amp:.6+rnd()*1.2})}
+    if(x0>60&&rnd()<Math.min(.5,.15+d*.07)){const bx=x0+len*(.25+.5*rnd());
+      // always leave a wide gap under it: no ground obstacle right below, gentle bobbing
+      G.obs=G.obs.filter(o=>o.deco||Math.abs(o.x-bx)>3);G.balloons.push({x:bx,y:5.6+rnd()*3,ph:rnd()*6,amp:.25+rnd()*.45})}
     G.nextX+=len;
   }
   // drop things far behind
@@ -254,8 +256,8 @@ function step(dt){
   let hit=P.y<=.2;
   for(const o of G.obs){if(o.deco)continue;const b=obsBox(o);if(tipX>b.x0&&P.x-.4<b.x1&&yb<b.y1)hit=true}
   for(const b of G.balloons){const by=b.y+Math.sin(G.t*.8+b.ph)*b.amp;const s=size('balloon');
-    if(Math.abs(P.x-b.x)<s.w*.38&&P.y>by+s.h*.35&&P.y<by+s.h*.95)hit=true;
-    if(Math.abs(P.x-b.x)<.25&&P.y>by&&P.y<by+s.h*.35)hit=true}
+    if(Math.abs(P.x-b.x)<s.w*.3&&P.y>by+s.h*.4&&P.y<by+s.h*.9)hit=true;
+    if(Math.abs(P.x-b.x)<.18&&P.y>by+.1&&P.y<by+s.h*.3)hit=true}
   if(hit)crash();
   // milestones
   const m=Math.floor(P.x/100);if(m>G.mile){G.mile=m;sfx('mile',.7);G.pop={txt:m*100+'m!',t:0}}

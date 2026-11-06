@@ -1,7 +1,5 @@
 # Sound effects source
 
-Unmodified CC0 1.0 sounds from the UI SFX library (https://github.com/romainsimon/uisfx, commit 2001f3d), via npm `@wubbleai/community-sfx@0.1.0`. No attribution or fee required.
-
-star=soft/reward, wind=soft/swipe, crash=organic/blocked, start=organic/start, mile=organic/streak, tap=rubber/select
+All sound effects are played on General MIDI instruments (celesta, glockenspiel, seashore/breath noise, harp, taiko, wood block, tubular bells) from the FluidR3_GM soundfont (MIT licence) and rendered with FluidSynth by `sfx.py`. No attribution or fee required.
 
 BGM/jingles: original (music.py), FluidSynth + FluidR3_GM (MIT).
