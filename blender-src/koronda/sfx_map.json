@@ -1,0 +1,4 @@
+{"key": [5, 7, 9, 0, 2], "sounds": {
+ "step": ["kenney:impact-sounds__footstep_grass_002.ogg", -10], "turn": ["kenney:rpg-audio__cloth2.ogg", -4], "caught": ["uisfx:soft/warning", -4],
+ "touch": ["kenney:interface-sounds__glass_002.ogg", -4], "mora": ["kenney:interface-sounds__pluck_002.ogg", -6], "meow": ["uisfx:rubber/notification", -8], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (win / lose / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
