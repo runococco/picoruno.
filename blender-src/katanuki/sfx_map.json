@@ -1,0 +1,4 @@
+{"key": [5, 7, 9, 0, 2], "sounds": {
+ "scratch": ["kenney:interface-sounds__scratch_002.ogg", -10], "crack": ["kenney:impact-sounds__impactPlate_light_002.ogg", -4], "break": ["kenney:impact-sounds__impactPlate_heavy_001.ogg", -4],
+ "pop": ["uisfx:organic/snap", -4], "warn": ["uisfx:soft/warning", -10], "coin": ["kenney:rpg-audio__handleCoins.ogg", -4], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (clear / clean / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
