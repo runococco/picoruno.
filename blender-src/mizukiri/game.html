@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<script src="count.js" defer></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#bfe0ff">
+<title>ねこの みずきり</title>
+<meta name="description" content="いけの ほとりで ねこが いしを なげるよ。いしが たいらな しゅんかんに しゅっと スワイプ。ぴょん ぴょん はねて、むこうぎしまで とどくかな？">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ねこの みずきり">
+<meta property="og:description" content="いしが たいらな しゅんかんに スワイプ。なんかい はねるかな？">
+<meta property="og:url" content="https://picoruno.com/mizukiri.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://picoruno.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://picoruno.com/og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23bfe0ff'/%3E%3Crect y='17' width='32' height='15' fill='%235aa8c8'/%3E%3Cellipse cx='8' cy='22' rx='4' ry='1.4' fill='none' stroke='%23fff' stroke-width='1.4'/%3E%3Cellipse cx='17' cy='20.5' rx='3' ry='1' fill='none' stroke='%23fff' stroke-width='1.2'/%3E%3Cellipse cx='25' cy='12' rx='3.4' ry='1.6' fill='%238a8e96' stroke='%234a2c1d' stroke-width='1.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<style>
+/* Pond in the afternoon: sky blue, water teal, dark-brown outlined flat UI. */
+:root{
+  --ink:#4a2c1d;
+  --ink2:#7a5440;
+  --paper:#fffaf2;
+  --blue:#3a9ab8;
+  --red:#e0703a;
+  --sky:#3a7ab8;
+  --gold:#f2c14e;
+  --display:"Dela Gothic One","Zen Maru Gothic","Hiragino Sans",sans-serif;
+  --body:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%;margin:0;background:#bfe0ff}
+[hidden]{display:none!important}
+body{color:var(--ink);font-family:var(--body);overflow:hidden;overscroll-behavior:none;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+#app{position:relative;height:100%;height:100dvh;max-width:560px;margin:0 auto;overflow:hidden}
+#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+button{font-family:inherit;color:inherit;cursor:pointer}
+.hud{position:absolute;left:0;right:0;top:env(safe-area-inset-top);z-index:2;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;pointer-events:none}
+.pill{font-family:var(--display);font-size:1rem;background:var(--paper);color:var(--ink);border:2.5px solid var(--ink);border-radius:12px;padding:4px 10px;box-shadow:0 3px 0 var(--ink);white-space:nowrap}
+.pill.t{min-width:3.6em;text-align:center}
+.pill.t.low{background:#ffd9c8;color:var(--red)}
+.ib{pointer-events:auto;width:40px;height:40px;border-radius:12px;border:2.5px solid var(--ink);background:var(--paper);display:grid;place-items:center;padding:0;box-shadow:0 3px 0 var(--ink)}
+.ib svg{width:22px;height:22px}
+.ov{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(74,44,29,.28)}
+.card{background:var(--paper);color:var(--ink);border:3px solid var(--ink);border-radius:22px;box-shadow:0 6px 0 var(--ink);padding:18px 18px 14px;width:100%;max-width:360px;box-sizing:border-box;text-align:center;max-height:100%;overflow:auto}
+.logo{font-family:var(--display);font-size:1.2rem;line-height:1.1;margin:4px 0 0;color:var(--sky)}
+.logo2{font-family:var(--display);font-size:2.6rem;line-height:1.1;margin:0 0 6px;color:var(--red)}
+.sub{font-size:.9rem;color:var(--ink2);margin:0 0 10px;font-weight:700}
+.how{font-size:.86rem;font-weight:700;background:#fff;border:2px dashed #e0c8a0;border-radius:12px;padding:8px 10px;margin:0 0 12px;line-height:1.6;text-align:left}
+.how ol{margin:0;padding-left:1.3em}
+.how em{font-style:normal;color:var(--red)}
+.how .kinds{display:flex;justify-content:space-around;margin:6px 0 0;font-size:.74rem;text-align:center;color:var(--ink2)}
+.how .kinds img{display:block;width:62px;height:auto;margin:0 auto -4px}
+.big{display:block;width:100%;font-family:var(--display);font-size:1.2rem;padding:13px 10px;border-radius:16px;border:3px solid var(--ink);
+  background:var(--blue);color:#fff;box-shadow:0 5px 0 var(--ink);margin:0 0 12px;letter-spacing:.04em;text-decoration:none;box-sizing:border-box}
+.big:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.big.sec{background:#fff;color:var(--ink)}
+.best{font-size:.85rem;color:var(--ink2);margin:-4px 0 10px;font-weight:700}
+.back{margin:6px 0 0;font-size:.85rem}
+.back a{color:var(--ink2);font-weight:700}
+.bag{display:flex;justify-content:center;gap:10px;margin:6px 0 8px}
+.bag div{width:84px;font-size:.78rem;font-weight:900;line-height:1.3}
+.bag img{display:block;width:76px;height:auto;margin:0 auto -6px}
+.bag b{font-family:var(--display);font-weight:400;font-size:1.25rem}
+.res-big{font-family:var(--display);font-size:2.6rem;line-height:1.05;margin:2px 0}
+.res-rank{display:inline-block;font-family:var(--display);font-size:1rem;background:var(--gold);border:2.5px solid var(--ink);border-radius:999px;padding:4px 14px;margin:4px 0 6px}
+.res-note{font-size:.84rem;font-weight:700;color:var(--ink2);margin:0 0 12px;line-height:1.6}
+.pause-t{font-family:var(--display);font-size:1.6rem;margin:4px 0 12px}
+.res-row{display:flex;justify-content:center;gap:14px;margin:4px 0 6px;font-size:.84rem;font-weight:900;color:var(--ink2)}
+.res-row b{display:block;font-family:var(--display);font-weight:400;font-size:1.3rem;color:var(--ink)}
+.logo2{font-size:1.9rem}
+.mis{display:flex;gap:6px;justify-content:center;align-items:center;margin:0 0 4px}
+.kinds3{display:flex;justify-content:space-around;margin:6px 0 0;font-size:.76rem;text-align:center;color:var(--ink2);font-weight:900}
+.kinds3 b{display:block;font-family:var(--display);font-weight:400;font-size:1rem;color:var(--red)}
+.logo2{font-size:1.9rem}
+.xx{position:relative;width:110px;height:20px;border:2.5px solid var(--ink);border-radius:10px;background:var(--paper);overflow:hidden;box-shadow:0 3px 0 var(--ink)}
+.wet b{position:absolute;left:0;top:0;bottom:0;width:0;background:#5aa8e8}
+.wet span{position:absolute;inset:0;font-size:.7rem;font-weight:900;text-align:center;line-height:16px}
+.pill.n{min-width:3.6em;text-align:center}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="cv"></canvas>
+  <div class="hud"><div class="pill n" id="stoneP">1/10</div><div class="pill" id="scoreP">0 てん</div><button class="ib" id="pauseBtn" aria-label="一時停止"><svg viewBox="0 0 24 24" fill="#4a2c1d"><rect x="6" y="5" width="4.2" height="14" rx="1.2"/><rect x="13.8" y="5" width="4.2" height="14" rx="1.2"/></svg></button></div>
+
+  <div class="ov" id="titleOv">
+    <div class="card">
+      <div class="logo">いけの ほとりで</div>
+      <div class="logo2">ねこの みずきり</div>
+      <p class="sub">ぴょん ぴょん、どこまで はねる？</p>
+      <div class="how"><ol>
+        <li>ゆびを おくと、てもとの いしが <em>ゆらゆら かたむく</em> よ</li>
+        <li>いしが <em>たいらな しゅんかん</em> に、うえへ しゅっと <em>スワイプ</em></li>
+        <li>はやすぎると たかく とんで しずみやすい。<em>はっぱ</em> で はねると ボーナス</li></ol></div>
+      <button class="big" id="startBtn">いしを なげる</button>
+      <p class="best" id="bestLine"></p>
+      <button class="big sec" id="muteBtn" style="font-size:.95rem;padding:9px">♪ 音あり</button>
+      <p class="back"><a href="https://picoruno.com/">← picoruno. のゲーム一覧へ</a></p>
+    </div>
+  </div>
+  <div class="ov" id="pauseOv" hidden>
+    <div class="card">
+      <div class="pause-t">ひとやすみ</div>
+      <button class="big" id="resumeBtn">つづける</button>
+      <button class="big sec" id="quitBtn">タイトルへ</button>
+    </div>
+  </div>
+  <div class="ov" id="resultOv" hidden>
+    <div class="card">
+      <div class="logo">きょうの みずきり</div>
+      <div class="res-big" id="resScore">0 てん</div>
+      <div class="res-row"><div>さいこう<b id="rBest">0かい</b></div><div>とおい<b id="rFar">0m</b></div><div>はっぱ<b id="rPad">0</b></div></div>
+      <div class="res-rank" id="resRank"></div>
+      <p class="res-note" id="resNote"></p>
+      <button class="big" id="againBtn">もういちど</button>
+      <a class="big sec" id="shareBtn" href="https://twitter.com/intent/tweet" target="_blank" rel="noopener" style="font-size:1rem">X でじまん</a>
+      <p class="back"><a href="https://picoruno.com/">← picoruno. のゲーム一覧へ</a></p>
+    </div>
+  </div>
+</div>
+<script>
+/*ART*/const ART={},LAYER={},SCENE={cam:{hc:1.6,pitch:8,f:1066.7},paw:[410,860],pawW:[.11,2.27,.79],shore:2.9,far:64,horizon:490,edge:1047,spr:{stone:{res:96,pxu:80},pad:{res:192,r:83.5}}};/*/ART*/
+/*AUDIO*/const AUD={};/*/AUDIO*/
+</script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const W0=720,H0=1280,CAM=SCENE.cam,PW=SCENE.pawW,FAR=SCENE.far,STONES=10,GRAV=9.8,TILT=32;
+const cp=Math.cos(CAM.pitch*Math.PI/180),sp=Math.sin(CAM.pitch*Math.PI/180);
+function proj(x,y,z){const d=y*cp-(z-CAM.hc)*sp,u=y*sp+(z-CAM.hc)*cp;return [W0/2+CAM.f*x/d,H0/2-CAM.f*u/d,d]}
+
+/* ---------- art ---------- */
+const IMG={};
+function loadImg(src){return new Promise(r=>{if(!src)return r(null);const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
+async function loadArt(){await Promise.all(Object.keys(ART).map(k=>loadImg(ART[k]).then(i=>{if(i)IMG[k]=i})))}
+
+/* ---------- audio ---------- */
+const AC=window.AudioContext||window.webkitAudioContext;
+let ac=null,master=null,bgmGain=null,bgmSrc=null,decoding=null;const BUF={};
+let muted=LS.get('mizukiri-mute',false);
+function b64buf(u){const b=atob(u.split(',')[1]);const a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a.buffer}
+function audioInit(){if(ac||!AC)return;ac=new AC();master=ac.createGain();master.gain.value=muted?0:1;master.connect(ac.destination);bgmGain=ac.createGain();bgmGain.gain.value=.3;bgmGain.connect(master);
+  decoding=Promise.all(Object.keys(AUD).map(k=>new Promise((r,j)=>{const p=ac.decodeAudioData(b64buf(AUD[k]),r,j);if(p&&p.then)p.then(r,j)}).then(b=>{BUF[k]=b}).catch(()=>{})))}
+function unlock(){audioInit();if(ac&&ac.state==='suspended')ac.resume()}
+function snapRate(r){const st=12*Math.log2(r);let b=0;for(const a of [-12,-7,-5,0,5,7,12])if(Math.abs(a-st)<Math.abs(b-st))b=a;return Math.pow(2,b/12)}
+function sfx(k,vol=1,rate=1){if(!ac||!BUF[k]||muted)return;const s=ac.createBufferSource();s.buffer=BUF[k];s.playbackRate.value=snapRate(rate);const g=ac.createGain();g.gain.value=vol;s.connect(g);g.connect(master);s.start()}
+function bgm(on){if(!ac)return;if(on){if(bgmSrc||!BUF.bgm)return;bgmSrc=ac.createBufferSource();bgmSrc.buffer=BUF.bgm;bgmSrc.loop=true;bgmSrc.connect(bgmGain);bgmSrc.start()}else if(bgmSrc){try{bgmSrc.stop()}catch(e){}bgmSrc=null}}
+function duck(v,t=.25){if(bgmGain&&ac)bgmGain.gain.setTargetAtTime(v,ac.currentTime,t)}
+function setMute(m){muted=m;LS.set('mizukiri-mute',m);if(master)master.gain.value=m?0:1;$('muteBtn').textContent=m?'♪ 音なし':'♪ 音あり'}
+
+/* ---------- state ---------- */
+function rnd(a,b){return a+Math.random()*(b-a)}
+const G={phase:'title',t:0,ripples:[],texts:[],pads:[],glints:[]};
+for(let i=0;i<26;i++)G.glints.push({x:rnd(-1,1),y:rnd(4,60),p:rnd(0,6)});
+function fresh(){return {phase:'play',t:0,score:0,n:0,state:'aim',stT:0,stone:null,ripples:[],texts:[],pads:[],glints:G.glints,best:0,far:0,padN:0,shores:0,
+  hold:false,tilt:0,tw:rnd(0,6),tsp:3.2,sx:0,sy:0,st0:0,throws:[],say:'',sayT:0,endT:0}}
+function reset(){Object.assign(G,fresh());G.phase='title';hud()}
+function hud(){$('stoneP').textContent=Math.min(G.n+1,STONES)+'/'+STONES;$('scoreP').textContent=G.score+' てん'}
+function text(s,x,y,c,small){G.texts.push({s,x,y,c,small,t:0})}
+function say(s){G.say=s;G.sayT=1.4}
+function layPads(){G.pads=[];const n=3+Math.floor(Math.random()*2);for(let i=0;i<n;i++){let p;for(let k=0;k<20;k++){const y=rnd(8,44),x=rnd(-.26,.26)*y;p={x,y,r:rnd(.9,1.3),bob:rnd(0,6)};if(G.pads.every(q=>Math.hypot(q.x-p.x,q.y-p.y)>4))break}G.pads.push(p)}}
+
+/* ---------- throw ---------- */
+function quality(){return Math.max(0,1-Math.abs(G.tilt)/TILT)}
+function throwStone(v0,yaw,q){if(G.state!=='aim'||G.phase!=='play')return;const el=(6+Math.max(0,v0-16)*2.5)*Math.PI/180;
+  G.stone={x:PW[0],y:PW[1],z:PW[2],vx:v0*Math.cos(el)*Math.sin(yaw),vy:v0*Math.cos(el)*Math.cos(yaw),vz:v0*Math.sin(el),q,skips:0,pads:0,rot:0,kind:G.n%2?'stone2':'stone',shore:false};
+  G.state='fly';G.stT=0;G.hold=false;sfx('throw',.5);say(q>.8?'それっ':'えいっ')}
+function contact(s){const vh=Math.hypot(s.vx,s.vy),steep=Math.abs(s.vz)/Math.max(.1,vh);let pad=null;for(const p of G.pads)if(Math.hypot(s.x-p.x,s.y-p.y)<p.r)pad=p;
+  G.ripples.push({x:s.x,y:s.y,t:0,big:pad?0:1});
+  if(pad){s.vz=Math.abs(s.vz)*.7+2.6;s.vx*=.95;s.vy*=.95;s.pads++;s.skips++;G.padN++;sfx('pad',.55);const [px,py]=proj(s.x,s.y,0);text('はっぱで ぴょん！',px,py-60,'#ffe27a',true);pad.hit=.6;return true}
+  if(vh<3.4||s.q<.12||steep>.4||(s.q<.35&&Math.random()<.5)){if(!s.skips){const [px,py]=proj(s.x,s.y,0);text(steep>.4&&vh>=3.4?'たかすぎた…':vh<3.4?'よわかった…':'ななめだった…',px,py-70,'#ffd0c0',true)}sink(s);return false}
+  const k=.72+.15*s.q;s.vx*=k;s.vy*=k;s.vz=Math.abs(s.vz)*.5+vh*k*.05;s.skips++;sfx('skip',.5,[1,1.335,1.498,2][Math.min(3,Math.floor(s.skips/3))]);
+  const [px,py]=proj(s.x,s.y,0);text(s.skips+'',px,py-40,'#fff',true);return true}
+function sink(s){sfx('sink',.6);G.ripples.push({x:s.x,y:s.y,t:0,big:2});endThrow(s)}
+function endThrow(s){const dist=Math.max(0,s.y-SCENE.shore),pts=s.skips*10+Math.floor(dist)+s.pads*20+(s.shore?50:0);G.score+=pts;G.best=Math.max(G.best,s.skips);G.far=Math.max(G.far,Math.floor(dist));
+  G.throws.push(s.skips);G.state='done';G.stT=0;G.stone=null;
+  text(s.skips?`${s.skips}かい はねた！ +${pts}`:`ぽちゃん… +${pts}`,360,380,s.skips>=8?'#ffe27a':'#fff');
+  if(s.skips>=10)say('すごい！');else if(!s.skips)say('あれ〜');hud()}
+
+/* ---------- step ---------- */
+function step(dt){
+  G.t+=dt;G.sayT=Math.max(0,G.sayT-dt);G.stT+=dt;
+  if(G.hold){G.tw+=dt*G.tsp;G.tilt=Math.sin(G.tw)*TILT;if(Math.random()<dt*.8)G.tsp=rnd(2.6,4.4)}
+  const s=G.stone;if(s&&G.state==='fly'){const n=6,h=dt/n;for(let i=0;i<n&&G.stone;i++){s.vz-=GRAV*h;s.x+=s.vx*h;s.y+=s.vy*h;s.z+=s.vz*h;s.rot+=h*18;
+      if(s.y>=FAR){s.shore=true;G.shores++;sfx('shore',.6);sfx('levelup',.5);text('むこうぎし まで！ +50',360,330,'#ffe27a');say('とどいた！');endThrow(s);break}
+      if(s.z<=0&&s.vz<0){s.z=0;if(!contact(s))break}}}
+  if(G.phase==='play'&&G.state==='done'&&G.stT>1.6){G.n++;if(G.n>=STONES)finish();else{G.state='aim';G.stT=0;if(G.n%3===0)layPads();hud()}}
+  for(let i=G.ripples.length-1;i>=0;i--){G.ripples[i].t+=dt;if(G.ripples[i].t>1.8)G.ripples.splice(i,1)}
+  for(const p of G.pads)p.hit=Math.max(0,(p.hit||0)-dt);
+  if(G.phase==='end'){G.endT+=dt;if(G.endT>1.6&&$('resultOv').hidden)showResult()}}
+function finish(){if(G.phase!=='play')return;G.phase='end';G.endT=0;duck(.08,.2);sfx('over',.7);hud()}
+function rank(n){return n>=900?'みずきり めいじん':n>=650?'いけの ぬし':n>=420?'ぴょんぴょん マスター':n>=220?'みずきり じょうず':'はじめての みずきり'}
+function showResult(){const n=G.score,best=LS.get('mizukiri-best',0),nb=n>best;if(nb){LS.set('mizukiri-best',n);if(n>0)sfx('best',.6)}
+  $('resScore').textContent=n+' てん';$('rBest').textContent=G.best+'かい';$('rFar').textContent=G.far+'m';$('rPad').textContent=G.padN;$('resRank').textContent=rank(n);
+  $('resNote').innerHTML=(nb&&n>0?'ベスト更新！<br>':'')+(G.shores?'むこうぎしまで '+G.shores+'かい とどいた！':'いしが たいらな ときに なげると よく はねるよ。<br>はやすぎると たかく とんで しずみやすい。');
+  $('shareBtn').href='https://twitter.com/intent/tweet?text='+encodeURIComponent(`ねこの みずきり🪨 ${n}てん（さいこう ${G.best}かい はねた）「${rank(n)}」\n#ねこのみずきり #picoruno`)+'&url='+encodeURIComponent('https://picoruno.com/mizukiri.html');
+  $('resultOv').hidden=false;bgm(false);refreshTitle()}
+
+/* ---------- draw ---------- */
+const cv=$('cv'),ctx=cv.getContext('2d');let CW=0,CH=0,DPR=1,S=1,OX=0,OY=0;
+function resize(){DPR=Math.min(devicePixelRatio||1,2.5);const r=cv.getBoundingClientRect();CW=r.width;CH=r.height;cv.width=Math.round(CW*DPR);cv.height=Math.round(CH*DPR);
+  S=Math.min(CW/W0,Math.max(CH/H0,CW/W0*.92));OX=(CW-W0*S)/2;OY=(CH-H0*S)*.5}
+function outlineText(c,s,x,y,sz,fill,lw){c.font=`${sz}px "Dela Gothic One",sans-serif`;c.lineJoin='round';c.lineWidth=lw||sz*.28;c.strokeStyle='#4a2c1d';c.strokeText(s,x,y);c.fillStyle=fill;c.fillText(s,x,y)}
+function ell(x,y,r){const a=proj(x,y,0),b=proj(x+r,y,0),f=proj(x,y+r,0),n=proj(x,y-r,0);return [a[0],a[1],b[0]-a[0],(n[1]-f[1])/2]}
+function draw(dt){
+  const c=ctx;c.setTransform(DPR,0,0,DPR,0,0);c.fillStyle='#6aa84a';c.fillRect(0,0,CW,CH);
+  c.save();c.translate(OX,OY);c.scale(S,S);
+  const top=-OY/S,L0=-OX/S,WW=CW/S,g=c.createLinearGradient(0,top,0,520);g.addColorStop(0,'#7cbcf0');g.addColorStop(1,'#e0f0ff');c.fillStyle=g;c.fillRect(L0,top,WW,540-top);
+  c.fillStyle='#ffffff';c.globalAlpha=.85;for(const [x,y,s] of [[150,200,1],[560,140,.8],[420,300,.6]]){const xx=(x+G.t*6*s)%(W0+200)-100;c.beginPath();c.ellipse(xx,y,70*s,24*s,0,0,7);c.ellipse(xx-30*s,y-12*s,34*s,24*s,0,0,7);c.ellipse(xx+22*s,y-20*s,40*s,30*s,0,0,7);c.fill()}c.globalAlpha=1;
+  c.fillStyle='#78b04e';c.fillRect(L0,1180,WW,CH/S);
+  if(IMG.bg)c.drawImage(IMG.bg,0,0,W0,H0);
+  // sparkles on the water
+  for(const gl of G.glints){const a=Math.max(0,Math.sin(G.t*1.3+gl.p));if(a<.3)continue;const [x,y,d]=proj(gl.x*gl.y*.3,gl.y,0);if(y>1040)continue;const w=Math.max(6,CAM.f*.5/d);c.strokeStyle='rgba(255,255,255,'+(a*.6)+')';c.lineWidth=Math.max(1.5,CAM.f*.03/d);c.beginPath();c.moveTo(x-w,y);c.lineTo(x+w,y);c.stroke()}
+  // lily pads, far to near
+  const pads=[...G.pads].sort((a,b)=>b.y-a.y);for(const p of pads){const [x,y,rx,ry]=ell(p.x,p.y,p.r),bob=Math.sin(G.t*1.4+p.bob)*ry*.06;
+    if(IMG.pad){const k=rx/SCENE.spr.pad.r;c.save();c.translate(x,y+bob);c.scale(1,ry/rx);c.drawImage(IMG.pad,-96*k,-96*k,192*k,192*k);c.restore()}else{c.fillStyle='#4a8a3a';c.beginPath();c.ellipse(x,y,rx,ry,0,0,7);c.fill()}
+    if(p.hit>0){c.strokeStyle='rgba(255,240,150,'+p.hit+')';c.lineWidth=4;c.beginPath();c.ellipse(x,y,rx*1.2,ry*1.2,0,0,7);c.stroke()}}
+  // ripples
+  for(const r of G.ripples){const k=r.t/1.8;for(let j=0;j<(r.big===2?3:2);j++){const kk=k-j*.18;if(kk<=0)continue;const [x,y,rx,ry]=ell(r.x,r.y,.25+kk*(r.big===2?2.2:1.5));c.strokeStyle='rgba(255,255,255,'+(1-kk)*.85+')';c.lineWidth=Math.max(1.5,3*(1-kk)*rx/40);c.beginPath();c.ellipse(x,y,rx,Math.max(1,ry),0,0,7);c.stroke()}
+    if(r.big===2&&r.t<.4){const [x,y,d]=proj(r.x,r.y,0),h=CAM.f*.5/d*(1-r.t/.4);c.fillStyle='rgba(255,255,255,.8)';for(let j=-2;j<=2;j++){c.beginPath();c.ellipse(x+j*h*.25,y-h*(1-Math.abs(j)*.3),Math.max(1.5,h*.08),Math.max(2,h*.2),0,0,7);c.fill()}}}
+  // stone in flight (+ its shadow on the water)
+  const s=G.stone;if(s){const [x,y,d]=proj(s.x,s.y,s.z),[sx2,sy2]=proj(s.x,s.y,0),w=Math.max(17,CAM.f*.13/d);c.fillStyle='rgba(30,60,80,.25)';c.beginPath();c.ellipse(sx2,sy2,w*.6,w*.15,0,0,7);c.fill();
+    const im=IMG[s.kind];c.save();c.translate(x,y);c.rotate(Math.sin(s.rot)*.15);if(im)c.drawImage(im,-w,-w,w*2,w*2);else{c.fillStyle='#8a8e96';c.beginPath();c.ellipse(0,0,w*.5,w*.15,0,0,7);c.fill()}c.restore()}
+  // stone in the paw + tilt gauge while aiming
+  if(G.phase==='play'&&G.state==='aim'){const [px,py]=SCENE.paw,im=IMG[G.n%2?'stone2':'stone'];c.save();c.translate(px,py-20);c.rotate(G.tilt*Math.PI/180);if(im)c.drawImage(im,-48,-48,96,96);c.restore();
+    const gx=W0/2,gy=1120;c.save();c.fillStyle='rgba(255,250,242,.92)';c.strokeStyle='#4a2c1d';c.lineWidth=4;c.beginPath();c.roundRect(gx-170,gy-46,340,92,22);c.fill();c.stroke();
+    c.fillStyle='#bfe8a8';c.beginPath();c.moveTo(gx,gy+30);c.arc(gx,gy+30,64,-Math.PI/2-.28,-Math.PI/2+.28);c.closePath();c.fill();
+    c.strokeStyle='#4a2c1d';c.lineWidth=3;c.beginPath();c.arc(gx,gy+30,64,-Math.PI/2-TILT*Math.PI/180,-Math.PI/2+TILT*Math.PI/180);c.stroke();
+    const a=-Math.PI/2+G.tilt*Math.PI/180,q=quality();c.strokeStyle=q>.8?'#3a9a4a':q>.4?'#e8a030':'#d84a4a';c.lineWidth=7;c.lineCap='round';c.beginPath();c.moveTo(gx,gy+30);c.lineTo(gx+Math.cos(a)*60,gy+30+Math.sin(a)*60);c.stroke();
+    c.textAlign='left';c.textBaseline='middle';c.fillStyle='#4a2c1d';c.font='22px "Dela Gothic One",sans-serif';c.fillText('かたむき',gx-155,gy-8);c.fillText(q>.8?'たいら！':G.hold?'…':'',gx+80,gy-8);c.restore()}
+  if(G.sayT>0){c.save();c.globalAlpha=Math.min(1,G.sayT*4);c.translate(170,780);c.fillStyle='#fffaf2';c.strokeStyle='#4a2c1d';c.lineWidth=4;c.beginPath();c.roundRect(-80,-28,160,52,20);c.fill();c.stroke();c.beginPath();c.moveTo(0,22);c.lineTo(10,50);c.lineTo(30,20);c.closePath();c.fill();c.stroke();c.fillRect(-4,16,38,8);
+    c.textAlign='center';c.textBaseline='middle';c.fillStyle='#4a2c1d';c.font='24px "Dela Gothic One",sans-serif';c.fillText(G.say,0,-2);c.restore()}
+  for(let i=G.texts.length-1;i>=0;i--){const x=G.texts[i];x.t+=dt;if(x.t>1.2){G.texts.splice(i,1);continue}
+    c.save();const sz=x.small?28:36;c.textAlign='center';c.textBaseline='middle';c.translate(Math.max(150,Math.min(W0-150,x.x)),x.y-x.t*30);c.globalAlpha=x.t>.9?(1.2-x.t)/.3:1;outlineText(c,x.s,0,0,sz,x.c);c.restore()}
+  if(G.phase==='play'&&G.state==='aim'&&G.n<2){c.save();c.textAlign='center';outlineText(c,G.hold?'たいらな ときに うえへ スワイプ！':'ゆびを おいてね',360,700,30,'#fff',8);c.restore()}
+  c.restore()}
+let last=performance.now();
+function frame(n){const dt=Math.min(.033,(n-last)/1000);last=n;if(G.phase!=='pause'&&G.phase!=='title')step(dt);draw(G.phase==='pause'?0:dt);requestAnimationFrame(frame)}
+
+/* ---------- input: finger down = the stone starts to wobble; swipe up = throw ---------- */
+let trail=[];
+cv.addEventListener('pointerdown',e=>{e.preventDefault();unlock();if(G.phase!=='play'||G.state!=='aim')return;try{cv.setPointerCapture(e.pointerId)}catch(_){}G.hold=true;trail=[[e.clientX,e.clientY,performance.now()]]},{passive:false});
+cv.addEventListener('pointermove',e=>{if(!G.hold)return;trail.push([e.clientX,e.clientY,performance.now()]);if(trail.length>12)trail.shift()});
+function up(e){if(!G.hold)return;trail.push([e.clientX,e.clientY,performance.now()]);const a=trail[0],b=trail[trail.length-1];let k=0;while(k<trail.length-2&&b[2]-trail[k][2]>140)k++;const c0=trail[k];
+  const dy=(c0[1]-b[1])/S,dx=(b[0]-c0[0])/S,dtm=Math.max(16,b[2]-c0[2]);
+  if(dy<40){G.hold=false;return}
+  const sp=Math.hypot(dx,dy)/dtm,v0=Math.max(6,Math.min(26,4+sp*7.5)),yaw=Math.max(-.26,Math.min(.26,Math.atan2(dx,dy)));throwStone(v0,yaw,quality())}
+cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',()=>{G.hold=false});
+window.addEventListener('keydown',e=>{if(e.code==='Space'&&!e.repeat){e.preventDefault();unlock();if(G.phase==='play'&&G.state==='aim')G.hold=true}});
+window.addEventListener('keyup',e=>{if(e.code==='Space'&&G.hold){e.preventDefault();throwStone(15,0,quality())}});
+function start(){unlock();guardHistory();for(const id of ['titleOv','resultOv','pauseOv'])$(id).hidden=true;Object.assign(G,fresh());layPads();hud();
+  if(ac)Promise.resolve(decoding).then(()=>{duck(.3,.01);bgm(true);sfx('start',.5)});pingPlay()}
+function pause(on){if(on){if(G.phase!=='play')return;G.phase='pause';G.hold=false;$('pauseOv').hidden=false;if(ac)ac.suspend()}else{if(G.phase!=='pause')return;$('pauseOv').hidden=true;G.phase='play';last=performance.now();if(ac)ac.resume()}}
+function toTitle(){bgm(false);reset();for(const id of ['pauseOv','resultOv'])$(id).hidden=true;$('titleOv').hidden=false;refreshTitle();if(ac&&ac.state==='suspended')ac.resume()}
+function refreshTitle(){const b=LS.get('mizukiri-best',0);$('bestLine').textContent=b?`ベスト ${b}てん`:''}
+$('startBtn').onclick=start;$('againBtn').onclick=start;
+$('pauseBtn').onclick=()=>pause(true);$('resumeBtn').onclick=()=>pause(false);$('quitBtn').onclick=toTitle;
+$('muteBtn').onclick=()=>{unlock();setMute(!muted)};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pause(true)});
+let guarded=false;function guardHistory(){if(guarded)return;try{history.pushState({mizukiri:1},'');guarded=true}catch(e){}}
+window.addEventListener('popstate',()=>{if(!guarded)return;guarded=false;if(G.phase==='play'){pause(true);guardHistory()}});
+document.addEventListener('touchstart',e=>{const x=e.touches[0].clientX;if(G.phase==='play'&&(x<24||x>innerWidth-24))e.preventDefault()},{passive:false});
+window.addEventListener('resize',resize);
+setMute(muted);refreshTitle();resize();reset();loadArt();requestAnimationFrame(frame);
+window.__T={G,throwStone,quality,proj,contact};
+</script>
+<script>
+function pingPlay(){
+  var G="ねこの みずきり", K="picoruno-played:"+G;
+  try{ if(sessionStorage.getItem(K)) return; sessionStorage.setItem(K,"1"); }catch(e){}
+  var KEY="sb_publishable_5hbtIPW-1y5MqsoiLC6X_A_oZMG0Z5Z";
+  fetch("https://fymwlpbspigpeaoenhhp.supabase.co/rest/v1/rpc/add_play",{method:"POST",keepalive:true,
+    headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify({g:G})})
+  .then(function(r){ if(!r.ok) throw 0; })
+  .catch(function(){ try{ var d=JSON.parse(localStorage.getItem("picoruno-stats")||"{}"); d[G]=d[G]||{plays:0,likes:0}; d[G].plays++; localStorage.setItem("picoruno-stats",JSON.stringify(d)); }catch(e){} });
+}
+</script>
+</body>
+</html>

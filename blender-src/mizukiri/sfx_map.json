@@ -1,0 +1,4 @@
+{"key": [7, 9, 11, 2, 4], "sounds": {
+ "throw": ["uisfx:dreamy/swipe", -8], "skip": ["uisfx:organic/drop", -6], "sink": ["uisfx:zen/drop", -2], "pad": ["kenney:interface-sounds__pluck_002.ogg", -6],
+ "shore": ["kenney:interface-sounds__glass_006.ogg", -6], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (levelup / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
