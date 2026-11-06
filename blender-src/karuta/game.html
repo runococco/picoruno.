@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<script src="count.js" defer></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#7a3a5a">
+<title>ねこかるた</title>
+<meta name="description" content="ねこの あるある かるたで、ねこと とりあいっこ。よまれた ふだの あたまの もじを さがして、ねこの てより はやく タップ！">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ねこかるた">
+<meta property="og:description" content="ねこの あるある かるたで、ねこと とりあいっこ！">
+<meta property="og:url" content="https://picoruno.com/karuta.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://picoruno.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://picoruno.com/og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23d6c884'/%3E%3Crect x='8' y='4' width='16' height='24' rx='2' fill='%23fbf6e8' stroke='%234a2c1d' stroke-width='2'/%3E%3Ccircle cx='16' cy='14' r='5' fill='none' stroke='%23c4432e' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<style>
+/* Neko karuta: tatami gold, cushion plum, card cream, dark-brown outlined flat UI. */
+:root{
+  --ink:#4a2c1d;
+  --ink2:#7a5440;
+  --paper:#fffaf2;
+  --blue:#7a3a5a;
+  --red:#c4432e;
+  --sky:#3a5a8a;
+  --gold:#f2c14e;
+  --display:"Dela Gothic One","Zen Maru Gothic","Hiragino Sans",sans-serif;
+  --body:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%;margin:0;background:#d6c884}
+[hidden]{display:none!important}
+body{color:var(--ink);font-family:var(--body);overflow:hidden;overscroll-behavior:none;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+#app{position:relative;height:100%;height:100dvh;max-width:560px;margin:0 auto;overflow:hidden}
+#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+button{font-family:inherit;color:inherit;cursor:pointer}
+.hud{position:absolute;left:0;right:0;top:env(safe-area-inset-top);z-index:2;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;pointer-events:none}
+.pill{font-family:var(--display);font-size:1rem;background:var(--paper);color:var(--ink);border:2.5px solid var(--ink);border-radius:12px;padding:4px 10px;box-shadow:0 3px 0 var(--ink);white-space:nowrap}
+.pill.t{min-width:3.6em;text-align:center}
+.pill.t.low{background:#ffd9c8;color:var(--red)}
+.ib{pointer-events:auto;width:40px;height:40px;border-radius:12px;border:2.5px solid var(--ink);background:var(--paper);display:grid;place-items:center;padding:0;box-shadow:0 3px 0 var(--ink)}
+.ib svg{width:22px;height:22px}
+.ov{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(74,44,29,.28)}
+.card{background:var(--paper);color:var(--ink);border:3px solid var(--ink);border-radius:22px;box-shadow:0 6px 0 var(--ink);padding:18px 18px 14px;width:100%;max-width:360px;box-sizing:border-box;text-align:center;max-height:100%;overflow:auto}
+.logo{font-family:var(--display);font-size:1.2rem;line-height:1.1;margin:4px 0 0;color:var(--sky)}
+.logo2{font-family:var(--display);font-size:2.6rem;line-height:1.1;margin:0 0 6px;color:var(--red)}
+.sub{font-size:.9rem;color:var(--ink2);margin:0 0 10px;font-weight:700}
+.how{font-size:.86rem;font-weight:700;background:#fff;border:2px dashed #e0c8a0;border-radius:12px;padding:8px 10px;margin:0 0 12px;line-height:1.6;text-align:left}
+.how ol{margin:0;padding-left:1.3em}
+.how em{font-style:normal;color:var(--red)}
+.how .kinds{display:flex;justify-content:space-around;margin:6px 0 0;font-size:.74rem;text-align:center;color:var(--ink2)}
+.how .kinds img{display:block;width:62px;height:auto;margin:0 auto -4px}
+.big{display:block;width:100%;font-family:var(--display);font-size:1.2rem;padding:13px 10px;border-radius:16px;border:3px solid var(--ink);
+  background:var(--blue);color:#fff;box-shadow:0 5px 0 var(--ink);margin:0 0 12px;letter-spacing:.04em;text-decoration:none;box-sizing:border-box}
+.big:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.big.sec{background:#fff;color:var(--ink)}
+.best{font-size:.85rem;color:var(--ink2);margin:-4px 0 10px;font-weight:700}
+.back{margin:6px 0 0;font-size:.85rem}
+.back a{color:var(--ink2);font-weight:700}
+.bag{display:flex;justify-content:center;gap:10px;margin:6px 0 8px}
+.bag div{width:84px;font-size:.78rem;font-weight:900;line-height:1.3}
+.bag img{display:block;width:76px;height:auto;margin:0 auto -6px}
+.bag b{font-family:var(--display);font-weight:400;font-size:1.25rem}
+.res-big{font-family:var(--display);font-size:2.6rem;line-height:1.05;margin:2px 0}
+.res-rank{display:inline-block;font-family:var(--display);font-size:1rem;background:var(--gold);border:2.5px solid var(--ink);border-radius:999px;padding:4px 14px;margin:4px 0 6px}
+.res-note{font-size:.84rem;font-weight:700;color:var(--ink2);margin:0 0 12px;line-height:1.6}
+.pause-t{font-family:var(--display);font-size:1.6rem;margin:4px 0 12px}
+.res-row{display:flex;justify-content:center;gap:14px;margin:4px 0 6px;font-size:.84rem;font-weight:900;color:var(--ink2)}
+.res-row b{display:block;font-family:var(--display);font-weight:400;font-size:1.3rem;color:var(--ink)}
+.logo2{font-size:2.2rem}
+.mis{display:flex;gap:6px;justify-content:center;align-items:center;margin:0 0 4px}
+.kinds3{display:flex;justify-content:space-around;margin:6px 0 0;font-size:.76rem;text-align:center;color:var(--ink2);font-weight:900}
+.kinds3 b{display:block;font-family:var(--display);font-weight:400;font-size:1rem;color:var(--red)}
+.logo2{font-size:2.2rem}
+.xx{position:relative;width:110px;height:20px;border:2.5px solid var(--ink);border-radius:10px;background:var(--paper);overflow:hidden;box-shadow:0 3px 0 var(--ink)}
+.wet b{position:absolute;left:0;top:0;bottom:0;width:0;background:#5aa8e8}
+.wet span{position:absolute;inset:0;font-size:.7rem;font-weight:900;text-align:center;line-height:16px}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="cv"></canvas>
+  <div class="hud"><div class="pill" id="roundP">1 / 15 まいめ</div><div class="pill" id="scoreP">あなた 0 − 0 ねこ</div><button class="ib" id="pauseBtn" aria-label="一時停止"><svg viewBox="0 0 24 24" fill="#4a2c1d"><rect x="6" y="5" width="4.2" height="14" rx="1.5"/><rect x="13.8" y="5" width="4.2" height="14" rx="1.5"/></svg></button></div>
+
+  <div class="ov" id="titleOv">
+    <div class="card">
+      <div class="logo">ねこの あるある</div>
+      <div class="logo2">ねこかるた</div>
+      <p class="sub">ねこと ふだの とりあいっこ</p>
+      <div class="how"><ol>
+        <li>よみふだの <em>さいしょの もじ</em> と おなじ ふだを さがして タップ</li>
+        <li><em>ねこの て</em> より はやく とれたら あなたの ふだ</li>
+        <li>ばに ない ふだ（<em>からふだ</em>）も よまれるよ。まちがえて さわると <em>おてつき</em></li></ol></div>
+      <button class="big" id="startBtn">よろしく おねがいします</button>
+      <p class="best" id="bestLine"></p>
+      <button class="big sec" id="muteBtn" style="font-size:.95rem;padding:9px">♪ 音あり</button>
+      <p class="back"><a href="https://picoruno.com/">← picoruno. のゲーム一覧へ</a></p>
+    </div>
+  </div>
+  <div class="ov" id="pauseOv" hidden>
+    <div class="card">
+      <div class="pause-t">ひとやすみ</div>
+      <button class="big" id="resumeBtn">つづける</button>
+      <button class="big sec" id="quitBtn">タイトルへ</button>
+    </div>
+  </div>
+  <div class="ov" id="resultOv" hidden>
+    <div class="card">
+      <div class="logo">ねこかるた けっか</div>
+      <div class="res-big" id="resScore">かち！</div>
+      <div class="res-row"><div>あなた<b id="rMe">0</b></div><div>ねこ<b id="rCat">0</b></div><div>いちばん はやとり<b id="rFast">-</b></div></div>
+      <div class="res-rank" id="resRank"></div>
+      <p class="res-note" id="resNote"></p>
+      <button class="big" id="againBtn">もういちど</button>
+      <a class="big sec" id="shareBtn" href="https://twitter.com/intent/tweet" target="_blank" rel="noopener" style="font-size:1rem">X でじまん</a>
+      <p class="back"><a href="https://picoruno.com/">← picoruno. のゲーム一覧へ</a></p>
+    </div>
+  </div>
+</div>
+<script>
+/*ART*/const ART={},LAYER={},SCENE={cat:[592,117],you:[360,1240],spr:{card:{res:192,pxu:160,w:118.4,h:166.4},paw:{res:160,pxu:133.3,tip:[80,97.3]}},pxu:160};/*/ART*/
+/*AUDIO*/const AUD={};/*/AUDIO*/
+</script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const W0=720,H0=1280,CAT=SCENE.cat,SC=SCENE.spr.card,SPW=SCENE.spr.paw,CS=1.05,READS=15,CPS=9;
+const COLS=[105,255,405,555],ROWS=[440,650,860];
+// original "cat あるある" reading lines; the first kana is the card's letter
+const LINES=['あくびが うつる ひだまりの ま','いつでも どこでも まるくなる','うしろすがたで ごきげん しっぽ','えさの おとには すぐ かけつける','おきゃくさまには まず かくれる','かみぶくろ みつけたら はいる','きのうの はこが きょうの ベッド','くもの すにも じゃれてみる','けいとだまは ころがすもの','こたつの なかで ゆめ みてる',
+  'さかなの ゆめで ねごとを いう','しっぽで へんじ ゆらゆら','すきまが あったら のぞきこむ','せなかを のばして おおきな のび','そとを ながめて とり かぞえ','たかい たなから みおろす おさま','つめとぎ ばりばり きもちいい','てぶくろ みたいな しろい あし','とびらの まえで まってます','なでてと いうまで ちかよらない',
+  'にゃーと ないたら ごはんの じかん','ぬくぬく おふとん とりあいっこ','ねこじゃらしには かてません','のびのび ねがえり おなか だす','はこが ちいさくても はいる','ひなたを おって へやを いどう','ふみふみ もうふで あまえんぼう','へやの すみっこ ひみつきち','ほそい めをして しあわせ そう','まどべの ねこは まちの みはり',
+  'みみを ぴくぴく なにか きこえた','むちゅうで おいかける ひかりの つぶ','めが まんまるで びっくり がお','もうすぐ ごはん そわそわ する','やねの うえから こんにちは','ゆうがた そわそわ うんどうかい','よなかの はしりは おきまり です','らくがき した かみの うえで ねる','りょうりの においに はなが ぴくり','るすばん じょうずの ねこ いっぴき',
+  'れいぞうこ あけたら すぐ くる','ろうかの まんなか ねころがる','わたしの いすは ねこの いす'];
+
+/* ---------- art ---------- */
+const IMG={};
+function loadImg(src){return new Promise(r=>{if(!src)return r(null);const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
+function outlined(im,px,thr){
+  const c=document.createElement('canvas');c.width=im.width+px*2;c.height=im.height+px*2;const x=c.getContext('2d');
+  const m=document.createElement('canvas');m.width=im.width;m.height=im.height;const mx=m.getContext('2d');mx.drawImage(im,0,0);
+  const d=mx.getImageData(0,0,m.width,m.height),a=d.data;for(let i=0;i<a.length;i+=4){const on=a[i+3]>thr;a[i]=74;a[i+1]=44;a[i+2]=29;a[i+3]=on?255:0}mx.putImageData(d,0,0);
+  for(let k=0;k<16;k++){const t=k/16*Math.PI*2;x.drawImage(m,px+Math.cos(t)*px,px+Math.sin(t)*px)}
+  x.drawImage(im,px,px);c.pad=px;return c}
+async function loadArt(){await Promise.all(Object.keys(ART).map(k=>loadImg(ART[k]).then(i=>{if(!i)return;IMG[k]=k==='bg'?i:outlined(i,3,90)})))}
+function sprAt(c,k,ax,ay,x,y,s,rot=0,a=1){const im=IMG[k];if(!im)return;const p=im.pad||0;c.save();c.globalAlpha*=a;c.translate(x,y);if(rot)c.rotate(rot);c.scale(s,s);c.drawImage(im,-ax-p,-ay-p);c.restore()}
+
+/* ---------- audio ---------- */
+const AC=window.AudioContext||window.webkitAudioContext;
+let ac=null,master=null,bgmGain=null,bgmSrc=null,decoding=null;const BUF={};
+let muted=LS.get('karuta-mute',false);
+function b64buf(u){const b=atob(u.split(',')[1]);const a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a.buffer}
+function audioInit(){if(ac||!AC)return;ac=new AC();master=ac.createGain();master.gain.value=muted?0:1;master.connect(ac.destination);bgmGain=ac.createGain();bgmGain.gain.value=.26;bgmGain.connect(master);
+  decoding=Promise.all(Object.keys(AUD).map(k=>new Promise((r,j)=>{const p=ac.decodeAudioData(b64buf(AUD[k]),r,j);if(p&&p.then)p.then(r,j)}).then(b=>{BUF[k]=b}).catch(()=>{})))}
+function unlock(){audioInit();if(ac&&ac.state==='suspended')ac.resume()}
+function snapRate(r){const st=12*Math.log2(r);let b=0;for(const a of [-12,-7,-5,0,5,7,12])if(Math.abs(a-st)<Math.abs(b-st))b=a;return Math.pow(2,b/12)}
+function sfx(k,vol=1,rate=1){if(!ac||!BUF[k]||muted)return;const s=ac.createBufferSource();s.buffer=BUF[k];s.playbackRate.value=snapRate(rate);const g=ac.createGain();g.gain.value=vol;s.connect(g);g.connect(master);s.start()}
+function bgm(on){if(!ac)return;if(on){if(bgmSrc||!BUF.bgm)return;bgmSrc=ac.createBufferSource();bgmSrc.buffer=BUF.bgm;bgmSrc.loop=true;bgmSrc.connect(bgmGain);bgmSrc.start()}else if(bgmSrc){try{bgmSrc.stop()}catch(e){}bgmSrc=null}}
+function duck(v,t=.25){if(bgmGain&&ac)bgmGain.gain.setTargetAtTime(v,ac.currentTime,t)}
+function setMute(m){muted=m;LS.set('karuta-mute',m);if(master)master.gain.value=m?0:1;$('muteBtn').textContent=m?'♪ 音なし':'♪ 音あり'}
+
+/* ---------- state ---------- */
+const G={phase:'title',t:0,pt:0,n:0,me:0,cat:0,table:[],deck:[],line:null,kara:0,karaN:0,shown:0,catT:0,paw:null,freeze:0,fx:[],texts:[],fast:null,say:'',sayT:0,piles:[[],[]],taken:null};
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function slotPos(i){return {x:COLS[i%4],y:ROWS[Math.floor(i/4)]}}
+function deal(i,li){const p=slotPos(i);G.table[i]={li,x:p.x+(Math.random()-.5)*14,y:p.y+(Math.random()-.5)*14,rot:(Math.random()-.5)*.14,flip:0}}
+function reset(){const idx=shuffle(LINES.map((_,i)=>i));Object.assign(G,{t:0,n:0,me:0,cat:0,table:[],deck:idx.slice(12),karaN:0,fx:[],texts:[],fast:null,say:'',sayT:0,piles:[[],[]],freeze:0,taken:null});
+  for(let i=0;i<12;i++)deal(i,idx[i]);hud()}
+function hud(){$('roundP').textContent=`${Math.min(READS,G.n+1)} / ${READS} まいめ`;$('scoreP').textContent=`あなた ${G.me} − ${G.cat} ねこ`}
+function text(s,x,y,c,small){G.texts.push({s,x,y,c,small,t:0})}
+function say(s){G.say=s;G.sayT=1.4}
+function nextRead(){if(G.n>=READS){finish();return}
+  const kara=G.karaN<3&&G.n>1&&Math.random()<.2&&G.deck.length>0;let li;
+  if(kara){li=G.deck[Math.floor(Math.random()*G.deck.length)];G.karaN++}else{const live=G.table.filter(c=>c);li=live[Math.floor(Math.random()*live.length)].li}
+  G.line=li;G.kara=kara;G.shown=0;G.pt=0;G.phase='read';G.paw=null;G.taken=null;
+  const base=Math.max(1.55,3.0-G.n*.1);G.catT=base+Math.random()*.8;G.catErr=kara&&Math.random()<.12;sfx('turn',.5);hud()}
+function cardIdx(li){return G.table.findIndex(c=>c&&c.li===li)}
+function take(who,i){const c=G.table[i];if(!c)return;G.table[i]=null;G.taken={who,c,t:0};G.piles[who].push(c.li);if(who===0){G.me++;sfx('take',.6);sfx('got',.6);text('とった！',c.x,c.y-110,'#ffe27a');const rt=G.pt-.4;if(G.fast==null||rt<G.fast)G.fast=rt;say('にゃっ…')}else{G.cat++;sfx('slap',.7);sfx('lose',.45);text('ねこが とった',c.x,c.y-110,'#fff',true);say('とったにゃ')}
+  // refill the slot from the deck
+  if(G.deck.length){const k=Math.floor(Math.random()*G.deck.length);const li=G.deck.splice(k,1)[0];setTimeout(()=>{deal(i,li)},700)}
+  G.phase='after';G.pt=0;hud()}
+function tapCard(i){if(G.phase!=='read'||G.freeze>0)return;const c=G.table[i];if(!c)return;
+  if(!G.kara&&c.li===G.line&&G.shown>=1){take(0,i);return}
+  // お手つき
+  G.freeze=1;G.cat++;sfx('foul',.6);text('おてつき！',c.x,c.y-110,'#ffd0c0');say('にゃふふ');c.shake=.4;hud()}
+function finish(){G.phase='end';G.pt=0;duck(.08,.2);const r=G.me-G.cat;setTimeout(()=>sfx(r>0?'win':'over',.75),300);text(r>0?'かち！':r<0?'まけ…':'ひきわけ',360,640,r>0?'#ffe27a':'#fff')}
+function rank(){const r=G.me-G.cat;return r>=8?'かるたの めいじん':r>=4?'はやとりの ねこなかせ':r>0?'ねこに かった！':r===0?'いい しょうぶ':r>-5?'あと すこし':'ねこの かち'}
+function showResult(){const r=G.me-G.cat;const wins=LS.get('karuta-wins',0)+(r>0?1:0);if(r>0)LS.set('karuta-wins',wins);
+  $('resScore').textContent=r>0?'かち！':r<0?'まけ…':'ひきわけ';$('rMe').textContent=G.me+'まい';$('rCat').textContent=G.cat+'まい';$('rFast').textContent=G.fast!=null?G.fast.toFixed(1)+'びょう':'-';$('resRank').textContent=rank();
+  $('resNote').innerHTML=(r>0?`ねこに ${wins}かい かったよ。<br>`:'')+(r>0?'ねこは もう いっかい やろうって。':'よみはじめの もじだけ みて、すぐ さがそう。<br>からふだの ときは がまん。');
+  $('shareBtn').href='https://twitter.com/intent/tweet?text='+encodeURIComponent(`ねこかるた🐾 あなた${G.me}まい − ねこ${G.cat}まい で${r>0?'かち':r<0?'まけ':'ひきわけ'}！「${rank()}」\n#ねこかるた #picoruno`)+'&url='+encodeURIComponent('https://picoruno.com/karuta.html');
+  $('resultOv').hidden=false;bgm(false);refreshTitle()}
+
+/* ---------- step ---------- */
+function step(dt){
+  G.t+=dt;G.pt+=dt;G.sayT=Math.max(0,G.sayT-dt);G.freeze=Math.max(0,G.freeze-dt);
+  for(const c of G.table)if(c){c.flip=Math.min(1,c.flip+dt*3);if(c.shake)c.shake=Math.max(0,c.shake-dt)}
+  if(G.phase==='read'){const L=LINES[G.line];G.shown=G.pt<.4?0:Math.min(L.length,Math.floor(1+(G.pt-.4)*CPS));
+    if(!G.paw&&G.pt>G.catT){if(!G.kara){const i=cardIdx(G.line);if(i>=0)G.paw={i,t:0}}else if(G.catErr){const live=G.table.map((c,i)=>c?i:-1).filter(i=>i>=0);G.paw={i:live[Math.floor(Math.random()*live.length)],t:0,err:1}}}
+    if(G.paw){G.paw.t+=dt;if(G.paw.t>=.32&&!G.paw.hit){G.paw.hit=1;if(G.paw.err){G.me++;sfx('slap',.6);text('ねこが おてつき！',360,560,'#ffe27a');say('にゃ!?');hud();G.phase='after';G.pt=0}else take(1,G.paw.i)}}
+    if(G.kara&&G.pt>.4+L.length/CPS+1.6){text('からふだ でした',360,560,'#fff',true);G.phase='after';G.pt=0}}
+  if(G.phase==='after'){if(G.taken)G.taken.t+=dt;if(G.paw)G.paw.t+=dt;if(G.pt>1.5){G.n++;nextRead()}}
+  if(G.phase==='end'&&G.pt>1.8&&$('resultOv').hidden)showResult();
+  for(let i=G.fx.length-1;i>=0;i--){const p=G.fx[i];p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.t>p.life)G.fx.splice(i,1)}}
+
+/* ---------- draw ---------- */
+const cv=$('cv'),ctx=cv.getContext('2d');let CW=0,CH=0,DPR=1,S=1,OX=0,OY=0;
+function resize(){DPR=Math.min(devicePixelRatio||1,2.5);const r=cv.getBoundingClientRect();CW=r.width;CH=r.height;cv.width=Math.round(CW*DPR);cv.height=Math.round(CH*DPR);
+  S=Math.min(CW/W0,Math.max(CH/H0,CW/W0*.92));OX=(CW-W0*S)/2;OY=(CH-H0*S)*.5}
+function toFrame(e){const r=cv.getBoundingClientRect();return {x:(e.clientX-r.left-OX)/S,y:(e.clientY-r.top-OY)/S}}
+function outlineText(c,s,x,y,sz,fill,lw){c.font=`${sz}px "Dela Gothic One",sans-serif`;c.lineJoin='round';c.lineWidth=lw||sz*.28;c.strokeStyle='#4a2c1d';c.strokeText(s,x,y);c.fillStyle=fill;c.fillText(s,x,y)}
+function drawCard(c,cd,x,y,rot,s=1){c.save();c.translate(x,y);c.rotate(rot);c.scale(s*cd.flip,s);sprAt(c,'card',96,96,0,0,CS);
+  if(cd.flip>.5){const ch=LINES[cd.li][0];c.strokeStyle='#c4432e';c.lineWidth=5;c.beginPath();c.arc(0,-18,44,0,7);c.stroke();
+    c.fillStyle='#3a2418';c.font='900 64px "Zen Maru Gothic","Hiragino Maru Gothic ProN",sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(ch,0,-14);
+    c.fillStyle='rgba(196,67,46,.55)';for(const [dx,dy,r] of [[0,52,9],[-12,40,4.5],[-4,36,4.5],[4,36,4.5],[12,40,4.5]]){c.beginPath();c.arc(dx,dy,r,0,7);c.fill()}}
+  c.restore()}
+function wrap(s,max){const w=s.split(' ');const out=[];let cur='';for(const x of w){if((cur+x).length>max&&cur){out.push(cur.trim());cur=''}cur+=x+' '}if(cur.trim())out.push(cur.trim());return out}
+function draw(dt){
+  const c=ctx;c.setTransform(DPR,0,0,DPR,0,0);c.fillStyle='#d6c884';c.fillRect(0,0,CW,CH);
+  c.save();c.translate(OX,OY);c.scale(S,S);c.beginPath();c.rect(0,0,W0,H0);c.clip();
+  if(IMG.bg)c.drawImage(IMG.bg,0,0,W0,H0);else{c.fillStyle='#d6c884';c.fillRect(0,0,W0,H0)}
+  // table cards
+  for(let i=0;i<12;i++){const cd=G.table[i];if(!cd)continue;const sh=cd.shake?Math.sin(G.t*60)*6*cd.shake:0;drawCard(c,cd,cd.x+sh,cd.y,cd.rot)}
+  // the card being taken slides to a pile
+  if(G.taken){const u=Math.min(1,G.taken.t/.5),cd=G.taken.c,tx=G.taken.who?CAT[0]+40:360,ty=G.taken.who?CAT[1]+170:1120;drawCard(c,cd,cd.x+(tx-cd.x)*u*u,cd.y+(ty-cd.y)*u*u,cd.rot*(1-u),1-.35*u)}
+  // piles
+  const pile=(n,x,y)=>{for(let k=0;k<Math.min(n,6);k++)sprAt(c,'card',96,96,x+k*3,y-k*3,CS*.62,.1*(k%2?1:-1));if(n){c.save();c.textAlign='center';outlineText(c,n+'まい',x+8,y+80,26,'#fff',7);c.restore()}};
+  pile(G.me,360,1120);pile(G.cat,CAT[0]+40,CAT[1]+170);
+  // reading card
+  if(G.line!=null&&(G.phase==='read'||G.phase==='after')){const L=LINES[G.line];c.save();c.fillStyle='#fffaf2';c.strokeStyle='#4a2c1d';c.lineWidth=5;c.beginPath();c.roundRect(30,140,470,160,22);c.fill();c.stroke();
+    c.fillStyle='#7a3a5a';c.font='22px "Dela Gothic One",sans-serif';c.textAlign='left';c.textBaseline='middle';c.fillText('よみふだ',52,166);
+    const shown=L.slice(0,G.shown);const lines=wrap(shown,12);c.font='900 36px "Zen Maru Gothic","Hiragino Maru Gothic ProN",sans-serif';c.fillStyle='#3a2418';
+    lines.forEach((ln,k)=>{if(k===0&&ln.length){c.fillStyle='#c4432e';c.fillText(ln[0],52,214);const w=c.measureText(ln[0]).width;c.fillStyle='#3a2418';c.fillText(ln.slice(1),52+w,214)}else c.fillText(ln,52,214+k*46)});c.restore()}
+  // the cat's paw reaching out
+  if(G.paw&&(G.phase==='read'||G.phase==='after')){const cd=G.table[G.paw.i]||(G.taken&&G.taken.c);if(cd){const u=G.paw.t<.32?G.paw.t/.32:Math.max(0,1-(G.paw.t-.5)/.3),e=u*(2-u);const x=CAT[0]+(cd.x-CAT[0])*e,y=CAT[1]+60+(cd.y-CAT[1]-60)*e;
+    if(e>0){c.save();c.lineCap='round';c.strokeStyle='#4a2c1d';c.lineWidth=40;c.beginPath();c.moveTo(CAT[0],CAT[1]+60);c.lineTo(x,y);c.stroke();c.strokeStyle='#fbf6ec';c.lineWidth=33;c.stroke();c.restore();
+      sprAt(c,'paw',SPW.tip[0],SPW.tip[1],x,y,1.2,Math.atan2(CAT[0]-x,-(CAT[1]+60-y)))}}}
+  if(G.sayT>0){c.save();c.globalAlpha=Math.min(1,G.sayT*4);c.translate(CAT[0]-20,CAT[1]+120);c.fillStyle='#fffaf2';c.strokeStyle='#4a2c1d';c.lineWidth=4;c.beginPath();c.roundRect(-84,-26,168,50,20);c.fill();c.stroke();c.textAlign='center';c.textBaseline='middle';c.font='22px "Dela Gothic One",sans-serif';c.fillStyle='#4a2c1d';c.fillText(G.say,0,-1);c.restore()}
+  if(G.freeze>0){c.save();c.fillStyle=`rgba(74,44,29,${.18*G.freeze})`;c.fillRect(0,0,W0,H0);c.restore()}
+  for(let i=G.texts.length-1;i>=0;i--){const x=G.texts[i];x.t+=dt;if(x.t>1.4){G.texts.splice(i,1);continue}
+    c.save();const sz=x.small?30:40;c.textAlign='center';c.textBaseline='middle';c.translate(Math.max(170,Math.min(W0-170,x.x)),x.y-x.t*26);c.globalAlpha=x.t>1.1?(1.4-x.t)/.3:1;outlineText(c,x.s,0,0,sz,x.c);c.restore()}
+  if(G.phase==='read'&&G.n===0&&G.t%1.4<1.05){c.save();c.textAlign='center';outlineText(c,'あかい もじの ふだを さがして タップ',360,1010,28,'#fff',8);c.restore()}
+  c.restore()}
+let last=performance.now();
+function frame(n){const dt=Math.min(.033,(n-last)/1000);last=n;if(G.phase!=='pause'&&G.phase!=='title')step(dt);draw(G.phase==='pause'?0:dt);requestAnimationFrame(frame)}
+
+/* ---------- input ---------- */
+cv.addEventListener('pointerdown',e=>{e.preventDefault();unlock();if(G.phase!=='read')return;const p=toFrame(e);let bi=-1,bd=1e9;
+  for(let i=0;i<12;i++){const cd=G.table[i];if(!cd)continue;const dx=Math.abs(p.x-cd.x),dy=Math.abs(p.y-cd.y);if(dx<SC.w*CS/2+6&&dy<SC.h*CS/2+6){const d=dx+dy;if(d<bd){bd=d;bi=i}}}
+  if(bi>=0)tapCard(bi)},{passive:false});
+function start(){unlock();guardHistory();for(const id of ['titleOv','resultOv','pauseOv'])$(id).hidden=true;reset();G.phase='wait';G.pt=0;text('よろしく おねがいします',360,640,'#fff',true);setTimeout(()=>{if(G.phase==='wait')nextRead()},1300);
+  if(ac)Promise.resolve(decoding).then(()=>{duck(.26,.01);bgm(true);sfx('start',.5)});pingPlay()}
+let prev='read';
+function pause(on){if(on){if(G.phase==='title'||G.phase==='end'||G.phase==='pause')return;prev=G.phase;G.phase='pause';$('pauseOv').hidden=false;if(ac)ac.suspend()}else{if(G.phase!=='pause')return;$('pauseOv').hidden=true;G.phase=prev;last=performance.now();if(ac)ac.resume()}}
+function toTitle(){bgm(false);G.phase='title';for(const id of ['pauseOv','resultOv'])$(id).hidden=true;$('titleOv').hidden=false;refreshTitle();if(ac&&ac.state==='suspended')ac.resume()}
+function refreshTitle(){const b=LS.get('karuta-wins',0);$('bestLine').textContent=b?`ねこに かった かず ${b}`:''}
+$('startBtn').onclick=start;$('againBtn').onclick=start;
+$('pauseBtn').onclick=()=>pause(true);$('resumeBtn').onclick=()=>pause(false);$('quitBtn').onclick=toTitle;
+$('muteBtn').onclick=()=>{unlock();setMute(!muted)};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pause(true)});
+let guarded=false;function guardHistory(){if(guarded)return;try{history.pushState({karuta:1},'');guarded=true}catch(e){}}
+window.addEventListener('popstate',()=>{if(!guarded)return;guarded=false;if(G.phase!=='title'&&G.phase!=='end'){pause(true);guardHistory()}});
+document.addEventListener('touchstart',e=>{const x=e.touches[0].clientX;if(G.phase==='read'&&(x<24||x>innerWidth-24))e.preventDefault()},{passive:false});
+window.addEventListener('resize',resize);
+setMute(muted);refreshTitle();resize();reset();for(const cd of G.table)cd.flip=1;loadArt();requestAnimationFrame(frame);
+window.__T={G,tapCard,cardIdx,LINES};
+</script>
+<script>
+function pingPlay(){
+  var G="ねこかるた", K="picoruno-played:"+G;
+  try{ if(sessionStorage.getItem(K)) return; sessionStorage.setItem(K,"1"); }catch(e){}
+  var KEY="sb_publishable_5hbtIPW-1y5MqsoiLC6X_A_oZMG0Z5Z";
+  fetch("https://fymwlpbspigpeaoenhhp.supabase.co/rest/v1/rpc/add_play",{method:"POST",keepalive:true,
+    headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify({g:G})})
+  .then(function(r){ if(!r.ok) throw 0; })
+  .catch(function(){ try{ var d=JSON.parse(localStorage.getItem("picoruno-stats")||"{}"); d[G]=d[G]||{plays:0,likes:0}; d[G].plays++; localStorage.setItem("picoruno-stats",JSON.stringify(d)); }catch(e){} });
+}
+</script>
+</body>
+</html>

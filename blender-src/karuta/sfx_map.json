@@ -1,0 +1,4 @@
+{"key": [4, 6, 8, 11, 1], "sounds": {
+ "slap": ["kenney:impact-sounds__impactSoft_medium_001.ogg", -2], "take": ["kenney:impact-sounds__impactPlate_light_001.ogg", -6], "foul": ["kenney:interface-sounds__back_003.ogg", -6],
+ "turn": ["kenney:rpg-audio__bookFlip2.ogg", -6], "meow": ["uisfx:rubber/notification", -8], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (got / win / lose / over): original (music.py), FluidSynth + FluidR3_GM (MIT). Reading-card lines are original."}
