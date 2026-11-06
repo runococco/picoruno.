@@ -1,0 +1,5 @@
+{"key": [2, 4, 6, 9, 11], "sounds": {
+ "pop": ["uisfx:organic/snap", -6], "gold": ["kenney:interface-sounds__glass_006.ogg", -4], "gust": ["uisfx:dreamy/swipe", -4],
+ "bonk": ["kenney:impact-sounds__impactSoft_medium_001.ogg", -4], "snap": ["kenney:rpg-audio__clothBelt2.ogg", -2], "reel": ["kenney:ui-audio__click3.ogg", -12],
+ "meow": ["uisfx:rubber/notification", -8], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (snapped / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT). The wind is generated in the browser from filtered noise."}
