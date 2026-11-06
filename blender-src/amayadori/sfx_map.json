@@ -1,0 +1,4 @@
+{"key": [10, 0, 2, 5, 7], "sounds": {
+ "drip": ["uisfx:glass/drop", -10], "pat": ["uisfx:soft/press", -12], "splash": ["uisfx:organic/drop", -4],
+ "meow": ["uisfx:rubber/notification", -8], "gust": ["uisfx:dreamy/swipe", -8], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (bonus / rainbow / soaked / over): original (music.py), FluidSynth + FluidR3_GM (MIT). Rain noise is generated in the browser from filtered noise."}
