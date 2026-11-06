@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<script src="count.js" defer></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#dce8f4">
+<title>ゆきだるま ころころ</title>
+<meta name="description" content="雪の庭で雪玉をころがして、大きい玉と小さい玉をかさねたら ゆきだるま。雪はかぎりがあるから、どう転がすかが大事。60秒でいくつ作れる？">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ゆきだるま ころころ">
+<meta property="og:description" content="雪玉をころがして、かさねて、ゆきだるま。60秒でいくつ作れる？">
+<meta property="og:url" content="https://picoruno.com/yukidaruma.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://picoruno.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://picoruno.com/og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%237aa8d8'/%3E%3Ccircle cx='16' cy='22' r='7.5' fill='%23fff' stroke='%234a2c1d' stroke-width='2'/%3E%3Ccircle cx='16' cy='11' r='5.5' fill='%23fff' stroke='%234a2c1d' stroke-width='2'/%3E%3Ccircle cx='14' cy='10.5' r='1.1' fill='%234a2c1d'/%3E%3Ccircle cx='18' cy='10.5' r='1.1' fill='%234a2c1d'/%3E%3Cpath d='M11.5 6.5h9l-1.5-4h-6z' fill='%23d84a3a' stroke='%234a2c1d' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<style>
+/* Snowy morning: snow white, sky blue, bucket red, dark-brown outlined flat UI. */
+:root{
+  --ink:#4a2c1d;
+  --ink2:#7a5440;
+  --paper:#fffaf2;
+  --blue:#4a86c8;
+  --red:#c4432e;
+  --sky:#7aa8d8;
+  --gold:#f2c14e;
+  --display:"Dela Gothic One","Zen Maru Gothic","Hiragino Sans",sans-serif;
+  --body:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%;margin:0;background:#dce8f4}
+[hidden]{display:none!important}
+body{color:var(--ink);font-family:var(--body);overflow:hidden;overscroll-behavior:none;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+#app{position:relative;height:100%;height:100dvh;max-width:560px;margin:0 auto;overflow:hidden}
+#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+button{font-family:inherit;color:inherit;cursor:pointer}
+.hud{position:absolute;left:0;right:0;top:env(safe-area-inset-top);z-index:2;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;pointer-events:none}
+.pill{font-family:var(--display);font-size:1rem;background:var(--paper);color:var(--ink);border:2.5px solid var(--ink);border-radius:12px;padding:4px 10px;box-shadow:0 3px 0 var(--ink);white-space:nowrap}
+.pill.t{min-width:3.6em;text-align:center}
+.pill.t.low{background:#ffd9c8;color:var(--red)}
+.ib{pointer-events:auto;width:40px;height:40px;border-radius:12px;border:2.5px solid var(--ink);background:var(--paper);display:grid;place-items:center;padding:0;box-shadow:0 3px 0 var(--ink)}
+.ib svg{width:22px;height:22px}
+.ov{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(74,44,29,.28)}
+.card{background:var(--paper);color:var(--ink);border:3px solid var(--ink);border-radius:22px;box-shadow:0 6px 0 var(--ink);padding:18px 18px 14px;width:100%;max-width:360px;box-sizing:border-box;text-align:center;max-height:100%;overflow:auto}
+.logo{font-family:var(--display);font-size:1.2rem;line-height:1.1;margin:4px 0 0;color:var(--sky)}
+.logo2{font-family:var(--display);font-size:2.6rem;line-height:1.1;margin:0 0 6px;color:var(--red)}
+.sub{font-size:.9rem;color:var(--ink2);margin:0 0 10px;font-weight:700}
+.how{font-size:.86rem;font-weight:700;background:#fff;border:2px dashed #a8c4e0;border-radius:12px;padding:8px 10px;margin:0 0 12px;line-height:1.6;text-align:left}
+.how ol{margin:0;padding-left:1.3em}
+.how em{font-style:normal;color:var(--red)}
+.how .kinds{display:flex;justify-content:space-around;margin:6px 0 0;font-size:.74rem;text-align:center;color:var(--ink2)}
+.how .kinds img{display:block;width:62px;height:auto;margin:0 auto -4px}
+.big{display:block;width:100%;font-family:var(--display);font-size:1.2rem;padding:13px 10px;border-radius:16px;border:3px solid var(--ink);
+  background:var(--blue);color:#fff;box-shadow:0 5px 0 var(--ink);margin:0 0 12px;letter-spacing:.04em;text-decoration:none;box-sizing:border-box}
+.big:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.big.sec{background:#fff;color:var(--ink)}
+.best{font-size:.85rem;color:var(--ink2);margin:-4px 0 10px;font-weight:700}
+.back{margin:6px 0 0;font-size:.85rem}
+.back a{color:var(--ink2);font-weight:700}
+.bag{display:flex;justify-content:center;gap:10px;margin:6px 0 8px}
+.bag div{width:84px;font-size:.78rem;font-weight:900;line-height:1.3}
+.bag img{display:block;width:76px;height:auto;margin:0 auto -6px}
+.bag b{font-family:var(--display);font-weight:400;font-size:1.25rem}
+.res-big{font-family:var(--display);font-size:2.6rem;line-height:1.05;margin:2px 0}
+.res-rank{display:inline-block;font-family:var(--display);font-size:1rem;background:var(--gold);border:2.5px solid var(--ink);border-radius:999px;padding:4px 14px;margin:4px 0 6px}
+.res-note{font-size:.84rem;font-weight:700;color:var(--ink2);margin:0 0 12px;line-height:1.6}
+.pause-t{font-family:var(--display);font-size:1.6rem;margin:4px 0 12px}
+.res-row{display:flex;justify-content:center;gap:14px;margin:4px 0 6px;font-size:.84rem;font-weight:900;color:var(--ink2)}
+.res-row b{display:block;font-family:var(--display);font-weight:400;font-size:1.3rem;color:var(--ink)}
+.how .q{display:flex;justify-content:center;align-items:flex-end;gap:14px;margin:6px 0 0;font-size:.74rem;text-align:center;color:var(--ink2)}
+.how .q i{display:block;margin:0 auto 2px;border:2.5px solid var(--ink);border-radius:50%;background:#fff}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="cv"></canvas>
+  <div class="hud"><div class="pill t" id="timeP">60</div><div class="pill" id="scoreP">0 てん</div><button class="ib" id="pauseBtn" aria-label="一時停止"><svg viewBox="0 0 24 24" fill="#4a2c1d"><rect x="6" y="5" width="4.2" height="14" rx="1.5"/><rect x="13.8" y="5" width="4.2" height="14" rx="1.5"/></svg></button></div>
+
+  <div class="ov" id="titleOv">
+    <div class="card">
+      <div class="logo">ゆきだるま</div>
+      <div class="logo2">ころころ</div>
+      <p class="sub">雪玉をそだてて、かさねよう</p>
+      <div class="how"><ol>
+        <li>雪の上を <em>ゆびで なぞる</em> と、雪玉が うまれて ころがる</li>
+        <li>ころがすほど <em>大きく</em> なる。でも 庭の雪には かぎりがあるよ</li>
+        <li>小さい玉を 大きい玉に <em>ぶつける</em> と、かさなって ゆきだるま</li></ol>
+        <div class="q"><div><i style="width:22px;height:22px"></i><i style="width:36px;height:36px"></i>あたま 6 : どう 10 が<br>いちばん きれい</div></div></div>
+      <button class="big" id="startBtn">雪の庭へ</button>
+      <p class="best" id="bestLine"></p>
+      <button class="big sec" id="muteBtn" style="font-size:.95rem;padding:9px">♪ 音あり</button>
+      <p class="back"><a href="https://picoruno.com/">← picoruno. のゲーム一覧へ</a></p>
+    </div>
+  </div>
+  <div class="ov" id="pauseOv" hidden>
+    <div class="card">
+      <div class="pause-t">ひとやすみ</div>
+      <button class="big" id="resumeBtn">つづける</button>
+      <button class="big sec" id="quitBtn">タイトルへ</button>
+    </div>
+  </div>
+  <div class="ov" id="resultOv" hidden>
+    <div class="card">
+      <div class="logo">雪の庭が にぎやかに</div>
+      <div class="res-row"><div>ゆきだるま<b id="rCount">0</b></div><div>ばっちり<b id="rPerfect">0</b></div><div>いちばん大きい<b id="rBig">0</b></div></div>
+      <div class="res-big" id="resScore">0</div>
+      <div class="res-rank" id="resRank"></div>
+      <p class="res-note" id="resNote"></p>
+      <button class="big" id="againBtn">もういちど</button>
+      <a class="big sec" id="shareBtn" href="https://twitter.com/intent/tweet" target="_blank" rel="noopener" style="font-size:1rem">X でじまん</a>
+      <p class="back"><a href="https://picoruno.com/">← picoruno. のゲーム一覧へ</a></p>
+    </div>
+  </div>
+</div>
+<script>
+/*ART*/const ART={},LAYER={},SCENE={pxu:160,elev:58,field:[-2.15,2.15,-4.4,2.35],pond:[512,800,124.8,88],props:{},rocks:[],spr:{}};/*/ART*/
+/*AUDIO*/const AUD={};/*/AUDIO*/
+</script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const W0=720,H0=1280,ROUND=60;
+const PXU=SCENE.pxu,EL=SCENE.elev*Math.PI/180,SE=Math.sin(EL),CE=Math.cos(EL);
+// world (ground plane, px = units*PXU, origin at frame centre) <-> frame
+const sxOf=wx=>W0/2+wx,syOf=wy=>H0/2-wy*SE,wyOf=sy=>(H0/2-sy)/SE;
+const F=SCENE.field.map(v=>v*PXU);           // x0,x1,y0,y1 in world px
+const POND={x:SCENE.pond[0]-W0/2,y:wyOf(SCENE.pond[1]),rx:SCENE.pond[2],ry:SCENE.pond[3]};
+const OBST=[];for(const k in SCENE.props){const p=SCENE.props[k];OBST.push({x:p[0]-W0/2,y:wyOf(p[1]),r:p[2],layer:k})}
+for(const p of SCENE.rocks)OBST.push({x:p[0]-W0/2,y:wyOf(p[1]),r:p[2]*.95,rock:1});
+const SB=SCENE.spr.ball||{res:256,scale:2.3},BR=SB.res/SB.scale;   // sprite px per unit radius
+const K=.42,R0=20,RMAX=138,MINBODY=52;
+
+/* ---------- art ---------- */
+const IMG={};
+function loadImg(src){return new Promise(r=>{if(!src)return r(null);const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
+function outlined(im,px,thr){
+  const c=document.createElement('canvas');c.width=im.width+px*2;c.height=im.height+px*2;const x=c.getContext('2d');
+  const m=document.createElement('canvas');m.width=im.width;m.height=im.height;const mx=m.getContext('2d');mx.drawImage(im,0,0);
+  const d=mx.getImageData(0,0,m.width,m.height),a=d.data;for(let i=0;i<a.length;i+=4){const on=a[i+3]>thr;a[i]=74;a[i+1]=44;a[i+2]=29;a[i+3]=on?255:0}mx.putImageData(d,0,0);
+  for(let k=0;k<16;k++){const t=k/16*Math.PI*2;x.drawImage(m,px+Math.cos(t)*px,px+Math.sin(t)*px)}
+  x.drawImage(im,px,px);c.pad=px;return c}
+const snowCv=document.createElement('canvas');snowCv.width=W0;snowCv.height=H0;const sctx=snowCv.getContext('2d');
+async function loadArt(){
+  await Promise.all(Object.keys(ART).map(k=>loadImg(ART[k]).then(i=>{if(!i)return;IMG[k]=['bucket','mikan','momiji','twig','ball'].includes(k)?outlined(i,k==='ball'?5:4,110):i})));
+  resetSnow()}
+function layer(c,k){const im=IMG[k],L=LAYER[k];if(!im||!L)return;c.drawImage(im,L[0],L[1],L[2],L[3])}
+
+/* ---------- audio ---------- */
+const AC=window.AudioContext||window.webkitAudioContext;
+let ac=null,master=null,bgmGain=null,bgmSrc=null,decoding=null;const BUF={};
+let muted=LS.get('yuki-mute',false);
+function b64buf(u){const b=atob(u.split(',')[1]);const a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a.buffer}
+function audioInit(){if(ac||!AC)return;ac=new AC();master=ac.createGain();master.gain.value=muted?0:1;master.connect(ac.destination);bgmGain=ac.createGain();bgmGain.gain.value=.4;bgmGain.connect(master);
+  decoding=Promise.all(Object.keys(AUD).map(k=>new Promise((r,j)=>{const p=ac.decodeAudioData(b64buf(AUD[k]),r,j);if(p&&p.then)p.then(r,j)}).then(b=>{BUF[k]=b}).catch(()=>{})))}
+function unlock(){audioInit();if(ac&&ac.state==='suspended')ac.resume()}
+function snapRate(r){const st=12*Math.log2(r);let b=0;for(const a of [-12,-7,-5,0,5,7,12])if(Math.abs(a-st)<Math.abs(b-st))b=a;return Math.pow(2,b/12)}
+function sfx(k,vol=1,rate=1){if(!ac||!BUF[k]||muted)return;const s=ac.createBufferSource();s.buffer=BUF[k];s.playbackRate.value=snapRate(rate);const g=ac.createGain();g.gain.value=vol;s.connect(g);g.connect(master);s.start()}
+function bgm(on){if(!ac)return;if(on){if(bgmSrc||!BUF.bgm)return;bgmSrc=ac.createBufferSource();bgmSrc.buffer=BUF.bgm;bgmSrc.loop=true;bgmSrc.connect(bgmGain);bgmSrc.start()}else if(bgmSrc){try{bgmSrc.stop()}catch(e){}bgmSrc=null}}
+function duck(v,t=.25){if(bgmGain&&ac)bgmGain.gain.setTargetAtTime(v,ac.currentTime,t)}
+function setMute(m){muted=m;LS.set('yuki-mute',m);if(master)master.gain.value=m?0:1;$('muteBtn').textContent=m?'♪ 音なし':'♪ 音あり'}
+
+/* ---------- snow ---------- */
+const CS=10,GX0=F[0],GY0=F[2],GW=Math.ceil((F[1]-F[0])/CS),GH=Math.ceil((F[3]-F[2])/CS);const SNOW=new Float32Array(GW*GH);
+function inPond(x,y,m=0){const dx=(x-POND.x)/(POND.rx+m),dy=(y-POND.y)/(POND.ry+m);return dx*dx+dy*dy<1}
+function resetSnow(){
+  for(let j=0;j<GH;j++)for(let i=0;i<GW;i++){const x=GX0+(i+.5)*CS,y=GY0+(j+.5)*CS;SNOW[j*GW+i]=inPond(x,y,4)?0:1}
+  sctx.globalCompositeOperation='source-over';sctx.clearRect(0,0,W0,H0);if(IMG.snow)layer(sctx,'snow')}
+function snowLeft(){let s=0;for(let i=0;i<SNOW.length;i++)s+=SNOW[i];return s}
+const SNOWTOTAL=(()=>{let s=0;for(let j=0;j<GH;j++)for(let i=0;i<GW;i++){const x=GX0+(i+.5)*CS,y=GY0+(j+.5)*CS;if(!inPond(x,y,4))s++}return s})();
+// take the snow under a footprint circle; returns the area picked up (world px^2)
+function scoop(x,y,rf){let got=0;const i0=Math.max(0,Math.floor((x-rf-GX0)/CS)),i1=Math.min(GW-1,Math.floor((x+rf-GX0)/CS)),j0=Math.max(0,Math.floor((y-rf-GY0)/CS)),j1=Math.min(GH-1,Math.floor((y+rf-GY0)/CS));
+  for(let j=j0;j<=j1;j++)for(let i=i0;i<=i1;i++){const cx=GX0+(i+.5)*CS-x,cy=GY0+(j+.5)*CS-y;if(cx*cx+cy*cy>rf*rf)continue;const k=j*GW+i;if(SNOW[k]>0){got+=SNOW[k]*CS*CS;SNOW[k]=0}}
+  if(got>0){const sx=sxOf(x),sy=syOf(y);sctx.save();sctx.globalCompositeOperation='destination-out';sctx.translate(sx,sy);sctx.scale(1,SE);
+    const g=sctx.createRadialGradient(0,0,rf*.6,0,0,rf*1.04);g.addColorStop(0,'rgba(0,0,0,1)');g.addColorStop(1,'rgba(0,0,0,0)');sctx.fillStyle=g;sctx.beginPath();sctx.arc(0,0,rf*1.05,0,7);sctx.fill();sctx.restore()}
+  return got}
+function snowAt(x,y){const i=Math.floor((x-GX0)/CS),j=Math.floor((y-GY0)/CS);if(i<0||j<0||i>=GW||j>=GH)return 0;return SNOW[j*GW+i]}
+
+/* ---------- 3D-ish ball orientation for the rolling specks ---------- */
+function rotM(ax,ay,az,a){const c=Math.cos(a),s=Math.sin(a),t=1-c;return [t*ax*ax+c,t*ax*ay-s*az,t*ax*az+s*ay,t*ax*ay+s*az,t*ay*ay+c,t*ay*az-s*ax,t*ax*az-s*ay,t*ay*az+s*ax,t*az*az+c]}
+function mul(A,B){const R=new Array(9);for(let i=0;i<3;i++)for(let j=0;j<3;j++)R[i*3+j]=A[i*3]*B[j]+A[i*3+1]*B[3+j]+A[i*3+2]*B[6+j];return R}
+function app(M,v){return [M[0]*v[0]+M[1]*v[1]+M[2]*v[2],M[3]*v[0]+M[4]*v[1]+M[5]*v[2],M[6]*v[0]+M[7]*v[1]+M[8]*v[2]]}
+function appT(M,v){return [M[0]*v[0]+M[3]*v[1]+M[6]*v[2],M[1]*v[0]+M[4]*v[1]+M[7]*v[2],M[2]*v[0]+M[5]*v[1]+M[8]*v[2]]}
+const SPECK=['#5a4632','#6e5a3e','#8a8a4a','#a89a5a','#c8642a'];
+
+/* ---------- game state ---------- */
+const G={phase:'title',t:0,left:ROUND,score:0,balls:[],men:[],fx:[],texts:[],grab:null,tx:0,ty:0,flakes:[],snowfall:0,crunchT:0,hint:null,best:0,perfect:0,lastHat:-1};
+function newBall(x,y,r=R0){return {x,y,r,M:[1,0,0,0,1,0,0,0,1],sp:[],bump:0,id:Math.random()}}
+function reset(){G.t=0;G.left=ROUND;G.score=0;G.balls=[];G.men=[];G.fx=[];G.texts=[];G.grab=null;G.snowfall=0;G.best=0;G.perfect=0;G.lastHat=-1;resetSnow();
+  G.flakes=[];for(let k=0;k<60;k++)G.flakes.push({x:Math.random()*W0,y:Math.random()*H0,v:30+Math.random()*50,s:1.5+Math.random()*2.5,p:Math.random()*6});hud()}
+function hud(){$('timeP').textContent=Math.ceil(Math.max(0,G.left));$('timeP').classList.toggle('low',G.left<=10&&G.phase==='play');$('scoreP').textContent=G.score+' てん'}
+
+const clampX=(x,r)=>Math.max(F[0]+r*.35,Math.min(F[1]-r*.35,x)),clampY=(y,r)=>Math.max(F[2]+r*.2,Math.min(F[3]-r*.6,y));
+function solids(except){const out=[];for(const o of OBST)out.push(o);for(const m of G.men)out.push({x:m.x,y:m.y,r:m.rb*.92,man:m});for(const b of G.balls)if(b!==except)out.push({x:b.x,y:b.y,r:b.r,ball:b});return out}
+function tryStack(a,b){
+  const big=a.r>=b.r?a:b,small=big===a?b:a;if(big.r<MINBODY||small.r>big.r*.92)return false;
+  const q=small.r/big.r,d=Math.abs(q-.6);const grade=d<.06?2:d<.14?1:0;
+  const hats=['bucket','mikan','momiji'];G.lastHat=(G.lastHat+1)%hats.length;
+  const m={x:big.x,y:big.y,rb:big.r,rh:small.r,hx:sxOf(small.x),hy:syOf(small.y)-small.r*CE,t:0,hat:hats[G.lastHat],grade,Mb:big.M,spb:big.sp,Mh:small.M,sph:small.sp,blink:Math.random()*3};
+  G.men.push(m);G.balls=G.balls.filter(z=>z!==a&&z!==b);if(G.grab===a||G.grab===b)G.grab=null;
+  const base=Math.round(big.r+small.r),mul=[1,1.5,2.2][grade],pt=Math.round(base*mul/10)*10;G.score+=pt;if(grade===2)G.perfect++;G.best=Math.max(G.best,Math.round(big.r));
+  const sx=sxOf(m.x),sy=syOf(m.y)-m.rb*CE*2-m.rh*1.2;
+  setTimeout(()=>{G.texts.push({s:['ゆきだるま！','いいかんじ！','ばっちり！'][grade],x:sx,y:sy-40,t:0,c:grade===2?'#ffe27a':'#fff'});G.texts.push({s:'+'+pt,x:sx,y:sy,t:-.1,c:'#fff',small:1});
+    for(let k=0;k<18;k++){const an=Math.random()*Math.PI*2,v=120+Math.random()*240;G.fx.push({x:sx,y:sy+40,vx:Math.cos(an)*v,vy:Math.sin(an)*v-60,t:0,life:.7+Math.random()*.4,c:k%3?'#fff':'#bfe0ff'})}
+    sfx(grade===2?'perfect':'done',.8)},420);
+  sfx('stack',.9);if(navigator.vibrate)try{navigator.vibrate(18)}catch(e){}hud();return true}
+function moveBall(b,tx,ty,dt){
+  const vmax=Math.max(250,560-b.r*1.6);let dx=tx-b.x,dy=ty-b.y;const d=Math.hypot(dx,dy);if(d<.5)return;
+  const st=Math.min(d,vmax*dt),ux=dx/d,uy=dy/d;let nx=clampX(b.x+ux*st,b.r),ny=clampY(b.y+uy*st,b.r);
+  for(const o of solids(b)){const ox=nx-o.x,oy=ny-o.y,rr=(o.ball?o.r+b.r:o.r+b.r*.8),dd=Math.hypot(ox,oy);
+    if(dd<rr){if(o.ball&&tryStack(b,o.ball))return;
+      if(!o.ball&&!o.man&&b.r>R0+6&&b.bump<=0&&st>vmax*dt*.8&&(ux*(o.x-b.x)+uy*(o.y-b.y))>.7*Math.hypot(o.x-b.x,o.y-b.y)){b.r=Math.max(R0,b.r*.96);b.bump=1.2;sfx('bump',.6);G.texts.push({s:'ごつん',x:sxOf(nx),y:syOf(ny)-b.r*CE-b.r,t:0,c:'#fff',small:1})}
+      const k=(rr-dd)/(dd||1);nx+=ox*k;ny+=oy*k}}
+  nx=clampX(nx,b.r);ny=clampY(ny,b.r);
+  const mx=nx-b.x,my=ny-b.y,md=Math.hypot(mx,my);if(md<.01)return;b.x=nx;b.y=ny;
+  // roll: rotate about the horizontal axis perpendicular to the motion
+  b.M=mul(rotM(-my/md,mx/md,0,md/b.r),b.M);
+  // pick up snow
+  const got=scoop(b.x,b.y,b.r*.8);if(got>0){const old=b.r;b.r=Math.min(RMAX,Math.sqrt(b.r*b.r+K*got/Math.PI));
+    if(Math.random()<got/900&&b.sp.length<46){const v=appT(b.M,[0,0,-1]);b.sp.push({v,c:SPECK[Math.floor(Math.random()*SPECK.length)],s:.04+Math.random()*.04})}
+    G.crunchT-=md;if(G.crunchT<=0){G.crunchT=26+b.r*.25;sfx('crunch'+(1+Math.floor(Math.random()*3)),.35+Math.min(.4,b.r/300),old>90?.75:1)}}
+}
+function step(dt){
+  G.t+=dt;
+  for(const f of G.flakes){f.y+=f.v*dt*(1+G.snowfall*2);f.x+=Math.sin(G.t*.8+f.p)*12*dt;if(f.y>H0+10){f.y=-10;f.x=Math.random()*W0}}
+  if(G.phase==='play'){
+    G.left-=dt;if(G.left<=0){G.left=0;finish()}
+    // halfway: fresh snow falls and slowly covers the bare paths again
+    if(G.t>28&&G.t<28+dt*1.5){G.texts.push({s:'また 雪が ふってきた',x:W0/2,y:420,t:0,c:'#fff'})}
+    if(G.t>28&&G.t<34){G.snowfall=Math.min(1,G.snowfall+dt);const a=dt*.35;for(let j=0;j<GH;j++)for(let i=0;i<GW;i++){const k=j*GW+i;if(SNOW[k]<1){const x=GX0+(i+.5)*CS,y=GY0+(j+.5)*CS;if(!inPond(x,y,4)&&!covered(x,y))SNOW[k]=Math.min(1,SNOW[k]+a)}}
+      if(IMG.snow){sctx.save();sctx.globalCompositeOperation='source-over';sctx.globalAlpha=a;layer(sctx,'snow');sctx.restore();for(const m of G.men)carve(m.x,m.y,m.rb);for(const b of G.balls)carve(b.x,b.y,b.r*.8)}}
+    else G.snowfall=Math.max(0,G.snowfall-dt*.5);
+    if(G.grab){moveBall(G.grab,G.tx,G.ty,dt)}
+  }
+  for(const b of G.balls)b.bump=Math.max(0,b.bump-dt);
+  for(const m of G.men)m.t+=dt;
+  for(let i=G.fx.length-1;i>=0;i--){const p=G.fx[i];p.t+=dt;if(p.t>p.life){G.fx.splice(i,1);continue}p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=320*dt;p.vx*=1-dt*2}
+  if(G.phase==='end'){G.endT+=dt;if(G.endT>1.8&&$('resultOv').hidden)showResult()}
+  hud();
+}
+function covered(x,y){for(const m of G.men)if(Math.hypot(x-m.x,y-m.y)<m.rb)return true;for(const b of G.balls)if(Math.hypot(x-b.x,y-b.y)<b.r*.8)return true;return false}
+function carve(x,y,r){const i0=Math.max(0,Math.floor((x-r-GX0)/CS)),i1=Math.min(GW-1,Math.floor((x+r-GX0)/CS)),j0=Math.max(0,Math.floor((y-r-GY0)/CS)),j1=Math.min(GH-1,Math.floor((y+r-GY0)/CS));
+  for(let j=j0;j<=j1;j++)for(let i=i0;i<=i1;i++){const cx=GX0+(i+.5)*CS-x,cy=GY0+(j+.5)*CS-y;if(cx*cx+cy*cy<=r*r)SNOW[j*GW+i]=0}
+  sctx.save();sctx.globalCompositeOperation='destination-out';sctx.translate(sxOf(x),syOf(y));sctx.scale(1,SE);sctx.beginPath();sctx.arc(0,0,r,0,7);sctx.fill();sctx.restore()}
+function finish(){if(G.phase!=='play')return;G.phase='end';G.endT=0;G.grab=null;duck(.08,.2);sfx('finish',.8);G.texts.push({s:'おしまい',x:W0/2,y:520,t:-.2,c:'#fff'})}
+function rank(s,n){return s>=1800?'ゆきだるま名人':s>=1100?'雪あそび上手':s>=500?'ころころ見習い':'雪だま はじめて'}
+function showResult(){
+  const best=LS.get('yuki-best',0),nb=G.score>best;if(nb)LS.set('yuki-best',G.score);const n=G.men.length;
+  $('rCount').textContent=n;$('rPerfect').textContent=G.perfect;$('rBig').textContent=G.best?Math.round(G.best*2/PXU*50)+'cm':'—';
+  $('resScore').textContent=G.score+' てん';$('resRank').textContent=rank(G.score,n);
+  $('resNote').innerHTML=(nb&&G.score>0?'ベスト更新！<br>':'')+(n>=6?'庭じゅう ゆきだるまだらけ。ねこも びっくり。':n>=3?'縁側から ながめると、なかなかの ながめ。':n>=1?'ちいさな なかまが できました。':'大きい玉に、小さい玉を ぶつけてみよう。');
+  $('shareBtn').href='https://twitter.com/intent/tweet?text='+encodeURIComponent(`ゆきだるま ころころ⛄ ${G.score}てん（${n}こ）「${rank(G.score,n)}」\n#ゆきだるまころころ #picoruno`)+'&url='+encodeURIComponent('https://picoruno.com/yukidaruma.html');
+  $('resultOv').hidden=false;bgm(false);refreshTitle()}
+
+/* ---------- draw ---------- */
+const cv=$('cv'),ctx=cv.getContext('2d');let CW=0,CH=0,DPR=1,S=1,OX=0,OY=0;
+function resize(){DPR=Math.min(devicePixelRatio||1,2.5);const r=cv.getBoundingClientRect();CW=r.width;CH=r.height;cv.width=Math.round(CW*DPR);cv.height=Math.round(CH*DPR);
+  S=Math.max(CW/W0,CH/H0);OX=(CW-W0*S)/2;OY=(CH-H0*S)*.7}
+function toFrame(e){const r=cv.getBoundingClientRect();return {x:(e.clientX-r.left-OX)/S,y:(e.clientY-r.top-OY)/S}}
+function ballSprite(c,cx,cy,r){const im=IMG.ball;if(!im){c.fillStyle='#fff';c.beginPath();c.arc(cx,cy,r,0,7);c.fill();return}const s=r/BR,p=im.pad||0;c.drawImage(im,cx-(SB.res/2+p)*s,cy-(SB.res/2+p)*s,im.width*s,im.height*s)}
+function specks(c,cx,cy,r,M,sp){for(const q of sp){const v=app(M,q.v);const vis=-v[1]*CE+v[2]*SE;if(vis<.12)continue;const px=cx+v[0]*r*.97,py=cy-(v[1]*SE+v[2]*CE)*r*.97;
+  c.globalAlpha=Math.min(1,(vis-.12)*4);c.fillStyle=q.c;c.beginPath();c.ellipse(px,py,q.s*r*Math.max(.35,vis)+1,q.s*r*.75+1,Math.atan2(py-cy,px-cx)+Math.PI/2,0,7);c.fill()}c.globalAlpha=1}
+function shadow(c,x,y,r){c.save();c.fillStyle='rgba(60,80,120,.22)';c.beginPath();c.ellipse(sxOf(x)+r*.18,syOf(y)+r*.06,r*.95,r*.95*SE,0,0,7);c.fill();c.restore()}
+function drawBall(c,b){const cx=sxOf(b.x),cy=syOf(b.y)-b.r*CE;shadow(c,b.x,b.y,b.r);ballSprite(c,cx,cy,b.r);specks(c,cx,cy,b.r,b.M,b.sp);
+  if(G.grab===b){c.save();c.strokeStyle='rgba(255,255,255,.9)';c.lineWidth=3;c.setLineDash([6,8]);c.beginPath();c.arc(cx,cy,b.r+10,0,7);c.stroke();c.restore()}
+  if(G.hint===b){c.save();c.strokeStyle='#ffe27a';c.lineWidth=5;c.beginPath();c.arc(cx,cy,b.r+8+Math.sin(G.t*10)*3,0,7);c.stroke();c.restore()}}
+function spr(c,k,ax,ay,x,y,s,flip,rot=0){const im=IMG[k];if(!im)return;const p=im.pad||0;c.save();c.translate(x,y);if(rot)c.rotate(rot);c.scale(flip?-s:s,s);c.drawImage(im,-ax-p,-ay-p);c.restore()}
+function drawMan(c,m){
+  const t=Math.min(1,m.t/.42),e=1-Math.pow(1-t,3);const bx=sxOf(m.x),by=syOf(m.y)-m.rb*CE;
+  const topY=by-m.rb*.78-m.rh*.82;const hx=m.hx+(bx-m.hx)*e,hy=m.hy+(topY-m.hy)*e-Math.sin(t*Math.PI)*90;
+  shadow(c,m.x,m.y,m.rb);
+  // arms behind the body
+  const pop=Math.min(1,Math.max(0,(m.t-.42)/.25)),bo=1+Math.sin(Math.min(1,pop)*Math.PI)*.25,TW=SCENE.spr.twig||{res:200,scale:1.6,base:[100,100]};
+  if(pop>0){const s=m.rb*.95/(.72*TW.res/TW.scale)*pop;for(const fl of [false,true]){spr(c,'twig',TW.base[0],TW.base[1],bx+(fl?-1:1)*m.rb*.62,by-m.rb*.1,s,fl,(fl?1:-1)*.15)}}
+  ballSprite(c,bx,by,m.rb);specks(c,bx,by,m.rb,m.Mb,m.spb);
+  const sq=t>=1?1+Math.sin(Math.min(1,(m.t-.42)/.3)*Math.PI)*.08*(m.t<.72?1:0):1;
+  c.save();c.translate(hx,hy+m.rh);c.scale(1/sq,sq);c.translate(-hx,-hy-m.rh);ballSprite(c,hx,hy,m.rh);specks(c,hx,hy,m.rh,m.Mh,m.sph);c.restore();
+  if(pop>0){
+    const blink=((m.t+m.blink)%3.4)<.12;const er=Math.max(3,m.rh*.1)*bo;c.fillStyle='#2a1a12';
+    for(const s of [-1,1]){c.beginPath();if(blink)c.ellipse(hx+s*m.rh*.3,hy+m.rh*.1,er,er*.25,0,0,7);else c.arc(hx+s*m.rh*.3,hy+m.rh*.1,er,0,7);c.fill()}
+    const H=SCENE.spr[m.hat]||{res:200,scale:1.3,base:[100,140]};const want={bucket:.6,mikan:.45,momiji:.6}[m.hat],size={bucket:.42,mikan:.34,momiji:.42}[m.hat];
+    const s=m.rh*want/(size*H.res/H.scale)*pop*bo;spr(c,m.hat,H.base[0],H.base[1],hx+(m.hat==='momiji'?m.rh*.25:0),hy-m.rh*.66,s,false,m.hat==='bucket'?-.12:m.hat==='momiji'?.3:0)}
+}
+function draw(dt){
+  const c=ctx;c.setTransform(DPR,0,0,DPR,0,0);c.fillStyle='#dce8f4';c.fillRect(0,0,CW,CH);c.save();c.translate(OX,OY);c.scale(S,S);
+  if(IMG.bg)c.drawImage(IMG.bg,0,0,W0,H0);
+  c.drawImage(snowCv,0,0);
+  layer(c,'rocks');
+  // depth-sorted: props, balls and snowmen (farther = larger world y first)
+  const items=[];for(const o of OBST)if(o.layer)items.push({y:o.y,f:()=>layer(c,o.layer)});
+  for(const b of G.balls)items.push({y:b.y,f:()=>drawBall(c,b)});for(const m of G.men)items.push({y:m.y,f:()=>drawMan(c,m)});
+  items.sort((a,b)=>b.y-a.y);for(const it of items)it.f();
+  for(const p of G.fx){c.globalAlpha=1-p.t/p.life;c.fillStyle=p.c;c.beginPath();c.arc(p.x,p.y,4.5,0,7);c.fill()}c.globalAlpha=1;
+  c.fillStyle='#fff';for(const f of G.flakes){c.globalAlpha=.55+.35*G.snowfall;c.beginPath();c.arc(f.x,f.y,f.s,0,7);c.fill()}c.globalAlpha=1;
+  // snow meter
+  if(G.phase==='play'||G.phase==='end'){const left=snowLeft()/SNOWTOTAL;c.save();c.font='22px "Dela Gothic One",sans-serif';c.textAlign='left';c.lineJoin='round';c.lineWidth=6;c.strokeStyle='#4a2c1d';
+    const tx=72,ty=1236;c.strokeText('庭の雪',tx,ty);c.fillStyle='#fff';c.fillText('庭の雪',tx,ty);rr(c,tx+92,ty-20,190,22,11);c.fillStyle='rgba(255,255,255,.5)';c.fill();c.lineWidth=3;c.stroke();
+    rr(c,tx+92,ty-20,Math.max(22,190*left),22,11);c.fillStyle='#fff';c.fill();c.stroke();c.restore()}
+  for(let i=G.texts.length-1;i>=0;i--){const x=G.texts[i];x.t+=dt;if(x.t>1.2){G.texts.splice(i,1);continue}if(x.t<0)continue;
+    c.save();const sz=x.small?26:36;c.font=`${sz}px "Dela Gothic One",sans-serif`;c.textAlign='center';c.textBaseline='middle';c.translate(x.x,x.y-x.t*34);c.globalAlpha=x.t>.9?(1.2-x.t)/.3:1;
+    c.lineJoin='round';c.lineWidth=sz*.28;c.strokeStyle='#4a2c1d';c.strokeText(x.s,0,0);c.fillStyle=x.c;c.fillText(x.s,0,0);c.restore()}
+  c.restore();
+}
+function rr(c,x,y,w,h,r){r=Math.min(r,w/2,h/2);c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
+let last=performance.now();
+function frame(n){const dt=Math.min(.05,(n-last)/1000);last=n;if(G.phase!=='pause')step(dt);
+  // which ball would the grabbed one stack onto?
+  G.hint=null;if(G.grab){let best=1e9;for(const b of G.balls){if(b===G.grab)continue;const big=Math.max(b.r,G.grab.r),sm=Math.min(b.r,G.grab.r);if(big<MINBODY||sm>big*.92)continue;const d=Math.hypot(b.x-G.grab.x,b.y-G.grab.y)-b.r-G.grab.r;if(d<160&&d<best){best=d;G.hint=b}}}
+  draw(G.phase==='pause'?0:dt);requestAnimationFrame(frame)}
+
+/* ---------- input ---------- */
+let pid=null;
+function setTarget(p){if(!G.grab)return;const b=G.grab;G.tx=p.x-W0/2;G.ty=wyOf(p.y+b.r*CE)}
+cv.addEventListener('pointerdown',e=>{e.preventDefault();unlock();if(G.phase!=='play')return;pid=e.pointerId;cv.setPointerCapture&&cv.setPointerCapture(e.pointerId);
+  const p=toFrame(e);let hit=null,hd=1e9;
+  for(const b of G.balls){const cx=sxOf(b.x),cy=syOf(b.y)-b.r*CE,d=Math.hypot(p.x-cx,p.y-cy);if(d<b.r+44&&d<hd){hd=d;hit=b}}
+  if(!hit){const wx=p.x-W0/2,wy=wyOf(p.y+R0*CE);if(wx>F[0]&&wx<F[1]&&wy>F[2]&&wy<F[3]&&snowAt(wx,wy)>.3&&!solids(null).some(o=>Math.hypot(o.x-wx,o.y-wy)<o.r+R0)){
+      if(G.balls.length>=6){const sm=G.balls.slice().sort((a,b)=>a.r-b.r)[0];G.balls.splice(G.balls.indexOf(sm),1)}
+      hit=newBall(wx,wy);G.balls.push(hit);scoop(wx,wy,R0*.8);sfx('pop',.6)}}
+  G.grab=hit;if(hit)setTarget(p)},{passive:false});
+cv.addEventListener('pointermove',e=>{if(e.pointerId!==pid)return;setTarget(toFrame(e))});
+function up(e){if(e.pointerId!==pid)return;pid=null;G.grab=null}
+cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+function start(){unlock();guardHistory();for(const id of ['titleOv','resultOv','pauseOv'])$(id).hidden=true;reset();G.phase='play';
+  if(ac)Promise.resolve(decoding).then(()=>{duck(.4,.01);bgm(true);sfx('start',.6)});pingPlay()}
+function pause(on){if(on){if(G.phase!=='play')return;G.phase='pause';G.grab=null;pid=null;$('pauseOv').hidden=false;if(ac)ac.suspend()}else{if(G.phase!=='pause')return;$('pauseOv').hidden=true;G.phase='play';if(ac)ac.resume()}}
+function toTitle(){bgm(false);G.phase='title';for(const id of ['pauseOv','resultOv'])$(id).hidden=true;$('titleOv').hidden=false;reset();refreshTitle();if(ac&&ac.state==='suspended')ac.resume()}
+function refreshTitle(){const b=LS.get('yuki-best',0);$('bestLine').textContent=b?`ベスト ${b}てん`:''}
+$('startBtn').onclick=start;$('againBtn').onclick=start;
+$('pauseBtn').onclick=()=>pause(true);$('resumeBtn').onclick=()=>pause(false);$('quitBtn').onclick=toTitle;
+$('muteBtn').onclick=()=>{unlock();setMute(!muted)};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pause(true)});
+let guarded=false;function guardHistory(){if(guarded)return;try{history.pushState({yuki:1},'');guarded=true}catch(e){}}
+window.addEventListener('popstate',()=>{if(!guarded)return;guarded=false;if(G.phase==='play'){pause(true);guardHistory()}});
+document.addEventListener('touchstart',e=>{const x=e.touches[0].clientX;if(G.phase==='play'&&(x<24||x>innerWidth-24))e.preventDefault()},{passive:false});
+window.addEventListener('resize',resize);
+setMute(muted);refreshTitle();resize();reset();loadArt();requestAnimationFrame(frame);
+window.__T={G,start,sxOf,syOf,wyOf,CE,snowLeft,toFrame:()=>({S,OX,OY})};
+</script>
+<script>
+function pingPlay(){
+  var G="ゆきだるま ころころ", K="picoruno-played:"+G;
+  try{ if(sessionStorage.getItem(K)) return; sessionStorage.setItem(K,"1"); }catch(e){}
+  var KEY="sb_publishable_5hbtIPW-1y5MqsoiLC6X_A_oZMG0Z5Z";
+  fetch("https://fymwlpbspigpeaoenhhp.supabase.co/rest/v1/rpc/add_play",{method:"POST",keepalive:true,
+    headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify({g:G})})
+  .then(function(r){ if(!r.ok) throw 0; })
+  .catch(function(){ try{ var d=JSON.parse(localStorage.getItem("picoruno-stats")||"{}"); d[G]=d[G]||{plays:0,likes:0}; d[G].plays++; localStorage.setItem("picoruno-stats",JSON.stringify(d)); }catch(e){} });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{"key": [5, 7, 9, 0, 2], "sounds": {
+ "crunch1": ["kenney:impact-sounds__footstep_snow_000.ogg", -4], "crunch2": ["kenney:impact-sounds__footstep_snow_002.ogg", -4],
+ "crunch3": ["kenney:impact-sounds__footstep_snow_004.ogg", -4], "bump": ["kenney:impact-sounds__impactSoft_heavy_001.ogg", -2],
+ "stack": ["kenney:impact-sounds__impactSoft_medium_002.ogg", 0], "pop": ["uisfx:soft/drop", -6],
+ "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (done / perfect / finish): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
