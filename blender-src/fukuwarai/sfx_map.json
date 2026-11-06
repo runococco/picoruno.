@@ -1,0 +1,4 @@
+{"key": [0, 2, 4, 7, 9], "sounds": {
+ "place": ["uisfx:soft/press", -4], "perfect": ["kenney:interface-sounds__glass_002.ogg", -8], "pick": ["kenney:interface-sounds__pluck_002.ogg", -6],
+ "cover": ["kenney:rpg-audio__cloth2.ogg", -4], "reveal": ["kenney:rpg-audio__cloth1.ogg", -4], "meow": ["uisfx:rubber/notification", -8], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (laugh / great / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
