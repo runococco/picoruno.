@@ -9,7 +9,7 @@ def enc(im, q=84, jpeg=False):
     if jpeg: im.convert('RGB').save(b, 'JPEG', quality=q, optimize=True, progressive=True); mt = 'jpeg'
     else: im.save(b, 'WEBP', quality=q, method=6); mt = 'webp'
     return f'data:image/{mt};base64,' + base64.b64encode(b.getvalue()).decode()
-for name in ['bg', 'usu', 'mochi0', 'mochi1', 'mochi2', 'usagi', 'kine', 'turner_idle', 'turner_reach', 'turner_ouch', 'plate']:
+for name in ['bg', 'moon', 'clouds', 'usu', 'mochi0', 'mochi1', 'mochi2', 'usagi', 'usagi_arm', 'kine', 'turner_idle', 'turner_reach', 'turner_ouch', 'turner_cheer', 'plate', 'maru']:
     im = Image.open(f'{src}/{name}.png').convert('RGBA')
     if name == 'bg':
         art[name] = enc(im, 82, True); layer[name] = [0, 0, im.width, im.height]; continue
@@ -17,7 +17,7 @@ for name in ['bg', 'usu', 'mochi0', 'mochi1', 'mochi2', 'usagi', 'kine', 'turner
     c = im.crop(bb); art[name] = enc(c); layer[name] = [bb[0], bb[1], c.width, c.height]
 scene = json.load(open(f'{src}/scene.json'))
 def a64(p): return 'data:audio/mpeg;base64,' + base64.b64encode(open(p, 'rb').read()).decode()
-aud = {k: a64(f'{HERE}/sfx/{k}.mp3') for k in ['ouch', 'perfect', 'start', 'miss']}
+aud = {k: a64(f'{HERE}/sfx/{k}.mp3') for k in ['best', 'great', 'good', 'miss', 'ouch', 'yoisho', 'start']}
 for k in ['song', 'finish', 'pound']: aud[k] = a64(f'{HERE}/audio/{k}.mp3')
 chart = json.load(open(f'{HERE}/audio/chart.json'))
 s = open(f'{HERE}/game.html', encoding='utf-8').read()

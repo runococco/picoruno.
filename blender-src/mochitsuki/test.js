@@ -18,7 +18,7 @@ const { chromium } = require('playwright');
     if (shots.length && s.t > shots[0]) { await pg.screenshot({ path: out + `/m2-play-${shots[0]}.png` }); shots.shift() }
     if (s.ph !== 'play') break; await pg.waitForTimeout(100);
   }
-  const G = await pg.evaluate(() => { const G = __T.G; return { ph: G.phase, score: G.score, perfect: G.perfect, good: G.good, miss: G.miss, ouch: G.ouch, max: G.maxCombo } });
+  const G = await pg.evaluate(() => { const G = __T.G; return { ph: G.phase, score: G.score, g3: G.g3, g2: G.g2, g1: G.g1, miss: G.miss, ouch: G.ouch, max: G.maxCombo } });
   console.log(JSON.stringify(G));
   await pg.waitForTimeout(1500);
   await pg.screenshot({ path: out + '/m3-result.png' });

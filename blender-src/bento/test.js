@@ -12,15 +12,16 @@ const { chromium } = require('playwright');
   await pg.screenshot({ path: out + '/t1-title.png' });
   // generator sanity: many seeds, all sizes, exact tiling
   const gen = await pg.evaluate(() => {
-    const { generate, mulberry, STAGES, shapeOf, TYPES } = window.__T; let bad = 0, n = 0, pieces = [];
-    for (let s = 0; s < 300; s++) for (const [W, H] of STAGES) {
-      const sol = generate(W, H, mulberry(s * 13 + W * H)); n++;
+    const { generate, mulberry, STAGES, shapeOf, TYPES, FEAT } = window.__T; let bad = 0, n = 0, pieces = [];
+    for (let s = 0; s < 300; s++) STAGES.forEach(([W, H], i) => {
+      const sol = generate(W, H, mulberry(s * 13 + W * H), FEAT[i].b, i >= 2); n++;
       const g = Array.from({ length: H }, () => Array(W).fill(0));
+      for (const [x, y] of sol.blocked) g[y][x]++;
       for (const p of sol) for (const [x, y] of shapeOf(p.type, p.rot).cells) { const X = p.gx + x, Y = p.gy + y; if (X < 0 || Y < 0 || X >= W || Y >= H) bad++; else g[Y][X]++ }
       if (!g.every(r => r.every(v => v === 1))) bad++;
       if (sol.every(p => p.type === 'karaage')) bad++;
       if (W === 5 && H === 5) pieces.push(sol.length);
-    }
+    });
     return { n, bad, avg55: pieces.reduce((a, b) => a + b, 0) / pieces.length, max55: Math.max(...pieces) };
   });
   console.log('generator', JSON.stringify(gen));

@@ -86,6 +86,17 @@ button{font-family:inherit;color:inherit;cursor:pointer}
 .bentos .wide{grid-column:span 1}
 .nb{color:var(--red);font-weight:900}
 .pause-t{font-family:var(--display);font-size:1.6rem;margin:4px 0 12px}
+.order{position:relative;z-index:2;display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center;justify-content:center;margin:2px 10px 0;padding:5px 8px;
+  background:#fff;border:2.5px solid var(--ink);border-radius:12px;font-size:.78rem;font-weight:900;line-height:1.3}
+.order b{font-family:var(--display);font-weight:400;font-size:.78rem;background:var(--red);color:#fff;border-radius:6px;padding:1px 6px}
+.order .oi{padding:1px 7px;border-radius:999px;background:#f7ecdc}
+.order .oi::before{content:'○ ';color:var(--ink2)}
+.order .oi.ok{background:#e1efd4}
+.order .oi.ok::before{content:'✓ ';color:var(--green)}
+.order .oi.ex{background:#fdf0c2}
+.order .oi.ex::before{content:'＋ '}
+.order.shake{animation:oshake .4s}
+@keyframes oshake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
 .toast{position:absolute;left:50%;top:64px;transform:translateX(-50%);z-index:6;background:var(--ink);color:#fff;font-weight:700;font-size:.85rem;
   padding:6px 14px;border-radius:999px;pointer-events:none;opacity:0;transition:opacity .25s}
 .toast.on{opacity:1}
@@ -102,6 +113,7 @@ button{font-family:inherit;color:inherit;cursor:pointer}
       <button class="ib" id="pauseBtn" aria-label="一時停止"><svg viewBox="0 0 24 24" fill="#4a2c1d"><rect x="6" y="5" width="4.2" height="14" rx="1.5"/><rect x="13.8" y="5" width="4.2" height="14" rx="1.5"/></svg></button>
     </div>
   </div>
+  <div class="order" id="order" hidden></div>
   <canvas id="cv"></canvas>
   <div class="toast" id="toast"></div>
 
@@ -110,7 +122,7 @@ button{font-family:inherit;color:inherit;cursor:pointer}
       <div class="logo">おべんとう<br><b>ぴったり</b></div>
       <p class="sub">おかずを すき間なく つめるパズル</p>
       <canvas class="hero" id="hero" width="500" height="400"></canvas>
-      <div class="how"><span class="nb">ドラッグ</span>でつめる・<span class="nb">タップ</span>でくるっと回す<br>すき間なく埋めたら、ふたをしめて完成！</div>
+      <div class="how"><span class="nb">ドラッグ</span>でつめる・<span class="nb">タップ</span>でくるっと回す<br>すき間なく埋めたら、ふたをしめて完成！<br>あとの段では おかずが<span class="nb">あまったり</span>、お客さんの<span class="nb">ちゅうもん</span>がつくよ</div>
       <button class="big" id="dailyBtn">きょうのおべんとう<small>みんな同じ 5つのお弁当・1日1セット</small></button>
       <button class="big sec" id="freeBtn">じゆうにつめる<small>毎回ちがうお弁当 5つ</small></button>
       <p class="best" id="bestLine"></p>
@@ -175,6 +187,9 @@ const TYPES={
   rice23:{name:'のりごはん',cells:[[0,0],[1,0],[0,1],[1,1],[0,2],[1,2]],w:2,h:3,wt:0,rice:1},
 };
 const STAGES=[[3,3],[4,3],[4,4],[5,4],[5,5]];
+// x = extra pieces that must be left out, b = cells blocked by a バラン divider, o = customer's requests
+const FEAT=[{x:0,b:0,o:0},{x:1,b:0,o:1},{x:1,b:1,o:1},{x:2,b:1,o:2},{x:2,b:2,o:2}];
+const BLOCK=9999;
 
 function rotCells(cells,w,h,r){ // rotate clockwise r times; returns {cells,w,h}
   let c=cells.map(a=>a.slice()),W=w,H=h;
@@ -189,10 +204,11 @@ function hashStr(s){let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math
 function jstDate(){const d=new Date(Date.now()+9*3600e3);return d.toISOString().slice(0,10)}
 
 /* ---------- puzzle generator: random exact tiling ---------- */
-function generate(W,H,rnd){
+function generate(W,H,rnd,nBlock=0,strict=false){
   const needRice=W*H>=16;
-  for(let attempt=0;attempt<400;attempt++){
+  for(let attempt=0;attempt<600;attempt++){
     const grid=Array.from({length:H},()=>Array(W).fill(-1));
+    const blocked=[];
     const sol=[]; const count={};
     let riceUsed=false;
     // pre-place the rice somewhere along the left or right side for bigger boxes
@@ -205,6 +221,12 @@ function generate(W,H,rnd){
         sh.cells.forEach(([x,y])=>grid[gy+y][gx+x]=0);
         sol.push({type:t,rot,gx,gy});riceUsed=true;count[t]=1;
       }
+    }
+    // バラン dividers on inner cells (never touching each other)
+    for(let k=0;k<nBlock;k++){
+      const opts=[];for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(grid[y][x]>=0)continue;if(W>3&&(x===0||x===W-1)&&rnd()<.7)continue;
+        if(blocked.some(([bx,by])=>Math.abs(bx-x)+Math.abs(by-y)<=1))continue;opts.push([x,y])}
+      if(!opts.length)break;const c=opts[Math.floor(rnd()*opts.length)];grid[c[1]][c[0]]=BLOCK;blocked.push(c);
     }
     let ok=true, guard=0;
     while(ok){
@@ -240,14 +262,15 @@ function generate(W,H,rnd){
     }
     if(!ok)continue;
     const singles=sol.filter(s=>TYPES[s.type].cells.length===1).length;
-    const maxSingles=Math.max(1,Math.round(W*H/7));
+    const maxSingles=strict?1:Math.max(1,Math.round(W*H/7));
     if(singles>maxSingles)continue;
     if(needRice&&!riceUsed)continue;
     if(sol.length<3)continue;
+    sol.blocked=blocked;
     return sol;
   }
   // fallback (never expected): rice + singles
-  const sol=[];for(let y=0;y<H;y++)for(let x=0;x<W;x++)sol.push({type:'karaage',rot:0,gx:x,gy:y});return sol;
+  const sol=[];for(let y=0;y<H;y++)for(let x=0;x<W;x++)sol.push({type:'karaage',rot:0,gx:x,gy:y});sol.blocked=[];return sol;
 }
 
 /* ---------- images ---------- */
@@ -370,15 +393,22 @@ const G={mode:'daily',idx:0,stage:null,clock:0,running:false,phase:'title',snaps
 function newStage(i){
   const [W,H]=STAGES[i];
   const rnd=mulberry(G.seed*31+i*7919+1);
-  const sol=generate(W,H,rnd);
+  const F=FEAT[i];
+  const sol=generate(W,H,rnd,F.b,i>=2);
   const pieces=sol.map((s,k)=>({id:k,type:s.type,rot:0,sol:s,place:null,x:0,y:0,s:30,a:0,tx:0,ty:0,ts:30,ta:0,pop:0,shake:0,z:0}));
+  // extra pieces that don't belong (2-4 cells, so you can't just count singles)
+  const pool=Object.keys(TYPES).filter(t=>!TYPES[t].rice&&TYPES[t].cells.length>=2);
+  for(let k=0;k<F.x;k++){const t=pool[Math.floor(rnd()*pool.length)];pieces.push({id:pieces.length,type:t,rot:0,sol:null,extra:1,place:null,x:0,y:0,s:30,a:0,tx:0,ty:0,ts:30,ta:0,pop:0,shake:0,z:0})}
+  const orders=makeOrders(sol,W,H,F.o,rnd);
   // shuffle tray order + random starting rotation
   for(let k=pieces.length-1;k>0;k--){const j=Math.floor(rnd()*(k+1));[pieces[k],pieces[j]]=[pieces[j],pieces[k]]}
   // sort bigger first so the tray reads nicely
   pieces.sort((a,b)=>TYPES[b.type].cells.length-TYPES[a.type].cells.length);
   for(const p of pieces){const T=TYPES[p.type];p.rot=T.cells.length===1?0:Math.floor(rnd()*4);if(T.rice&&p.rot%2===1&&rnd()<.5)p.rot=0;p.a=p.ta=p.rot*Math.PI/2}
   for(const p of pieces)p.slotRot=null;
-  G.stage={W,H,pieces,grid:Array.from({length:H},()=>Array(W).fill(-1)),enter:0};
+  const grid=Array.from({length:H},()=>Array(W).fill(-1));for(const [x,y] of sol.blocked)grid[y][x]=BLOCK;
+  G.stage={W,H,pieces,grid,blocked:sol.blocked,orders,enter:0};
+  renderOrders();
   layout(true);
   for(const p of pieces){p.x=p.tx+CW;p.y=p.ty;p.s=p.ts}
   G.stage.enter=1;
@@ -394,14 +424,58 @@ function target(p,snap){
 }
 function canPlace(p,rot,gx,gy){
   const st=G.stage,sh=shapeOf(p.type,rot);
-  for(const [x,y] of sh.cells){const X=gx+x,Y=gy+y;if(X<0||Y<0||X>=st.W||Y>=st.H)return false;const o=st.grid[Y][X];if(o>=0&&o!==p.id)return false}
+  for(const [x,y] of sh.cells){const X=gx+x,Y=gy+y;if(X<0||Y<0||X>=st.W||Y>=st.H)return false;const o=st.grid[Y][X];if(o!==-1&&o!==p.id)return false}
   return true;
 }
 function occupy(p,on){
   const st=G.stage,sh=shapeOf(p.type,p.rot);
   for(const [x,y] of sh.cells){const X=p.place.gx+x,Y=p.place.gy+y;st.grid[Y][X]=on?p.id:-1}
 }
-function filled(){return G.stage.grid.every(r=>r.every(v=>v>=0))}
+function filled(){return G.stage.grid.every(r=>r.every(v=>v!==-1))}
+/* ---------- customer requests ---------- */
+const NAME=t=>TYPES[t].name.replace('3つ','');
+function cellsOf(p){const sh=shapeOf(p.type,p.rot);return sh.cells.map(([x,y])=>[p.place.gx+x,p.place.gy+y])}
+function solCells(s){const sh=shapeOf(s.type,s.rot);return sh.cells.map(([x,y])=>[s.gx+x,s.gy+y])}
+function makeOrders(sol,W,H,n,rnd){
+  if(!n)return [];
+  const c=[];const uniq=t=>sol.filter(s=>s.type===t).length===1;
+  const rice=sol.find(s=>TYPES[s.type].rice);
+  if(rice){const cs=solCells(rice);const L=cs.some(([x])=>x===0),R=cs.some(([x])=>x===W-1);if(L!==R)c.push({k:'side',t:rice.type,v:L?0:1,txt:`ごはんは ${L?'ひだり':'みぎ'}がわに`})}
+  const corners=[[0,0],[W-1,0],[0,H-1],[W-1,H-1]];
+  for(const s of sol){if(TYPES[s.type].rice)continue;const cs=solCells(s);
+    if(cs.some(([x,y])=>corners.some(([a,b])=>a===x&&b===y)))c.push({k:'corner',t:s.type,txt:`${NAME(s.type)}は すみっこに`});
+    if(cs.every(([x,y])=>y===0)&&!cs.some(([x,y])=>y>0))c.push({k:'top',t:s.type,txt:`${NAME(s.type)}は いちばん上の段に`});
+    if(cs.every(([x,y])=>y===H-1))c.push({k:'bottom',t:s.type,txt:`${NAME(s.type)}は いちばん下の段に`});}
+  for(let a=0;a<sol.length;a++)for(let b=a+1;b<sol.length;b++){const A=sol[a],B=sol[b];if(A.type===B.type||TYPES[A.type].rice||TYPES[B.type].rice||!uniq(A.type)||!uniq(B.type))continue;
+    const ca=solCells(A),cb=solCells(B);if(ca.some(([x,y])=>cb.some(([u,v])=>Math.abs(u-x)+Math.abs(v-y)===1)))c.push({k:'pair',t:A.type,u:B.type,txt:`${NAME(A.type)}と ${NAME(B.type)}は となりに`})}
+  // shuffle and pick distinct kinds
+  for(let k=c.length-1;k>0;k--){const j=Math.floor(rnd()*(k+1));[c[k],c[j]]=[c[j],c[k]]}
+  const out=[];for(const o of c){if(out.length>=n)break;if(out.some(q=>q.k===o.k||q.t===o.t))continue;out.push(o)}
+  return out;
+}
+function orderOk(o){
+  const st=G.stage,W=st.W,H=st.H;const ps=st.pieces.filter(p=>p.place&&p.type===o.t);
+  if(!ps.length)return false;
+  if(o.k==='side')return ps.some(p=>cellsOf(p).some(([x])=>x===(o.v?W-1:0)));
+  if(o.k==='corner')return ps.some(p=>cellsOf(p).some(([x,y])=>(x===0||x===W-1)&&(y===0||y===H-1)));
+  if(o.k==='top')return ps.some(p=>cellsOf(p).every(([x,y])=>y===0));
+  if(o.k==='bottom')return ps.some(p=>cellsOf(p).every(([x,y])=>y===H-1));
+  if(o.k==='pair'){const qs=st.pieces.filter(p=>p.place&&p.type===o.u);return ps.some(p=>qs.some(q=>cellsOf(p).some(([x,y])=>cellsOf(q).some(([u,v])=>Math.abs(u-x)+Math.abs(v-y)===1))))}
+  return true;
+}
+function renderOrders(){
+  const st=G.stage,el=$('order');if(!st){el.hidden=true;return}
+  const ex=st.pieces.filter(p=>p.extra).length;
+  const items=st.orders.map(o=>`<span class="oi${orderOk(o)?' ok':''}">${o.txt}</span>`);
+  if(ex)items.push(`<span class="oi ex">おかず ${ex}こ あまるよ</span>`);
+  el.hidden=!items.length;el.innerHTML=items.length?'<b>ちゅうもん</b>'+items.join(''):'';
+}
+function tryComplete(){
+  if(!filled())return;
+  const bad=G.stage.orders.filter(o=>!orderOk(o));
+  if(bad.length){sfx('bad',.7);toast('ちゅうもんと ちがうよ：'+bad[0].txt);const el=$('order');el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');return}
+  complete();
+}
 
 /* ---------- input ---------- */
 let drag=null;
@@ -435,7 +509,7 @@ cv.addEventListener('pointermove',e=>{
   const q=ptr(e);drag.x=q.x;drag.y=q.y;
   if(!drag.moved&&Math.hypot(q.x-drag.sx,q.y-drag.sy)>7){
     drag.moved=true;const p=drag.p;
-    if(p.place){occupy(p,false);p.place=null}
+    if(p.place){occupy(p,false);p.place=null;renderOrders()}
     p.z=1;sfx('pick',.8);
   }
 });
@@ -452,7 +526,7 @@ function endDrag(e){
     p.place={gx,gy};occupy(p,true);target(p);p.pop=1;
     sfx(Math.random()<.5?'place':'place2',.9,.95+Math.random()*.1);
     puff(p.tx,p.ty,sh);
-    if(filled())complete();
+    renderOrders();tryComplete();
   }else{
     if(overBox){sfx('bad',.7);toast(gx<0||gy<0||gx+sh.w>G.stage.W||gy+sh.h>G.stage.H?'はみ出しちゃう':'ほかのおかずと かさなってるよ')}
     else sfx('drop',.5);
@@ -474,7 +548,7 @@ function rotatePiece(p){
   const bx=Math.round(cx-b.w/2),by=Math.round(cy-b.h/2);
   const tries=[[0,0],[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[1,1],[1,-1],[-1,1]];
   for(const [dx,dy] of tries){
-    if(canPlace(p,nr,bx+dx,by+dy)){p.rot=nr;p.place={gx:bx+dx,gy:by+dy};occupy(p,true);const pa=p.a;target(p);p.a=pa;sfx('turn',.7);if(filled())complete();return}
+    if(canPlace(p,nr,bx+dx,by+dy)){p.rot=nr;p.place={gx:bx+dx,gy:by+dy};occupy(p,true);const pa=p.a;target(p);p.a=pa;sfx('turn',.7);renderOrders();tryComplete();return}
   }
   occupy(p,true);p.shake=1;sfx('bad',.6);toast('ここだと回れないよ');
 }
@@ -500,7 +574,7 @@ function complete(){
   setTimeout(()=>{sfx('clear',1);duck(1.8);confetti();G.stamp=1},240);
 }
 function nextStage(){
-  if(G.idx+1>=STAGES.length){G.stage=null;finish();return}
+  if(G.idx+1>=STAGES.length){G.stage=null;renderOrders();finish();return}
   G.idx++;
   newStage(G.idx);G.phase='play';G.running=true;
 }
@@ -529,10 +603,10 @@ function finish(){
   setTimeout(()=>{$('resultOv').hidden=false},700);
 }
 function rank(t){
-  if(t<45)return'でんせつの おべんとう職人';
-  if(t<70)return'おべんとう名人';
-  if(t<100)return'つめつめ上手';
-  if(t<150)return'ていねいに つめる人';
+  if(t<75)return'でんせつの おべんとう職人';
+  if(t<120)return'おべんとう名人';
+  if(t<180)return'つめつめ上手';
+  if(t<270)return'ていねいに つめる人';
   return'のんびり おべんとう';
 }
 function fmt(t){const m=Math.floor(t/60),s=t-m*60;return m+':'+(s<10?'0':'')+s.toFixed(1)}
@@ -545,7 +619,7 @@ function hint(){
   unlock();
   const st=G.stage;
   // a piece that is not already sitting on its solution spot
-  const cand=st.pieces.filter(p=>!(p.place&&p.rot===p.sol.rot&&p.place.gx===p.sol.gx&&p.place.gy===p.sol.gy));
+  const cand=st.pieces.filter(p=>p.sol&&!(p.place&&p.rot===p.sol.rot&&p.place.gx===p.sol.gx&&p.place.gy===p.sol.gy));
   if(!cand.length)return;
   // prefer big pieces
   cand.sort((a,b)=>TYPES[b.type].cells.length-TYPES[a.type].cells.length);
@@ -558,7 +632,7 @@ function hint(){
   G.clock+=10;G.hints++;
   const pen=document.createElement('span');pen.className='pen';pen.textContent='+10';$('time').appendChild(pen);setTimeout(()=>pen.remove(),1000);
   sfx('hint',.8);
-  if(filled())complete();
+  renderOrders();tryComplete();
 }
 
 /* ---------- drawing ---------- */
@@ -581,11 +655,20 @@ function drawBox(c,st,S,bx,by,withPieces){
   c.save();c.fillStyle='rgba(90,52,34,.22)';roundRect(c,bx+S*.08,by+S*.14,bw*S,bh*S,S*.3);c.fill();c.restore();
   if(im)c.drawImage(im,bx,by,bw*S,bh*S);
   else{c.fillStyle='#d9a066';roundRect(c,bx,by,bw*S,bh*S,S*.3);c.fill()}
+  for(const [x,y] of (st.blocked||[]))baran(c,bx+WALL*S+(x+.5)*S,by+WALL*S+(y+.5)*S,S);
   if(withPieces){
     const gx=bx+WALL*S,gy=by+WALL*S;
     for(const p of st.pieces){if(!p.place)continue;const sh=shapeOf(p.type,p.rot);
       drawPiece(c,p,gx+(p.place.gx+sh.w/2)*S,gy+(p.place.gy+sh.h/2)*S,S,p.rot*Math.PI/2)}
   }
+}
+function baran(c,x,y,S){ // green grass-leaf divider (バラン) filling one cell
+  c.save();c.translate(x,y);const h=S*.44;
+  c.fillStyle='#6aa24c';c.strokeStyle='#4a2c1d';c.lineWidth=Math.max(1.5,S*.04);c.lineJoin='round';
+  c.beginPath();c.moveTo(-h,h);const n=5;for(let i=0;i<=n;i++){const xx=-h+i*2*h/n;c.lineTo(xx,i%2?-h*.55:-h);if(i<n)c.lineTo(xx+h/n,-h*.25)}
+  c.lineTo(h,h);c.closePath();c.fill();c.stroke();
+  c.strokeStyle='rgba(74,44,29,.35)';c.lineWidth=Math.max(1,S*.025);for(let i=1;i<n;i++){const xx=-h+i*2*h/n;c.beginPath();c.moveTo(xx,h*.8);c.lineTo(xx,-h*.3);c.stroke()}
+  c.restore();
 }
 function roundRect(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
 function snapshot(){
@@ -610,7 +693,7 @@ function frame(dt){
   drawBox(c,st,L.S,L.bx,L.by,false);
   // empty-cell guides
   c.save();c.fillStyle='rgba(122,84,64,.22)';
-  for(let y=0;y<st.H;y++)for(let x=0;x<st.W;x++)if(st.grid[y][x]<0){c.beginPath();c.arc(L.gx+(x+.5)*L.S,L.gy+(y+.5)*L.S,Math.max(2,L.S*.05),0,Math.PI*2);c.fill()}
+  for(let y=0;y<st.H;y++)for(let x=0;x<st.W;x++)if(st.grid[y][x]===-1){c.beginPath();c.arc(L.gx+(x+.5)*L.S,L.gy+(y+.5)*L.S,Math.max(2,L.S*.05),0,Math.PI*2);c.fill()}
   c.restore();
   // snap preview while dragging
   if(drag&&drag.moved){
@@ -753,7 +836,7 @@ function refreshTitle(){
   $('bestLine').textContent=parts.join('　');
 }
 function toTitle(){
-  G.phase='title';G.running=false;G.stage=null;bgmStop();
+  G.phase='title';G.running=false;G.stage=null;renderOrders();bgmStop();
   $('pauseOv').hidden=true;$('resultOv').hidden=true;$('titleOv').hidden=false;
   $('time').firstChild.nodeValue='0:00.0';refreshTitle();
 }
@@ -776,15 +859,15 @@ function guardHistory(){if(guarded)return;try{history.pushState({bento:'play'},'
 window.addEventListener('popstate',()=>{if(!guarded)return;guarded=false;if(G.phase==='play'){pause(true);guardHistory()}});
 // block the iOS edge back-swipe while playing
 document.addEventListener('touchstart',e=>{const x=e.touches[0].clientX;if(G.phase==='play'&&(x<24||x>innerWidth-24))e.preventDefault()},{passive:false});
-window.addEventListener('resize',resize);
+window.addEventListener('resize',resize);try{new ResizeObserver(()=>resize()).observe(cv)}catch(e){}
 
 setMute(muted);refreshTitle();
 $('time').textContent='0:00.0';
 loadArt().then(()=>{drawHero()});
 resize();
 requestAnimationFrame(loop);
-window.__T={G,L,TYPES,STAGES,generate,mulberry,shapeOf,canPlace,startGame,hint,
-  solveAll(){const st=G.stage;for(const p of st.pieces){if(p.place){occupy(p,false);p.place=null}}for(const p of st.pieces){p.rot=p.sol.rot;p.place={gx:p.sol.gx,gy:p.sol.gy};occupy(p,true);target(p)}complete()}};
+window.__T={G,L,TYPES,STAGES,FEAT,generate,mulberry,shapeOf,canPlace,startGame,hint,
+  solveAll(){const st=G.stage;for(const p of st.pieces){if(p.place){occupy(p,false);p.place=null}}for(const p of st.pieces){if(!p.sol)continue;p.rot=p.sol.rot;p.place={gx:p.sol.gx,gy:p.sol.gy};occupy(p,true);target(p)}reflowTray();renderOrders();tryComplete()}};
 </script>
 <script>
 /* 遊んだ回数を数える（トップページの ▶ 回数）。同じタブでの再読みこみは1回だけ数えます。 */

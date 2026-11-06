@@ -1,7 +1,7 @@
 # Sound effects source
 
-Unmodified CC0 1.0 sounds from the UI SFX library (https://github.com/romainsimon/uisfx, commit 2001f3d), via npm `@wubbleai/community-sfx@0.1.0`. No attribution or fee required.
+All effects are original, played on General MIDI instruments with FluidSynth + the FluidR3_GM soundfont (MIT) by `sfx.py`,
+written in the song's key (G pentatonic) so they never clash with the music:
+best (koto + glockenspiel), great (koto), good (wood block), miss (muffled taiko), ouch (vibraslap + shamisen), yoisho (koto run + taiko), start (hyoshigi + koto).
 
-ouch=rubber/error, perfect=glass/select, start=organic/start, miss=rubber/press
-
-Song, pound (taiko) and finish jingle: original (music.py), FluidSynth + FluidR3_GM (MIT).
+Song, pound (taiko) and finish jingle: original (music.py), same toolchain.
