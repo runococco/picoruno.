@@ -1,0 +1,4 @@
+{"key": [9, 11, 1, 4, 6], "sounds": {
+ "jump": ["uisfx:rubber/swipe", -4], "land": ["uisfx:organic/drop", -4], "land2": ["uisfx:organic/snap", -6],
+ "sink": ["uisfx:soft/warning", -8], "pull": ["uisfx:rubber/drag-start", -8], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM, croak, splash and jingles (gulp / lotus / over): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
