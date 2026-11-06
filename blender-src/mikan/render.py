@@ -189,8 +189,8 @@ def segment_mat(name, c1, line, n=10):
     return m
 
 FRUIT = {
-    'mikan': dict(c1='#f08a12', c2='#f7a52a', dim=38, bump=.35, flat=.82, fruit='#f5a73c', line='#f7cf8e', cal='#4f7a2c'),
-    'yuzu':  dict(c1='#e9b812', c2='#f4d23a', dim=22, bump=.8, flat=.9, fruit='#f1cf5e', line='#f8e6a6', cal='#5d7f2e'),
+    'mikan': dict(c1='#f08a12', c2='#f7a52a', dim=38, bump=.35, flat=.82, fruit='#f08e22', line='#f6b24e', cal='#4f7a2c'),
+    'yuzu':  dict(c1='#e9b812', c2='#f4d23a', dim=22, bump=.8, flat=.9, fruit='#eebf2c', line='#f6d76a', cal='#5d7f2e'),
 }
 
 def skin(kind):
@@ -205,26 +205,75 @@ def skin(kind):
     cyl((0, 0, k['flat'] + .02), .04, .05, bm, 16)
     fit_render(sc, kind + '_skin', margin=.02, px=210)
 
+def fruit_mat(name, c1, c2):
+    """Juicy segment flesh: subsurface, a faint white film, soft sheen."""
+    m = bpy.data.materials.new(name); m.use_nodes = True
+    nt = m.node_tree; b = nt.nodes['Principled BSDF']
+    tc = nt.nodes.new('ShaderNodeTexCoord')
+    nz = nt.nodes.new('ShaderNodeTexNoise'); nz.inputs['Scale'].default_value = 14; nz.inputs['Detail'].default_value = 6
+    nt.links.new(tc.outputs['Object'], nz.inputs['Vector'])
+    r = nt.nodes.new('ShaderNodeValToRGB'); r.color_ramp.elements[0].position = .4; r.color_ramp.elements[1].position = .75
+    r.color_ramp.elements[0].color = (*srgb(c1), 1); r.color_ramp.elements[1].color = (*srgb(c2), 1)
+    nt.links.new(nz.outputs['Fac'], r.inputs['Fac']); nt.links.new(r.outputs['Color'], b.inputs['Base Color'])
+    bp = nt.nodes.new('ShaderNodeBump'); bp.inputs['Strength'].default_value = .25; bp.inputs['Distance'].default_value = .01
+    nt.links.new(nz.outputs['Fac'], bp.inputs['Height']); nt.links.new(bp.outputs['Normal'], b.inputs['Normal'])
+    b.inputs['Roughness'].default_value = .38; b.inputs['Specular IOR Level'].default_value = .45
+    b.inputs['Subsurface Weight'].default_value = .4; b.inputs['Subsurface Scale'].default_value = .08
+    b.inputs['Subsurface Radius'].default_value = (1.0, .45, .15)
+    b.inputs['Sheen Weight'].default_value = .12; b.inputs['Sheen Tint'].default_value = (1, .97, .9, 1)
+    return m
+
 def fruit(kind):
+    """Peeled fruit: real segment lobes in the geometry, translucent flesh, white pith strands (albedo) on top."""
     sc = reset(); top_light(sc); k = FRUIT[kind]
-    sphere((0, 0, 0), (.95, .95, k['flat'] * .93), segment_mat('seg', k['fruit'], k['line']), 96)
-    # white pith strings over the top
-    wm = mat('pith', '#fdf6e6', .8, .05, .2)
+    NSEG = 10 if kind == 'mikan' else 9
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=256, ring_count=128, radius=1)
+    o = bpy.context.object; smooth(o)
+    for v in o.data.vertices:
+        x, y, z = v.co; a = math.atan2(y, x)
+        f = (a * NSEG / (2 * math.pi)) % 1.0
+        groove = math.exp(-((f - 0.5) / 0.06) ** 2) if False else math.exp(-(min(f, 1 - f) / 0.045) ** 2)
+        lobe = math.sin(f * math.pi) ** .6
+        pole = min(1, math.hypot(x, y) * 2.2)           # grooves fade into the top pole
+        rr = .93 * (1 - .055 * groove * pole + .015 * lobe)
+        v.co = (x * rr, y * rr, z * rr * k['flat'])
+    o.data.materials.append(fruit_mat('flesh', k['fruit'], k['line']))
+    # white pith: a few broad, thin strands running pole to equator plus a small cap
+    wm = mat('pith', '#fbf3e4', .85, .05, .25)
     random.seed(3 if kind == 'mikan' else 8)
-    for i in range(13):
-        a = random.uniform(0, 6.28); r0 = random.uniform(.05, .2); r1 = random.uniform(.55, .85)
+    for i in range(12):
+        a = random.uniform(0, 6.28); r0 = random.uniform(.02, .12); r1 = random.uniform(.5, .92)
         pts = []
-        for t in range(9):
-            u = t / 8; rr = r0 + (r1 - r0) * u; aa = a + math.sin(u * 3 + i) * .25
-            z = math.sqrt(max(0, 1 - (rr / .95) ** 2)) * k['flat'] * .93 + .012
+        for t in range(14):
+            u = t / 13; rr = r0 + (r1 - r0) * u; aa = a + math.sin(u * 2.5 + i) * .22
+            z = math.sqrt(max(0, 1 - (rr / .93) ** 2)) * k['flat'] * .93 + .006
             pts.append((math.cos(aa) * rr, math.sin(aa) * rr, z))
-        cu = bpy.data.curves.new('p%d' % i, 'CURVE'); cu.dimensions = '3D'; cu.bevel_depth = .007; cu.bevel_resolution = 2
+        cu = bpy.data.curves.new('p%d' % i, 'CURVE'); cu.dimensions = '3D'; cu.bevel_depth = random.uniform(.004, .009); cu.bevel_resolution = 2
         sp = cu.splines.new('POLY'); sp.points.add(len(pts) - 1)
         for j, p in enumerate(pts): sp.points[j].co = (*p, 1)
         ob = bpy.data.objects.new('p%d' % i, cu); bpy.context.collection.objects.link(ob); ob.data.materials.append(wm)
-        bpy.ops.object.select_all(action='DESELECT'); ob.select_set(True); bpy.context.view_layer.objects.active = ob; bpy.ops.object.convert(target='MESH')
-    sphere((0, 0, k['flat'] * .93 - .01), (.1, .1, .03), wm, 24)
+    sphere((0, 0, k['flat'] * .93 - .012), (.09, .09, .025), wm, 24)
     fit_render(sc, kind + '_fruit', margin=.02, px=210)
+
+def strip(kind):
+    """A long ribbon of peel, curled and gently twisted, orange skin up and white pith underneath (top view).
+    The game slices it along the peel path, so the peel on screen is this rendered strip."""
+    sc = reset(); top_light(sc); k = FRUIT[kind]
+    L, Wd = 6.0, .5
+    bpy.ops.mesh.primitive_grid_add(x_subdivisions=600, y_subdivisions=24, size=1); o = bpy.context.object
+    for v in o.data.vertices:
+        x, y = v.co.x * L, v.co.y * Wd
+        tw = math.sin(x / L * 2 * math.pi * 2) * .7         # periodic twist, so the texture repeats cleanly
+        z = -1.8 * (y * y - Wd * Wd / 12)                                       # curled across the width, skin side convex
+        yy = y * math.cos(tw) - z * math.sin(tw); zz = y * math.sin(tw) + z * math.cos(tw)
+        v.co = (x, yy, zz)
+    sk = peel_mat('skin', k['c1'], k['c2'], k['dim'], k['bump']); pm = mat('pithin', '#fbf1dc', .85, .05, .3)
+    o.data.materials.append(sk); o.data.materials.append(pm)
+    so = o.modifiers.new('so', 'SOLIDIFY'); so.thickness = .045; so.offset = -1; so.material_offset = 1; so.material_offset_rim = 1
+    smooth(o)
+    sc.render.film_transparent = True
+    cam_top(sc, -L / 2, L / 2, -.36, .36, 256)
+    sc.render.filepath = os.path.join(OUT, kind + '_strip.png'); bpy.ops.render.render(write_still=True); print('wrote strip', flush=True)
 
 def cat():
     """A grey-and-white cat asleep in a ball (top view), closed curved eyes."""
@@ -305,7 +354,7 @@ def tex(kind):
     sc.render.film_transparent = False; cam_top(sc, -.6, .6, -.6, .6, 213)
     sc.render.filepath = os.path.join(OUT, kind + '_tex.png'); bpy.ops.render.render(write_still=True); print('wrote tex', flush=True)
 
-JOBS = {'bg': bg, 'cat': cat, 'mikan_tex': lambda: tex('mikan'), 'yuzu_tex': lambda: tex('yuzu')}
+JOBS = {'bg': bg, 'cat': cat, 'mikan_strip': lambda: strip('mikan'), 'yuzu_strip': lambda: strip('yuzu'), 'mikan_tex': lambda: tex('mikan'), 'yuzu_tex': lambda: tex('yuzu')}
 for kd in FRUIT:
     JOBS[kd + '_skin'] = (lambda kd=kd: skin(kd)); JOBS[kd + '_fruit'] = (lambda kd=kd: fruit(kd))
 for name, fn in JOBS.items():

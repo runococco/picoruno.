@@ -243,28 +243,21 @@ function ropeUpdate(dt){
   }
 }
 function lenIndex(l){const A=F.sp.len;let lo=0,hi=A.length-1;while(lo<hi){const m=(lo+hi)>>1;if(A[m]<l)lo=m+1;else hi=m}return lo}
-const PAT={};
-function peelPattern(c,kind){
-  // the peel uses the real skin texture of that fruit (rendered in Blender), so colour and dimples match
-  if(PAT[kind])return PAT[kind];const im=IMG[kind+'_tex'];if(!im)return kind==='yuzu'?'#e9c21e':'#f0901c';
-  // mirror-tile so the repeat has no seams
-  const s=im.width,t=document.createElement('canvas');t.width=t.height=s*2;const y=t.getContext('2d');
-  for(const [fx,fy] of [[1,1],[-1,1],[1,-1],[-1,-1]]){y.save();y.translate(fx<0?s*2:0,fy<0?s*2:0);y.scale(fx,fy);y.drawImage(im,0,0);y.restore()}
-  const p=c.createPattern(t,'repeat');try{p.setTransform(new DOMMatrix().scale(.5))}catch(e){}PAT[kind]=p;return p}
 function drawRope(c,pts,w,ox,oy,sc,alpha=1,kind='mikan'){
-  if(pts.length<2)return;c.save();c.globalAlpha=alpha;c.translate(ox,oy);c.scale(sc,sc);c.lineCap='round';c.lineJoin='round';
-  const X=p=>p[0]??p.x,Y=p=>p[1]??p.y;
-  const path=(dx=0,dy=0)=>{c.beginPath();c.moveTo(X(pts[0])+dx,Y(pts[0])+dy);for(let i=1;i<pts.length-1;i++){const a=pts[i],b=pts[i+1];c.quadraticCurveTo(X(a)+dx,Y(a)+dy,(X(a)+X(b))/2+dx,(Y(a)+Y(b))/2+dy)}c.lineTo(X(pts[pts.length-1])+dx,Y(pts[pts.length-1])+dy)};
-  // soft contact shadow right under the peel (it lies on the table, not above it)
-  c.strokeStyle='rgba(70,35,10,.16)';c.lineWidth=w+8;path(1.5,3);c.stroke();
-  c.strokeStyle='rgba(70,35,10,.22)';c.lineWidth=w+2;path(1,2);c.stroke();
-  // white pith showing along both cut edges
-  c.strokeStyle=kind==='yuzu'?'#fbf3d6':'#fbecd2';c.lineWidth=w+3;path();c.stroke();
-  // the skin itself
-  c.strokeStyle=peelPattern(c,kind);c.lineWidth=w-1;path();c.stroke();
-  // a little curl: the outer edge catches light, the middle sits lower
-  c.strokeStyle='rgba(255,255,255,.10)';c.lineWidth=w*.35;path(-w*.12,-w*.12);c.stroke();
-  c.strokeStyle='rgba(120,50,0,.10)';c.lineWidth=w*.2;path(w*.15,w*.15);c.stroke();
+  // the peel is the Blender-rendered strip, sliced and laid along the peel path
+  if(pts.length<2)return;const X=p=>p[0]??p.x,Y=p=>p[1]??p.y;
+  const P=[];for(let i=0;i<pts.length;i++){if(i>0&&i<pts.length-1){P.push([(X(pts[i-1])+2*X(pts[i])+X(pts[i+1]))/4,(Y(pts[i-1])+2*Y(pts[i])+Y(pts[i+1]))/4])}else P.push([X(pts[i]),Y(pts[i])])}
+  c.save();c.globalAlpha=alpha;c.translate(ox,oy);c.scale(sc,sc);c.lineCap='round';c.lineJoin='round';
+  const path=(dx=0,dy=0)=>{c.beginPath();c.moveTo(P[0][0]+dx,P[0][1]+dy);for(let i=1;i<P.length;i++)c.lineTo(P[i][0]+dx,P[i][1]+dy)};
+  c.strokeStyle='rgba(70,35,10,.13)';c.lineWidth=w*1.15;path(2,4);c.stroke();
+  c.strokeStyle='rgba(70,35,10,.18)';c.lineWidth=w*.95;path(1,2);c.stroke();
+  c.strokeStyle=kind==='yuzu'?'#fbf3d6':'#fbecd2';c.lineWidth=w*.98;path();c.stroke();            // white pith where the strip twists
+  c.strokeStyle=kind==='yuzu'?'#e3b62a':'#ee9425';c.lineWidth=w*.62;path();c.stroke();             // fills the joints between slices
+  const im=IMG[kind+'_strip'];
+  if(im){const th=w*1.44,k=im.height/th;let u=(pts.length*37)%im.width;
+    for(let i=0;i<P.length-1;i++){const a=P[i],b=P[i+1];const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy);if(L<.5)continue;
+      let sw=L*k;if(u+sw>im.width)u=0;
+      c.save();c.translate(a[0],a[1]);c.rotate(Math.atan2(dy,dx));c.drawImage(im,u,0,Math.min(sw+2,im.width-u),im.height,-.6,-th/2,L+1.2,th);c.restore();u+=sw}}
   c.restore()}
 
 /* ---------- update / draw ---------- */
