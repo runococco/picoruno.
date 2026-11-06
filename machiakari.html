@@ -52,6 +52,15 @@ button{font-family:inherit;color:inherit;cursor:pointer}
 .ib:disabled{opacity:.45}
 #cv{position:relative;z-index:1;flex:1;min-height:0;width:100%;touch-action:none;display:block}
 .foot{position:relative;z-index:2;text-align:center;font-size:.8rem;color:var(--mute);font-weight:700;padding:0 12px 10px;min-height:1.2em}
+.howto .card{max-width:380px;padding:14px 14px 12px}
+.ht-step p{font-size:.82rem}
+.ht-t{font-family:var(--display);font-size:1.4rem;margin:2px 0 8px}
+.ht-step{display:flex;flex-direction:column;gap:6px;background:#fff;border:2px solid #e7d3b8;border-radius:14px;padding:8px;margin:0 0 8px;text-align:left}
+.ht-step svg{flex:none;width:100%;height:auto;background:#262c58;border-radius:10px;border:2px solid var(--ink)}
+.ht-step p{margin:0;font-size:.84rem;font-weight:700;line-height:1.5}
+.ht-step em{font-style:normal;color:#c9584c}
+.ht-n{display:inline-grid;place-items:center;width:1.5em;height:1.5em;border-radius:50%;background:var(--ink);color:var(--cream);font-size:.75rem;margin-right:4px;font-family:var(--display)}
+.coach{position:absolute;left:50%;transform:translateX(-50%);z-index:3;background:var(--cream);color:var(--ink);border:2.5px solid var(--ink);border-radius:14px;padding:6px 12px;font-weight:900;font-size:.9rem;white-space:nowrap;box-shadow:0 3px 0 var(--ink);pointer-events:none}
 .ov{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(20,24,52,.55)}
 .ov.clear{background:transparent;align-items:flex-end;pointer-events:none}
 .ov.clear .card{pointer-events:auto;margin-bottom:12px}
@@ -106,6 +115,7 @@ button{font-family:inherit;color:inherit;cursor:pointer}
       <button class="big" id="dailyBtn">きょうの町<small>みんな同じ 8つの町・1日1セット</small></button>
       <button class="big sec" id="freeBtn">じゆうに あそぶ<small>毎回ちがう 8つの町</small></button>
       <p class="best" id="bestLine"></p>
+      <button class="big sec" id="howBtn" style="font-size:.95rem;padding:9px">あそびかた</button>
       <button class="big sec" id="muteBtn" style="font-size:.95rem;padding:9px">♪ 音あり</button>
       <p class="back"><a href="https://picoruno.com/">← picoruno. のゲーム一覧へ</a></p>
     </div>
@@ -120,10 +130,21 @@ button{font-family:inherit;color:inherit;cursor:pointer}
     </div>
   </div>
 
+  <div class="ov howto" id="howOv" hidden>
+    <div class="card">
+      <div class="ht-t">あそびかた</div>
+      <div class="ht-step"><svg id="ht1" viewBox="0 0 236 92"></svg><p><span class="ht-n">1</span>家を<em>タップ</em>すると、その家と<em>ひもでつながった家</em>が いっしょに 点いたり消えたり。</p></div>
+      <div class="ht-step"><svg id="ht2" viewBox="0 0 236 92"></svg><p><span class="ht-n">2</span>点いている家も、もう一度 切りかわると<em>消えて</em>眠っちゃう。順番がだいじ。</p></div>
+      <div class="ht-step"><svg id="ht3" viewBox="0 0 236 92"></svg><p><span class="ht-n">3</span><em>ぜんぶの家</em>が起きたらクリア！「めやす」の回数以内なら ★3つ。</p></div>
+      <button class="big" id="howOk" style="margin:4px 0 0">わかった！</button>
+    </div>
+  </div>
+  <div class="coach" id="coach" hidden></div>
   <div class="ov" id="pauseOv" hidden>
     <div class="card">
       <div class="pause-t">ひとやすみ</div>
       <button class="big" id="resumeBtn">つづける</button>
+      <button class="big sec" id="howBtn2" style="font-size:.95rem;padding:9px">あそびかた</button>
       <button class="big sec" id="hintBtn">ヒントを見る<small>押すとよい家が ひかります</small></button>
       <button class="big sec" id="quitBtn">タイトルへ</button>
       <button class="big sec" id="muteBtn2" style="font-size:.95rem;padding:9px">♪ 音あり</button>
@@ -320,7 +341,9 @@ function next(){
   startLevel(G.idx+1);
 }
 function startGame(mode){
-  unlock();guardHistory();
+  unlock();
+  if(!LS.get('machi-howto',0)){showHow(()=>startGame(mode));return}
+  guardHistory();G.coachDone=false;
   G.mode=mode;G.seed=mode==='daily'?hashStr('machi'+jstDate()):(Math.random()*2**31)|0;
   G.stars=[];G.movesAll=0;G.hints=0;G.clock=0;
   for(const id of ['titleOv','resultOv','pauseOv','clearOv'])$(id).hidden=true;
@@ -487,7 +510,7 @@ function frame(dt,t){
   drawFx(c,dt);
 }
 let last=performance.now();
-function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;G.t+=dt;if(G.phase==='play'&&!document.hidden)G.clock+=dt;frame(dt,G.t);requestAnimationFrame(loop)}
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;coachUpdate();G.t+=dt;if(G.phase==='play'&&!document.hidden)G.clock+=dt;frame(dt,G.t);requestAnimationFrame(loop)}
 
 /* ---------- title hero: a small lit town ---------- */
 function drawHero(){
@@ -531,6 +554,39 @@ function drawHeroLit(){drawHero()}
 function refreshTitle(){const d=LS.get('machi-daily',{}),b=LS.get('machi-best',0);const p=[];if(d.date===jstDate())p.push(`きょうの町 ★${d.best}`);if(b)p.push(`じゆう ベスト ★${b}`);$('bestLine').textContent=p.join('　')}
 function toTitle(){G.phase='title';G.lv=null;bgmStop();for(const id of ['pauseOv','resultOv','clearOv'])$(id).hidden=true;$('titleOv').hidden=false;refreshTitle()}
 function pause(on){if(on){if(G.phase!=='play')return;G.phase='pause';$('pauseOv').hidden=false;if(ac)ac.suspend()}else{if(G.phase!=='pause')return;G.phase='play';$('pauseOv').hidden=true;unlock()}}
+
+/* ---------- how to play ---------- */
+function houseSVG(x,on,tap){
+  const win=on?'#ffd27a':'#3b4170',body=on?'#f3e3c4':'#9aa0bf',roof=on?'#d9534a':'#6c5a7a';
+  const eyes=on?`<circle cx="${x-7}" cy="78" r="2.6" fill="#4a2c1d"/><circle cx="${x+7}" cy="78" r="2.6" fill="#4a2c1d"/>`
+    :`<path d="M${x-10} 77q3 3 6 0M${x+4} 77q3 3 6 0" stroke="#4a2c1d" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+  const glow=on?`<circle cx="${x}" cy="72" r="34" fill="#ffd27a" opacity=".22"/>`:'';
+  const z=on?'':`<text x="${x+14}" y="44" font-size="13" fill="#cfd8ff" font-weight="900">z</text>`;
+  const finger=tap?`<g transform="translate(${x+6},84)"><ellipse cx="8" cy="18" rx="10" ry="13" fill="#fff6e4" stroke="#4a2c1d" stroke-width="2.5"/><ellipse cx="0" cy="2" rx="5" ry="10" fill="#fff6e4" stroke="#4a2c1d" stroke-width="2.5"/></g>`:'';
+  return glow+`<rect x="${x-18}" y="60" width="36" height="34" rx="4" fill="${body}" stroke="#4a2c1d" stroke-width="3"/><path d="M${x-24} 62L${x} 40L${x+24} 62Z" fill="${roof}" stroke="#4a2c1d" stroke-width="3" stroke-linejoin="round"/><rect x="${x-6}" y="64" width="12" height="9" rx="2" fill="${win}" stroke="#4a2c1d" stroke-width="2"/>`+eyes+z+finger}
+function strSVG(a,b,on){const m=(a+b)/2;return `<path d="M${a+18} 58Q${m} 74 ${b-18} 58" stroke="#e8dcc0" stroke-width="2" fill="none"/>`+[.3,.5,.7].map(u=>{const x=a+18+(b-a-36)*u,y=58+Math.sin(u*Math.PI)*11;return `<circle cx="${x}" cy="${y+3}" r="3.4" fill="${on?'#ffd27a':'#565c86'}" stroke="#4a2c1d" stroke-width="1.5"/>`}).join('')}
+function rowSVG(xs,on,tap){let o='';for(let i=0;i+1<xs.length;i++)o+=strSVG(xs[i],xs[i+1],on[i]&&on[i+1]);xs.forEach((x,i)=>o+=houseSVG(x,on[i],tap===i));return o}
+function arrow(x){return `<path d="M${x-8} 70h16m-6-6 6 6-6 6" stroke="#fff6e4" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`}
+function buildHowto(){
+  // small before → after pictures: left half before the tap, right half after
+  const sc=(xs)=>xs.map(x=>x*.48);
+  const g=(xs,on,tap,dx)=>`<g transform="translate(${dx},2) scale(.5)">${rowSVG(xs,on,tap)}</g>`;
+  const X=[30,104,178];
+  $('ht1').innerHTML=g(X,[0,0,0],1,-2)+`<g transform="translate(-32,-24)">${arrow(150)}</g>`+g(X,[1,1,1],-1,124);
+  $('ht2').innerHTML=g(X,[1,0,0],0,-2)+`<g transform="translate(-32,-24)">${arrow(150)}</g>`+g(X,[0,1,0],-1,124);
+  $('ht3').innerHTML=`<g transform="translate(14,-4) scale(.86)">${rowSVG([30,104,178],[1,1,1],-1)}</g><text x="118" y="88" text-anchor="middle" font-size="13" fill="#ffd27a" font-weight="900">★ ★ ★</text>`;
+}
+function showHow(after){buildHowto();$('howOv').hidden=false;$('howOk').onclick=()=>{$('howOv').hidden=true;LS.set('machi-howto',1);if(after)after()}}
+$('howBtn').onclick=()=>showHow();
+$('howBtn2').onclick=()=>{$('pauseOv').hidden=true;showHow(()=>pause(false))};
+// first town of a session: point at a good house, then explain what just happened
+function coachUpdate(){
+  const el=$('coach');
+  if(G.phase!=='play'||G.idx!==0||G.coachDone){el.hidden=true;return}
+  if(!G.moves){if(G.hint<0){const s=minSolution(G.lit,G.lv.nb);if(s.length)G.hint=s[0]}el.textContent='ひかっている家を タップしてみよう';}
+  else el.textContent='ひもでつながった家も いっしょに切りかわった！';
+  el.style.top=(document.querySelector('.hud')?.getBoundingClientRect().bottom||60)+8+'px';el.hidden=false;
+  if(G.moves>=2)G.coachDone=true}
 $('dailyBtn').onclick=()=>startGame('daily');
 $('freeBtn').onclick=()=>startGame('free');
 $('againBtn').onclick=()=>startGame(G.mode);
