@@ -1,0 +1,4 @@
+{"key": [4, 6, 8, 11, 1], "sounds": {
+ "roll": ["uisfx:rubber/swipe", -8], "bump": ["kenney:impact-sounds__impactSoft_medium_002.ogg", -2], "drop": ["kenney:impact-sounds__impactSoft_heavy_002.ogg", -4],
+ "paw": ["uisfx:soft/press", -6], "blow": ["uisfx:dreamy/swipe", -10], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (point / win / lose / over): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
