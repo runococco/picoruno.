@@ -182,15 +182,15 @@ def segment_mat(name, c1, line, n=10):
     r = nt.nodes.new('ShaderNodeValToRGB'); r.color_ramp.elements[0].position = .015; r.color_ramp.elements[1].position = .06
     r.color_ramp.elements[0].color = (*srgb(line), 1); r.color_ramp.elements[1].color = (*srgb(c1), 1)
     nt.links.new(fr.outputs[0], r.inputs['Fac']); nt.links.new(r.outputs['Color'], b.inputs['Base Color'])
-    bp = nt.nodes.new('ShaderNodeBump'); bp.inputs['Strength'].default_value = .6
+    bp = nt.nodes.new('ShaderNodeBump'); bp.inputs['Strength'].default_value = 1.0
     nt.links.new(fr.outputs[0], bp.inputs['Height']); nt.links.new(bp.outputs['Normal'], b.inputs['Normal'])
     b.inputs['Roughness'].default_value = .45; b.inputs['Specular IOR Level'].default_value = .3
     b.inputs['Subsurface Weight'].default_value = .3; b.inputs['Subsurface Scale'].default_value = .1
     return m
 
 FRUIT = {
-    'mikan': dict(c1='#f08a12', c2='#f7a52a', dim=38, bump=.35, flat=.82, fruit='#f6b04a', line='#fbe2b0', cal='#4f7a2c'),
-    'yuzu':  dict(c1='#e9b812', c2='#f4d23a', dim=22, bump=.8, flat=.9, fruit='#f3d374', line='#fdf1c8', cal='#5d7f2e'),
+    'mikan': dict(c1='#f08a12', c2='#f7a52a', dim=38, bump=.35, flat=.82, fruit='#f5a73c', line='#f7cf8e', cal='#4f7a2c'),
+    'yuzu':  dict(c1='#e9b812', c2='#f4d23a', dim=22, bump=.8, flat=.9, fruit='#f1cf5e', line='#f8e6a6', cal='#5d7f2e'),
 }
 
 def skin(kind):
@@ -211,14 +211,14 @@ def fruit(kind):
     # white pith strings over the top
     wm = mat('pith', '#fdf6e6', .8, .05, .2)
     random.seed(3 if kind == 'mikan' else 8)
-    for i in range(7):
+    for i in range(13):
         a = random.uniform(0, 6.28); r0 = random.uniform(.05, .2); r1 = random.uniform(.55, .85)
         pts = []
         for t in range(9):
             u = t / 8; rr = r0 + (r1 - r0) * u; aa = a + math.sin(u * 3 + i) * .25
             z = math.sqrt(max(0, 1 - (rr / .95) ** 2)) * k['flat'] * .93 + .012
             pts.append((math.cos(aa) * rr, math.sin(aa) * rr, z))
-        cu = bpy.data.curves.new('p%d' % i, 'CURVE'); cu.dimensions = '3D'; cu.bevel_depth = .012; cu.bevel_resolution = 2
+        cu = bpy.data.curves.new('p%d' % i, 'CURVE'); cu.dimensions = '3D'; cu.bevel_depth = .007; cu.bevel_resolution = 2
         sp = cu.splines.new('POLY'); sp.points.add(len(pts) - 1)
         for j, p in enumerate(pts): sp.points[j].co = (*p, 1)
         ob = bpy.data.objects.new('p%d' % i, cu); bpy.context.collection.objects.link(ob); ob.data.materials.append(wm)
@@ -294,7 +294,18 @@ def bg():
     sc.render.filepath = os.path.join(OUT, 'bg.png'); bpy.ops.render.render(write_still=True)
     print('wrote bg', flush=True)
 
-JOBS = {'bg': bg, 'cat': cat}
+def tex(kind):
+    """A flat, evenly lit patch of skin, used as the texture of the peeled ribbon."""
+    sc = reset(); k = FRUIT[kind]
+    for o in list(sc.objects):
+        if o.type == 'LIGHT': bpy.data.objects.remove(o)
+    bpy.ops.object.light_add(type='SUN', location=(0, 0, 10)); s_ = bpy.context.object; s_.data.energy = 3.0; s_.rotation_euler = Euler((math.radians(-25), math.radians(15), 0))
+    bpy.ops.mesh.primitive_plane_add(size=2); p = bpy.context.object; p.data.materials.append(peel_mat('skin', k['c1'], k['c2'], k['dim'], k['bump']))
+    if kind == 'yuzu': displace(p, .02, .35, 4)
+    sc.render.film_transparent = False; cam_top(sc, -.6, .6, -.6, .6, 213)
+    sc.render.filepath = os.path.join(OUT, kind + '_tex.png'); bpy.ops.render.render(write_still=True); print('wrote tex', flush=True)
+
+JOBS = {'bg': bg, 'cat': cat, 'mikan_tex': lambda: tex('mikan'), 'yuzu_tex': lambda: tex('yuzu')}
 for kd in FRUIT:
     JOBS[kd + '_skin'] = (lambda kd=kd: skin(kd)); JOBS[kd + '_fruit'] = (lambda kd=kd: fruit(kd))
 for name, fn in JOBS.items():

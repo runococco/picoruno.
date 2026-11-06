@@ -12,6 +12,7 @@ def enc(im, q=84, jpeg=False):
     return f'data:image/{mt};base64,' + base64.b64encode(b.getvalue()).decode()
 art['bg'] = enc(Image.open(f'{src}/bg.png'), 82, True)
 names = ['cat', 'mikan_skin', 'mikan_fruit', 'yuzu_skin', 'yuzu_fruit']
+for t in ('mikan_tex', 'yuzu_tex'): art[t] = enc(Image.open(f'{src}/{t}.png').convert('RGB'), 84, True)
 for name in names:
     im = Image.open(f'{src}/{name}.png').convert('RGBA')
     sc = 1.0 if name != 'cat' else 0.9

@@ -229,11 +229,12 @@ function ropeUpdate(dt){
     const want=F.sp.len[F.i];while(F.ropeLen+SEG<=want){F.ropeLen+=SEG;const k=lenIndex(F.ropeLen);const q=F.sp.pts[k];F.rope.push({x:q[0],y:q[1],px:q[0],py:q[1],age:0})}
     const R=F.rope,n=R.length;if(!n)return;
     for(let i=0;i<n;i++){const p=R[i];p.age+=dt;if(i===n-1&&F.state==='peel')continue;
-      let vx=(p.x-p.px)*.86,vy=(p.y-p.py)*.86;p.px=p.x;p.py=p.y;
+      let vx=(p.x-p.px)*.8,vy=(p.y-p.py)*.8;p.px=p.x;p.py=p.y;
       // older parts slide off the fruit and droop towards the table edge
       const d=Math.hypot(p.x,p.y);const R0=F.L.r+F.sp.pitch*.4;
-      if(p.age>.12&&d<R0){vx+=p.x/(d||1)*dt*260;vy+=p.y/(d||1)*dt*260}
-      vy+=dt*dt*900;p.x+=vx;p.y+=vy}
+      if(p.age>.12&&d<R0){vx+=p.x/(d||1)*dt*230;vy+=p.y/(d||1)*dt*230}
+      else if(d>=R0){vx=vx*.7+dt*dt*(-120+((i*37)%7-3)*40);vy=vy*.7+dt*dt*260}   // on the table it slumps a little towards you, then rests
+      p.x+=vx;p.y+=vy}
     if(F.state==='peel'){R[n-1].x=e[0];R[n-1].y=e[1]}
     for(let it=0;it<4;it++)for(let i=n-1;i>0;i--){const a=R[i],b=R[i-1];const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,k=(d-SEG)/d;
       if(i===n-1&&F.state==='peel'){b.x-=dx*k;b.y-=dy*k}else{a.x+=dx*k*.5;a.y+=dy*k*.5;b.x-=dx*k*.5;b.y-=dy*k*.5}}
@@ -242,15 +243,28 @@ function ropeUpdate(dt){
   }
 }
 function lenIndex(l){const A=F.sp.len;let lo=0,hi=A.length-1;while(lo<hi){const m=(lo+hi)>>1;if(A[m]<l)lo=m+1;else hi=m}return lo}
-function drawRope(c,pts,w,ox,oy,sc,alpha=1){
+const PAT={};
+function peelPattern(c,kind){
+  // the peel uses the real skin texture of that fruit (rendered in Blender), so colour and dimples match
+  if(PAT[kind])return PAT[kind];const im=IMG[kind+'_tex'];if(!im)return kind==='yuzu'?'#e9c21e':'#f0901c';
+  // mirror-tile so the repeat has no seams
+  const s=im.width,t=document.createElement('canvas');t.width=t.height=s*2;const y=t.getContext('2d');
+  for(const [fx,fy] of [[1,1],[-1,1],[1,-1],[-1,-1]]){y.save();y.translate(fx<0?s*2:0,fy<0?s*2:0);y.scale(fx,fy);y.drawImage(im,0,0);y.restore()}
+  const p=c.createPattern(t,'repeat');try{p.setTransform(new DOMMatrix().scale(.5))}catch(e){}PAT[kind]=p;return p}
+function drawRope(c,pts,w,ox,oy,sc,alpha=1,kind='mikan'){
   if(pts.length<2)return;c.save();c.globalAlpha=alpha;c.translate(ox,oy);c.scale(sc,sc);c.lineCap='round';c.lineJoin='round';
-  const path=()=>{c.beginPath();c.moveTo(pts[0][0]??pts[0].x,pts[0][1]??pts[0].y);for(const p of pts)c.lineTo(p[0]??p.x,p[1]??p.y)};
-  c.strokeStyle='rgba(60,25,10,.18)';c.lineWidth=w+4;c.save();c.translate(5,8);path();c.stroke();c.restore();
-  c.strokeStyle='#4a2c1d';c.lineWidth=w+5;path();c.stroke();
-  c.strokeStyle='#f0901c';c.lineWidth=w;path();c.stroke();
-  c.strokeStyle='#f7ad3c';c.lineWidth=w*.45;path();c.stroke();
-  // oil-gland dots
-  c.fillStyle='rgba(200,100,10,.35)';for(let i=1;i<pts.length;i+=2){const p=pts[i];c.beginPath();c.arc((p[0]??p.x)+((i*7)%5-2)*w*.08,(p[1]??p.y)+((i*3)%5-2)*w*.08,1.6,0,7);c.fill()}
+  const X=p=>p[0]??p.x,Y=p=>p[1]??p.y;
+  const path=(dx=0,dy=0)=>{c.beginPath();c.moveTo(X(pts[0])+dx,Y(pts[0])+dy);for(let i=1;i<pts.length-1;i++){const a=pts[i],b=pts[i+1];c.quadraticCurveTo(X(a)+dx,Y(a)+dy,(X(a)+X(b))/2+dx,(Y(a)+Y(b))/2+dy)}c.lineTo(X(pts[pts.length-1])+dx,Y(pts[pts.length-1])+dy)};
+  // soft contact shadow right under the peel (it lies on the table, not above it)
+  c.strokeStyle='rgba(70,35,10,.16)';c.lineWidth=w+8;path(1.5,3);c.stroke();
+  c.strokeStyle='rgba(70,35,10,.22)';c.lineWidth=w+2;path(1,2);c.stroke();
+  // white pith showing along both cut edges
+  c.strokeStyle=kind==='yuzu'?'#fbf3d6':'#fbecd2';c.lineWidth=w+3;path();c.stroke();
+  // the skin itself
+  c.strokeStyle=peelPattern(c,kind);c.lineWidth=w-1;path();c.stroke();
+  // a little curl: the outer edge catches light, the middle sits lower
+  c.strokeStyle='rgba(255,255,255,.10)';c.lineWidth=w*.35;path(-w*.12,-w*.12);c.stroke();
+  c.strokeStyle='rgba(120,50,0,.10)';c.lineWidth=w*.2;path(w*.15,w*.15);c.stroke();
   c.restore()}
 
 /* ---------- update / draw ---------- */
@@ -279,7 +293,7 @@ function draw(){
   c.save();c.translate(OX,OY);c.scale(S,S);
   if(IMG.bg)c.drawImage(IMG.bg,0,0,W0,H0);
   // dish of peels and plate of fruit
-  G.dish.forEach((r,i)=>{if(r.rope.length>1)drawRope(c,r.rope,r.pitch*.95,DISH.x+((i%3)-1)*14,DISH.y+(Math.floor(i/3)-.5)*14,.22)});
+  G.dish.forEach((r,i)=>{if(r.rope.length>1)drawRope(c,r.rope,r.pitch*.8,DISH.x+((i%3)-1)*14,DISH.y+(Math.floor(i/3)-.5)*14,.22,1,r.kind)});
   G.plate.forEach((p,i)=>{const a=i*2.1,rr=i?38:0;spr(c,p.kind+'_fruit',PLATE.x+Math.cos(a)*rr,PLATE.y+Math.sin(a)*rr*.8,40)});
   // cat
   const br=1+Math.sin(G.catT*1.6)*.015;c.save();c.translate(CAT.x,CAT.y);c.scale(br,br);spr(c,'cat',0,0,80);c.restore();
@@ -307,7 +321,7 @@ function drawFruit(c){
   if(F.state==='done'&&F.torn&&F.t>.3&&F.t<.9){const k=(F.t-.3)/.6;c.save();c.globalAlpha=1-k;const z=skinC.width/skinQ*(1+k*.15);c.drawImage(skinC,cx-z/2,cy-z/2-k*40,z,z);c.restore()}
   // peel rope
   if(F.rope.length>1){const fade=F.state==='done'&&F.t>.9?Math.max(0,1-(F.t-.9)/.5):1;
-    const pts=F.rope.map(n=>[n.x,n.y]);if(F.state==='peel'&&F.i>0)pts.push(endPt());drawRope(c,pts,F.sp.pitch*.95,cx,cy,sc,fade)}
+    const pts=F.rope.map(n=>[n.x,n.y]);if(F.state==='peel'&&F.i>0)pts.push(endPt());drawRope(c,pts,F.sp.pitch*.8,cx,cy,sc,fade,F.L.kind)}
   if(F.state!=='peel')return;
   // guide: the path still to peel, brighter just ahead of the cut
   const P=F.sp.pts;c.save();c.translate(cx,cy);c.lineCap='round';
@@ -344,7 +358,7 @@ function peelImage(r,size){
   let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const p of r.rope){x0=Math.min(x0,p[0]);y0=Math.min(y0,p[1]);x1=Math.max(x1,p[0]);y1=Math.max(y1,p[1])}
   const sc=Math.min(1.2,(size*.82)/Math.max(x1-x0+r.pitch,y1-y0+r.pitch));
   spr(c,r.kind+'_fruit',size*.78,size*.8,size*.13);
-  drawRope(c,r.rope,r.pitch*.95,size/2-(x0+x1)/2*sc,size/2-(y0+y1)/2*sc,sc);return k}
+  drawRope(c,r.rope,r.pitch*.8,size/2-(x0+x1)/2*sc,size/2-(y0+y1)/2*sc,sc,1,r.kind);return k}
 function shareImage(){
   const k=document.createElement('canvas');k.width=1200;k.height=630;const c=k.getContext('2d');
   if(IMG.bg)c.drawImage(IMG.bg,0,-560,1200,1200*H0/W0);c.fillStyle='rgba(60,24,16,.3)';c.fillRect(0,0,1200,630);
