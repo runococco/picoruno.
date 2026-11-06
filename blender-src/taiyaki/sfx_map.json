@@ -1,0 +1,6 @@
+{"key": [7, 9, 11, 2, 4], "sounds": {
+ "pour": ["uisfx:organic/drop", -2], "scoop": ["uisfx:organic/snap", -4],
+ "flip": ["kenney:impact-sounds__impactMetal_light_002.ogg", -6], "take": ["kenney:impact-sounds__impactPlate_light_001.ogg", -6],
+ "coin": ["kenney:rpg-audio__handleCoins.ogg", -2], "burn": ["kenney:impact-sounds__impactSoft_medium_001.ogg", -2],
+ "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM, jingles (happy / perfect / sad / finish) and the sizzle loop: original (music.py), FluidSynth + FluidR3_GM (MIT)."}
