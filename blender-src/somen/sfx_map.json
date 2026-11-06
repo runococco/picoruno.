@@ -1,0 +1,5 @@
+{"key": [7, 9, 11, 2, 4], "sounds": {
+ "hashi": ["kenney:impact-sounds__impactWood_light_002.ogg", -6], "get": ["uisfx:organic/drop", -4], "plop": ["uisfx:zen/drop", -6],
+ "whiff": ["uisfx:soft/swipe", -8], "bad": ["kenney:interface-sounds__back_003.ogg", -6], "meow": ["uisfx:rubber/notification", -8],
+ "bonus": ["kenney:interface-sounds__glass_002.ogg", -4], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (combo / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT). Water noise is generated in the browser from filtered noise."}
