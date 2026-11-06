@@ -1,0 +1,4 @@
+{"key": [7, 9, 11, 2, 4], "sounds": {
+ "catch": ["kenney:impact-sounds__impactGlass_light_002.ogg", -6], "flee": ["kenney:rpg-audio__cloth1.ogg", -6], "gold": ["kenney:interface-sounds__glass_006.ogg", -4],
+ "plop": ["uisfx:zen/drop", -8], "meow": ["uisfx:rubber/notification", -10], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (sync / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT). The river murmur is generated in the browser from filtered noise."}
