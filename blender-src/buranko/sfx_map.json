@@ -1,0 +1,4 @@
+{"key": [7, 9, 11, 2, 4], "sounds": {
+ "pump": ["uisfx:rubber/swipe", -10], "creak": ["kenney:rpg-audio__creak1.ogg", -10], "jump": ["uisfx:dreamy/swipe", -6], "land": ["kenney:impact-sounds__footstep_grass_002.ogg", -2],
+ "star": ["kenney:interface-sounds__glass_006.ogg", -6], "oops": ["uisfx:soft/warning", -8], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (levelup / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
