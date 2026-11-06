@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<script src="count.js" defer></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#a8324a">
+<title>ずるずる いもほり</title>
+<meta name="description" content="つるを つかんで ゆっくり ひっぱると、おいもが ずるずる つながって 出てくる！ ひっぱりすぎると ぷちっ。60秒で どれだけ ほれるかな？">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ずるずる いもほり">
+<meta property="og:description" content="ちょうどいい 力で ひっぱって、おいもを ずるずる！ 60秒の いもほり。">
+<meta property="og:url" content="https://picoruno.com/imohori.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://picoruno.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://picoruno.com/og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23f6ecd0'/%3E%3Cellipse cx='16' cy='19' rx='11' ry='6' transform='rotate(-20 16 19)' fill='%23b03a50' stroke='%234a2c1d' stroke-width='2'/%3E%3Cpath d='M20 10 q4 -6 8 -3 q-2 5 -8 3z' fill='%235a9a3a' stroke='%234a2c1d' stroke-width='1.5'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<style>
+/* Autumn field: sweet-potato purple-red, soil brown, leaf green, dark-brown outlined flat UI. */
+:root{
+  --ink:#4a2c1d;
+  --ink2:#7a5440;
+  --paper:#fffaf2;
+  --blue:#a8324a;
+  --red:#c4432e;
+  --sky:#5a8a34;
+  --gold:#f2c14e;
+  --display:"Dela Gothic One","Zen Maru Gothic","Hiragino Sans",sans-serif;
+  --body:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%;margin:0;background:#9a6a44}
+[hidden]{display:none!important}
+body{color:var(--ink);font-family:var(--body);overflow:hidden;overscroll-behavior:none;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+#app{position:relative;height:100%;height:100dvh;max-width:560px;margin:0 auto;overflow:hidden}
+#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+button{font-family:inherit;color:inherit;cursor:pointer}
+.hud{position:absolute;left:0;right:0;top:env(safe-area-inset-top);z-index:2;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;pointer-events:none}
+.pill{font-family:var(--display);font-size:1rem;background:var(--paper);color:var(--ink);border:2.5px solid var(--ink);border-radius:12px;padding:4px 10px;box-shadow:0 3px 0 var(--ink);white-space:nowrap}
+.pill.t{min-width:3.6em;text-align:center}
+.pill.t.low{background:#ffd9c8;color:var(--red)}
+.ib{pointer-events:auto;width:40px;height:40px;border-radius:12px;border:2.5px solid var(--ink);background:var(--paper);display:grid;place-items:center;padding:0;box-shadow:0 3px 0 var(--ink)}
+.ib svg{width:22px;height:22px}
+.ov{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(74,44,29,.28)}
+.card{background:var(--paper);color:var(--ink);border:3px solid var(--ink);border-radius:22px;box-shadow:0 6px 0 var(--ink);padding:18px 18px 14px;width:100%;max-width:360px;box-sizing:border-box;text-align:center;max-height:100%;overflow:auto}
+.logo{font-family:var(--display);font-size:1.2rem;line-height:1.1;margin:4px 0 0;color:var(--sky)}
+.logo2{font-family:var(--display);font-size:2.6rem;line-height:1.1;margin:0 0 6px;color:var(--red)}
+.sub{font-size:.9rem;color:var(--ink2);margin:0 0 10px;font-weight:700}
+.how{font-size:.86rem;font-weight:700;background:#fff;border:2px dashed #e0c8a0;border-radius:12px;padding:8px 10px;margin:0 0 12px;line-height:1.6;text-align:left}
+.how ol{margin:0;padding-left:1.3em}
+.how em{font-style:normal;color:var(--red)}
+.how .kinds{display:flex;justify-content:space-around;margin:6px 0 0;font-size:.74rem;text-align:center;color:var(--ink2)}
+.how .kinds img{display:block;width:62px;height:auto;margin:0 auto -4px}
+.big{display:block;width:100%;font-family:var(--display);font-size:1.2rem;padding:13px 10px;border-radius:16px;border:3px solid var(--ink);
+  background:var(--blue);color:#fff;box-shadow:0 5px 0 var(--ink);margin:0 0 12px;letter-spacing:.04em;text-decoration:none;box-sizing:border-box}
+.big:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.big.sec{background:#fff;color:var(--ink)}
+.best{font-size:.85rem;color:var(--ink2);margin:-4px 0 10px;font-weight:700}
+.back{margin:6px 0 0;font-size:.85rem}
+.back a{color:var(--ink2);font-weight:700}
+.bag{display:flex;justify-content:center;gap:10px;margin:6px 0 8px}
+.bag div{width:84px;font-size:.78rem;font-weight:900;line-height:1.3}
+.bag img{display:block;width:76px;height:auto;margin:0 auto -6px}
+.bag b{font-family:var(--display);font-weight:400;font-size:1.25rem}
+.res-big{font-family:var(--display);font-size:2.6rem;line-height:1.05;margin:2px 0}
+.res-rank{display:inline-block;font-family:var(--display);font-size:1rem;background:var(--gold);border:2.5px solid var(--ink);border-radius:999px;padding:4px 14px;margin:4px 0 6px}
+.res-note{font-size:.84rem;font-weight:700;color:var(--ink2);margin:0 0 12px;line-height:1.6}
+.pause-t{font-family:var(--display);font-size:1.6rem;margin:4px 0 12px}
+.res-row{display:flex;justify-content:center;gap:14px;margin:4px 0 6px;font-size:.84rem;font-weight:900;color:var(--ink2)}
+.res-row b{display:block;font-family:var(--display);font-weight:400;font-size:1.3rem;color:var(--ink)}
+.lives{display:flex;gap:4px}
+.lives i{width:22px;height:22px;border-radius:50% 50% 46% 46%;background:#d8402e;border:2.5px solid var(--ink);box-shadow:0 2px 0 var(--ink)}
+.lives i.off{background:#cfd8d0;border-color:#9aa;box-shadow:none}
+.mis{display:flex;gap:6px;justify-content:center;align-items:center;margin:0 0 4px}
+.kinds3{display:flex;justify-content:space-around;margin:6px 0 0;font-size:.76rem;text-align:center;color:var(--ink2);font-weight:900}
+.kinds3 b{display:block;font-family:var(--display);font-weight:400;font-size:1rem;color:var(--red)}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="cv"></canvas>
+  <div class="hud"><div class="pill t" id="timeP">60</div><div class="pill" id="scoreP">0 てん</div><button class="ib" id="pauseBtn" aria-label="一時停止"><svg viewBox="0 0 24 24" fill="#4a2c1d"><rect x="6" y="5" width="4.2" height="14" rx="1.5"/><rect x="13.8" y="5" width="4.2" height="14" rx="1.5"/></svg></button></div>
+
+  <div class="ov" id="titleOv">
+    <div class="card">
+      <div class="logo">あきの はたけで</div>
+      <div class="logo2">ずるずる いもほり</div>
+      <p class="sub">ちょうどいい 力で、ずるずる〜</p>
+      <div class="how"><ol>
+        <li><em>つるを つかんで 上に ひっぱる</em> と、ゲージの 針が うごくよ</li>
+        <li>針を <em>みどりの ところ</em> に たもつと、おいもが だんだん 出てくる</li>
+        <li>ひっぱりすぎて <em>赤</em> が つづくと ぷちっ！ <em>金色の つる</em> は おおものの しるし</li></ol></div>
+      <button class="big" id="startBtn">いもほり スタート</button>
+      <p class="best" id="bestLine"></p>
+      <button class="big sec" id="muteBtn" style="font-size:.95rem;padding:9px">♪ 音あり</button>
+      <p class="back"><a href="https://picoruno.com/">← picoruno. のゲーム一覧へ</a></p>
+    </div>
+  </div>
+  <div class="ov" id="pauseOv" hidden>
+    <div class="card">
+      <div class="pause-t">ひとやすみ</div>
+      <button class="big" id="resumeBtn">つづける</button>
+      <button class="big sec" id="quitBtn">タイトルへ</button>
+    </div>
+  </div>
+  <div class="ov" id="resultOv" hidden>
+    <div class="card">
+      <div class="logo">きょうの しゅうかく</div>
+      <div class="res-big" id="resScore">0 てん</div>
+      <div class="res-row"><div>おいも<b id="rCnt">0</b></div><div>おもさ<b id="rKg">0kg</b></div><div>金いも<b id="rGold">0</b></div><div>ぷちっ<b id="rSnap">0</b></div></div>
+      <div class="res-rank" id="resRank"></div>
+      <p class="res-note" id="resNote"></p>
+      <button class="big" id="againBtn">もういちど</button>
+      <a class="big sec" id="shareBtn" href="https://twitter.com/intent/tweet" target="_blank" rel="noopener" style="font-size:1rem">X でじまん</a>
+      <p class="back"><a href="https://picoruno.com/">← picoruno. のゲーム一覧へ</a></p>
+    </div>
+  </div>
+</div>
+<script>
+/*ART*/const ART={},LAYER={},SCENE={pxu:160,ridges:[476.6,664.5,852.4],spr:{vine:{res:320,pxu:200,root:[160,160]},vine_big:{res:320,pxu:200,root:[160,160]},vine_gold:{res:320,pxu:200,root:[160,160]},imo_s:{res:256,pxu:213.3,L:.26},imo_m:{res:256,pxu:213.3,L:.34},imo_l:{res:256,pxu:213.3,L:.44},imo_gold:{res:256,pxu:213.3,L:.44},kago:{res:320,pxu:228.6,mouth:[160,116.4]}}};/*/ART*/
+/*AUDIO*/const AUD={};/*/AUDIO*/
+</script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const W0=720,H0=1280,ROUND=60,PULLMAX=300;
+const SV=SCENE.spr;
+const SLOTS=[];for(const y of SCENE.ridges)for(const x of [150,360,570])SLOTS.push({x,y:y+6,v:null,wait:Math.random()*1.5});
+const KAGO={x:610,y:1150};
+const TYPES={
+  vine:{n:[3,5],imo:['imo_s','imo_m','imo_m'],band:.32,drift:.55,rate:.42},
+  vine_big:{n:[5,7],imo:['imo_m','imo_l','imo_l'],band:.25,drift:.85,rate:.32},
+  vine_gold:{n:[3,3],imo:['imo_gold','imo_l','imo_l'],band:.19,drift:1.05,rate:.28}};
+const PTS={imo_s:10,imo_m:20,imo_l:40,imo_gold:300},KG={imo_s:.2,imo_m:.35,imo_l:.6,imo_gold:1};
+
+/* ---------- art ---------- */
+const IMG={};
+function loadImg(src){return new Promise(r=>{if(!src)return r(null);const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
+function outlined(im,px,thr){
+  const c=document.createElement('canvas');c.width=im.width+px*2;c.height=im.height+px*2;const x=c.getContext('2d');
+  const m=document.createElement('canvas');m.width=im.width;m.height=im.height;const mx=m.getContext('2d');mx.drawImage(im,0,0);
+  const d=mx.getImageData(0,0,m.width,m.height),a=d.data;for(let i=0;i<a.length;i+=4){const on=a[i+3]>thr;a[i]=74;a[i+1]=44;a[i+2]=29;a[i+3]=on?255:0}mx.putImageData(d,0,0);
+  for(let k=0;k<16;k++){const t=k/16*Math.PI*2;x.drawImage(m,px+Math.cos(t)*px,px+Math.sin(t)*px)}
+  x.drawImage(im,px,px);c.pad=px;return c}
+async function loadArt(){await Promise.all(Object.keys(ART).map(k=>loadImg(ART[k]).then(i=>{if(!i)return;IMG[k]=k==='bg'?i:outlined(i,k.startsWith('vine')?3:4,120)})))}
+function sprAt(c,k,ax,ay,x,y,s,rot=0,a=1){const im=IMG[k];if(!im)return;const p=im.pad||0;c.save();c.globalAlpha*=a;c.translate(x,y);if(rot)c.rotate(rot);c.scale(s,s);c.drawImage(im,-ax-p,-ay-p);c.restore()}
+function imoSpr(c,k,x,y,s=1,rot=0){const r=SV[k].res;sprAt(c,k,r/2,r/2,x,y,.8*s,rot)}
+function vineSpr(c,k,x,y,s=1,rot=0){const v=SV[k];sprAt(c,k,v.root[0],v.root[1],x,y,.95*s,rot)}
+
+/* ---------- audio ---------- */
+const AC=window.AudioContext||window.webkitAudioContext;
+let ac=null,master=null,bgmGain=null,bgmSrc=null,decoding=null;const BUF={};
+let muted=LS.get('imohori-mute',false);
+function b64buf(u){const b=atob(u.split(',')[1]);const a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a.buffer}
+function audioInit(){if(ac||!AC)return;ac=new AC();master=ac.createGain();master.gain.value=muted?0:1;master.connect(ac.destination);bgmGain=ac.createGain();bgmGain.gain.value=.34;bgmGain.connect(master);
+  decoding=Promise.all(Object.keys(AUD).map(k=>new Promise((r,j)=>{const p=ac.decodeAudioData(b64buf(AUD[k]),r,j);if(p&&p.then)p.then(r,j)}).then(b=>{BUF[k]=b}).catch(()=>{})))}
+function unlock(){audioInit();if(ac&&ac.state==='suspended')ac.resume()}
+function snapRate(r){const st=12*Math.log2(r);let b=0;for(const a of [-12,-7,-5,0,5,7,12])if(Math.abs(a-st)<Math.abs(b-st))b=a;return Math.pow(2,b/12)}
+function sfx(k,vol=1,rate=1){if(!ac||!BUF[k]||muted)return;const s=ac.createBufferSource();s.buffer=BUF[k];s.playbackRate.value=snapRate(rate);const g=ac.createGain();g.gain.value=vol;s.connect(g);g.connect(master);s.start()}
+function bgm(on){if(!ac)return;if(on){if(bgmSrc||!BUF.bgm)return;bgmSrc=ac.createBufferSource();bgmSrc.buffer=BUF.bgm;bgmSrc.loop=true;bgmSrc.connect(bgmGain);bgmSrc.start()}else if(bgmSrc){try{bgmSrc.stop()}catch(e){}bgmSrc=null}}
+function duck(v,t=.25){if(bgmGain&&ac)bgmGain.gain.setTargetAtTime(v,ac.currentTime,t)}
+function setMute(m){muted=m;LS.set('imohori-mute',m);if(master)master.gain.value=m?0:1;$('muteBtn').textContent=m?'♪ 音なし':'♪ 音あり'}
+
+/* ---------- state ---------- */
+const G={phase:'title',t:0,left:ROUND,score:0,combo:0,cnt:0,kg:0,gold:0,snaps:0,hold:null,flying:[],chain:null,fx:[],texts:[],basket:0,bump:0,endT:0};
+function newVine(slot){const r=Math.random();const type=r<.07?'vine_gold':r<.3?'vine_big':'vine';const T=TYPES[type];
+  const n=T.n[0]+Math.floor(Math.random()*(T.n[1]-T.n[0]+1));const imos=[];for(let i=0;i<n;i++)imos.push(i===0&&type==='vine_gold'?'imo_gold':T.imo[Math.floor(Math.random()*T.imo.length)]);
+  slot.v={type,imos,prog:0,strain:0,grow:0,ph:Math.random()*7,shake:0}}
+function reset(){G.t=0;G.left=ROUND;G.score=0;G.combo=0;G.cnt=0;G.kg=0;G.gold=0;G.snaps=0;G.hold=null;G.flying=[];G.chain=null;G.fx=[];G.texts=[];G.basket=0;G.endT=0;
+  SLOTS.forEach((s,i)=>{s.v=null;s.wait=.2+Math.random()*1.2});for(const i of [1,3,5,7,8]){newVine(SLOTS[i]);SLOTS[i].v.grow=1}hud()}
+function hud(){$('scoreP').textContent=G.score+' てん';const t=Math.ceil(G.left);$('timeP').textContent=t;$('timeP').classList.toggle('low',t<=10&&G.phase==='play')}
+function text(s,x,y,c,small){G.texts.push({s,x,y,c,small,t:0})}
+function dirt(x,y,n=12){for(let i=0;i<n;i++){const a=Math.PI+Math.random()*Math.PI,v=120+Math.random()*220;G.fx.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,t:0,life:.5+Math.random()*.3,c:Math.random()<.5?'#7a4a2a':'#9a6440',r:4+Math.random()*5})}}
+function sparks(x,y,c,n=14){for(let i=0;i<n;i++){const a=Math.random()*7,v=150+Math.random()*300;G.fx.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-150,t:0,life:.5+Math.random()*.4,c,r:4.5})}}
+function band(v){const T=TYPES[v.type];const c=.55+.2*Math.sin(G.t*T.drift+v.ph)+.06*Math.sin(G.t*T.drift*2.7+v.ph*3);return {lo:c-T.band/2,hi:c+T.band/2}}
+function tension(){const h=G.hold;if(!h)return 0;return Math.max(0,Math.min(1.25,(h.y0-h.y)/PULLMAX+Math.max(0,Math.abs(h.x-h.x0)-60)/900))}
+
+/* ---------- harvest ---------- */
+function harvest(slot){const v=slot.v,h=G.hold;G.combo++;const mult=1+Math.min(10,G.combo-1)*.1;
+  const ax=h?h.x:slot.x,ay=h?h.y:slot.y-120;
+  G.chain={x:ax,y:ay,imos:v.imos.slice(),t:0,sx:slot.x,sy:slot.y,mult};
+  dirt(slot.x,slot.y,22);sfx('dig',.9);sfx(v.type==='vine_gold'?'gold':'pop',.7);
+  if(v.type==='vine_gold'){sparks(ax,ay,'#ffe27a',24);text('金いも！！',360,420,'#ffe27a')}
+  else text(v.imos.length>=6?'おおきな かぶ…じゃなくて おおもの！':'ずるずる〜！',360,420,'#fff',v.imos.length<6);
+  if(G.combo>=3)text(G.combo+' れんぞく',360,470,'#ffe27a',true);
+  slot.v=null;slot.wait=1+Math.random()*1.2;G.hold=null}
+function snap(slot){const v=slot.v;G.snaps++;G.combo=0;sfx('snap',.9);sfx('oops',.5);dirt(slot.x,slot.y,8);
+  text('ぷちっ…',slot.x,slot.y-130,'#fff',true);
+  // the vine breaks off: leaves tumble away, one small potato is left behind sometimes
+  G.flying.push({k:v.type,x:G.hold?G.hold.x:slot.x,y:G.hold?G.hold.y:slot.y,vx:(Math.random()-.5)*300,vy:-300,rot:0,w:(Math.random()-.5)*6,vine:1,life:1.2});
+  slot.v=null;slot.wait=1.2+Math.random();G.hold=null}
+function launch(k,x,y,i){G.flying.push({k,x,y,vx:0,vy:0,rot:0,w:(Math.random()-.5)*8,t:-i*.12,tx:KAGO.x+(Math.random()-.5)*40,ty:KAGO.y-34,sx:x,sy:y,dur:.55,mult:G.chain?G.chain.mult:1})}
+
+/* ---------- step ---------- */
+function step(dt){
+  G.t+=dt;G.bump=Math.max(0,G.bump-dt*3);
+  if(G.phase==='play'){G.left-=dt;if(G.left<=0){G.left=0;finish()}hud()}
+  if(G.phase==='end'){G.endT+=dt;if(G.endT>1.6&&$('resultOv').hidden)showResult()}
+  for(const s of SLOTS){if(s.v){s.v.grow=Math.min(1,s.v.grow+dt*2.2);if(!(G.hold&&G.hold.slot===s)){s.v.prog=Math.max(0,s.v.prog-dt*.12);s.v.strain=Math.max(0,s.v.strain-dt)}}
+    else if(G.phase!=='end'){s.wait-=dt;if(s.wait<=0&&SLOTS.filter(q=>q.v).length<5)newVine(s);else if(s.wait<=0)s.wait=.5}}
+  const h=G.hold;
+  if(h&&G.phase==='play'){const v=h.slot.v,T=TYPES[v.type],b=band(v),te=tension();
+    h.te+=(te-h.te)*Math.min(1,dt*14);
+    if(h.te>b.hi){v.strain+=dt*1.7;v.shake=1}else{v.strain=Math.max(0,v.strain-dt*.8);v.shake=Math.max(0,v.shake-dt*4)}
+    if(h.te>=b.lo&&h.te<=b.hi){v.prog+=dt*T.rate;h.dig-=dt;if(h.dig<=0){h.dig=.35;sfx('dig',.35,1);dirt(h.slot.x,h.slot.y,3)}}
+    else if(h.te<b.lo)v.prog=Math.max(0,v.prog-dt*.06);
+    h.cr-=dt;if(h.te>b.hi&&h.cr<=0){h.cr=.3;sfx('creak',.35,1)}
+    if(v.strain>=1)snap(h.slot);else if(v.prog>=1)harvest(h.slot)}
+  // the chain hangs from the finger point for a moment, then each potato flies to the basket
+  if(G.chain){const ch=G.chain;ch.t+=dt;if(ch.t>.55){ch.imos.forEach((k,i)=>launch(k,ch.x+(i-(ch.imos.length-1)/2)*0,ch.y+60+i*46,i));G.chain=null}}
+  for(let i=G.flying.length-1;i>=0;i--){const f=G.flying[i];
+    if(f.vine){f.life-=dt;f.vy+=1400*dt;f.x+=f.vx*dt;f.y+=f.vy*dt;f.rot+=f.w*dt;if(f.life<=0)G.flying.splice(i,1);continue}
+    f.t+=dt;if(f.t<0)continue;const k=Math.min(1,f.t/f.dur);f.x=f.sx+(f.tx-f.sx)*k;f.y=f.sy+(f.ty-f.sy)*k-Math.sin(k*Math.PI)*220;f.rot+=f.w*dt;
+    if(k>=1){G.flying.splice(i,1);const g=Math.round(PTS[f.k]*f.mult);G.score+=g;G.cnt++;G.kg+=KG[f.k];if(f.k==='imo_gold')G.gold++;G.basket++;G.bump=1;sfx('plop',.6,1+Math.random()*.2);text('+'+g,KAGO.x-30,KAGO.y-110,f.k==='imo_gold'?'#ffe27a':'#fff',true);hud()}}
+  for(let i=G.fx.length-1;i>=0;i--){const p=G.fx[i];p.t+=dt;p.vy+=900*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.t>p.life)G.fx.splice(i,1)}}
+function finish(){if(G.phase!=='play')return;G.phase='end';G.endT=0;G.hold=null;duck(.08,.2);sfx('over',.8)}
+function rank(s){return s>=2000?'いもほり 名人':s>=1200?'はたけの ぬし':s>=600?'ずるずる 上手':s>=200?'いもほり 見習い':'はじめての いもほり'}
+function showResult(){const s=G.score;const best=LS.get('imohori-best',0),nb=s>best;if(nb)LS.set('imohori-best',s);
+  $('resScore').textContent=s+' てん';$('rCnt').textContent=G.cnt;$('rKg').textContent=G.kg.toFixed(1)+'kg';$('rGold').textContent=G.gold;$('rSnap').textContent=G.snaps;$('resRank').textContent=rank(s);
+  $('resNote').innerHTML=(nb&&s>0?'ベスト更新！<br>':'')+(G.kg>=10?'これで やきいも 何本 できるかな。':G.snaps>=4?'ひっぱりすぎ ちゅうい。みどりを ねらって ゆっくり〜':'みどりの ところは ゆらゆら うごくよ。<br>針を ついていかせよう。');
+  $('shareBtn').href='https://twitter.com/intent/tweet?text='+encodeURIComponent(`ずるずる いもほり🍠 ${s}てん（${G.cnt}本・${G.kg.toFixed(1)}kg）「${rank(s)}」\n#ずるずるいもほり #picoruno`)+'&url='+encodeURIComponent('https://picoruno.com/imohori.html');
+  $('resultOv').hidden=false;bgm(false);refreshTitle()}
+
+/* ---------- draw ---------- */
+const cv=$('cv'),ctx=cv.getContext('2d');let CW=0,CH=0,DPR=1,S=1,OX=0,OY=0;
+function resize(){DPR=Math.min(devicePixelRatio||1,2.5);const r=cv.getBoundingClientRect();CW=r.width;CH=r.height;cv.width=Math.round(CW*DPR);cv.height=Math.round(CH*DPR);
+  S=Math.min(CW/W0,Math.max(CH/H0,CW/W0*.92));OX=(CW-W0*S)/2;OY=(CH-H0*S)*.5}
+function toFrame(e){const r=cv.getBoundingClientRect();return {x:(e.clientX-r.left-OX)/S,y:(e.clientY-r.top-OY)/S}}
+function mound(c,x,y,k){if(k<=0)return;c.fillStyle='#7a4a2c';c.beginPath();c.ellipse(x,y+4,34+k*26,10+k*10,0,0,7);c.fill();
+  c.strokeStyle='#5a3218';c.lineWidth=3;c.lineCap='round';for(let i=0;i<3;i++){const a=-.6+i*.6;c.beginPath();c.moveTo(x+Math.cos(a)*6,y+4);c.lineTo(x+Math.cos(a)*(18+k*24),y+4+Math.sin(a)*(4+k*7));c.stroke()}}
+function draw(dt){
+  const c=ctx;c.setTransform(DPR,0,0,DPR,0,0);c.fillStyle='#9a6a44';c.fillRect(0,0,CW,CH);
+  if(OY>0){c.fillStyle='#d6eaf2';c.fillRect(0,0,CW,OY+2);c.fillStyle='#d8b868';c.fillRect(0,OY+H0*S-2,CW,CH)}
+  c.save();c.translate(OX,OY);c.scale(S,S);c.beginPath();c.rect(0,0,W0,H0);c.clip();
+  if(IMG.bg)c.drawImage(IMG.bg,0,0,W0,H0);else{c.fillStyle='#9a6a44';c.fillRect(0,0,W0,H0)}
+  const h=G.hold;
+  for(const s of SLOTS){const v=s.v;if(!v)continue;const held=h&&h.slot===s;
+    mound(c,s.x,s.y,v.prog);
+    if(v.prog>.55){const k=(v.prog-.55)/.45;c.save();c.beginPath();c.rect(s.x-80,s.y-60,160,60+2);c.clip();imoSpr(c,v.imos[0],s.x+6,s.y+18-k*22,.8,-.25);c.restore()}
+    if(held){const te=h.te,lx=s.x+(h.x-s.x)*.85,ly=Math.min(s.y-30,h.y);
+      c.strokeStyle='#6a4a4a';c.lineWidth=5;c.lineCap='round';for(const o of [-14,0,14]){c.beginPath();c.moveTo(s.x+o*.4,s.y);c.quadraticCurveTo(s.x+o*1.6,(s.y+ly)/2,lx+o*.6,ly+30);c.stroke()}
+      const sh=v.shake?Math.sin(G.t*60)*4*v.shake:0;vineSpr(c,v.type,lx+sh,ly+30,1.04,0)}
+    else{const g=v.grow,bob=Math.sin(G.t*2+v.ph)*.03;vineSpr(c,v.type,s.x,s.y,(.3+.7*g)*(1+bob),Math.sin(G.t*1.3+v.ph)*.04)}
+    if(v.type==='vine_gold'&&!held&&G.t%1<.5){c.fillStyle='#fff6c0';for(let i=0;i<3;i++){const a=G.t*2+i*2.1;c.beginPath();c.arc(s.x+Math.cos(a)*60,s.y-40+Math.sin(a)*24,4,0,7);c.fill()}}
+    if(v.prog>0&&!held){c.strokeStyle='#ffe27a';c.lineWidth=6;c.beginPath();c.arc(s.x,s.y-100,16,-Math.PI/2,-Math.PI/2+v.prog*Math.PI*2);c.stroke()}}
+  // basket
+  const bs=1+Math.sin(G.bump*Math.PI)*.06;sprAt(c,'kago',SV.kago.res/2,SV.kago.res/2,KAGO.x,KAGO.y,.62*bs);
+  const heap=Math.min(9,G.basket);for(let i=0;i<heap;i++){const row=i<4?0:i<7?1:2,col=row===0?i:row===1?i-4:i-7,nr=row===0?4:row===1?3:2;imoSpr(c,G.gold&&i===heap-1?'imo_gold':i%3?'imo_m':'imo_s',KAGO.x+(col-(nr-1)/2)*30,KAGO.y-38-row*16-(i===heap-1?G.bump*8:0),.62*bs,(i%2?.35:-.35))}
+  if(G.basket){c.save();c.font='26px "Dela Gothic One",sans-serif';c.textAlign='center';c.lineJoin='round';c.lineWidth=7;c.strokeStyle='#4a2c1d';c.strokeText(G.basket+'本',KAGO.x-120,KAGO.y+40);c.fillStyle='#fff';c.fillText(G.basket+'本',KAGO.x-120,KAGO.y+40);c.restore()}
+  // chain of potatoes hanging from the vine
+  if(G.chain){const ch=G.chain,n=ch.imos.length;c.strokeStyle='#6a4a4a';c.lineWidth=4;c.beginPath();c.moveTo(ch.x,ch.y+30);c.lineTo(ch.x+Math.sin(G.t*8)*6,ch.y+60+n*46);c.stroke();
+    vineSpr(c,'vine',ch.x,ch.y+30,1);ch.imos.forEach((k,i)=>imoSpr(c,k,ch.x+Math.sin(G.t*8+i)*6*(i+1)/n,ch.y+60+i*46+Math.min(1,ch.t*5)*0,1.05,Math.PI/2+Math.sin(G.t*6+i)*.3))}
+  for(const f of G.flying){if(f.t<0)continue;if(f.vine)vineSpr(c,f.k,f.x,f.y,1,f.rot);else imoSpr(c,f.k,f.x,f.y,1,f.rot)}
+  // tension gauge next to the held vine
+  if(h&&G.phase==='play'){const v=h.slot.v,b=band(v);const gx=h.slot.x>500?h.slot.x-130:h.slot.x+110,gy=h.slot.y-330,gh=300,gw=34;
+    c.fillStyle='rgba(255,250,242,.95)';c.strokeStyle='#4a2c1d';c.lineWidth=4;c.beginPath();c.roundRect(gx-6,gy-6,gw+12,gh+12,12);c.fill();c.stroke();
+    const Y=t=>gy+gh-Math.min(1.25,t)/1.25*gh;
+    c.fillStyle='#f0a090';c.fillRect(gx,gy,gw,Y(b.hi)-gy);c.fillStyle='#9ad070';c.fillRect(gx,Y(b.hi),gw,Y(b.lo)-Y(b.hi));c.fillStyle='#e0d4c0';c.fillRect(gx,Y(b.lo),gw,gy+gh-Y(b.lo));
+    const ny=Y(h.te);c.fillStyle='#4a2c1d';c.beginPath();c.moveTo(gx-14,ny-10);c.lineTo(gx-14,ny+10);c.lineTo(gx+2,ny);c.fill();c.fillRect(gx,ny-2.5,gw,5);
+    // progress + strain bars
+    c.fillStyle='#ffe27a';c.fillRect(gx,gy+gh+16,gw*Math.min(1,v.prog),10);c.strokeRect(gx,gy+gh+16,gw,10);
+    if(v.strain>0){c.fillStyle=`rgba(216,64,46,${.4+.6*Math.abs(Math.sin(G.t*20))})`;c.beginPath();c.arc(gx+gw/2,gy-26,10+v.strain*8,0,7);c.fill()}}
+  for(const p of G.fx){c.globalAlpha=Math.max(0,1-p.t/p.life);c.fillStyle=p.c;c.beginPath();c.arc(p.x,p.y,p.r,0,7);c.fill()}c.globalAlpha=1;
+  for(let i=G.texts.length-1;i>=0;i--){const x=G.texts[i];x.t+=dt;if(x.t>1.1){G.texts.splice(i,1);continue}
+    c.save();const sz=x.small?28:38;c.font=`${sz}px "Dela Gothic One",sans-serif`;c.textAlign='center';c.textBaseline='middle';c.translate(Math.max(170,Math.min(W0-170,x.x)),x.y-x.t*40);c.globalAlpha=x.t>.8?(1.1-x.t)/.3:1;
+    c.lineJoin='round';c.lineWidth=sz*.28;c.strokeStyle='#4a2c1d';c.strokeText(x.s,0,0);c.fillStyle=x.c;c.fillText(x.s,0,0);c.restore()}
+  if(G.phase==='play'&&!h&&G.cnt===0&&G.t%1.4<1){c.save();c.font='30px "Dela Gothic One",sans-serif';c.textAlign='center';c.lineJoin='round';c.lineWidth=8;c.strokeStyle='#4a2c1d';c.strokeText('つるを つかんで 上へ ひっぱろう',360,1040);c.fillStyle='#fff';c.fillText('つるを つかんで 上へ ひっぱろう',360,1040);c.restore()}
+  c.restore()}
+let last=performance.now();
+function frame(n){const dt=Math.min(.033,(n-last)/1000);last=n;if(G.phase!=='pause')step(dt);draw(G.phase==='pause'?0:dt);requestAnimationFrame(frame)}
+
+/* ---------- input ---------- */
+let pid=null;
+function pdown(x,y){if(G.phase!=='play'||G.hold)return false;let best=null,bd=1e9;for(const s of SLOTS){if(!s.v||s.v.grow<.6)continue;const d=Math.hypot(x-s.x,(y-(s.y-40))*1.3);if(d<110&&d<bd){bd=d;best=s}}
+  if(!best)return false;G.hold={slot:best,x0:x,y0:y,x,y,te:0,dig:.2,cr:0};sfx('grab',.6);return true}
+function pmove(x,y){if(G.hold){G.hold.x=x;G.hold.y=y}}
+function pup(){if(G.hold){G.hold=null}}
+cv.addEventListener('pointerdown',e=>{e.preventDefault();unlock();const p=toFrame(e);if(pdown(p.x,p.y)){pid=e.pointerId;cv.setPointerCapture&&cv.setPointerCapture(e.pointerId)}},{passive:false});
+cv.addEventListener('pointermove',e=>{if(e.pointerId!==pid)return;const p=toFrame(e);pmove(p.x,p.y)});
+cv.addEventListener('pointerup',e=>{if(e.pointerId!==pid)return;pid=null;pup()});cv.addEventListener('pointercancel',e=>{if(e.pointerId!==pid)return;pid=null;pup()});
+function start(){unlock();guardHistory();for(const id of ['titleOv','resultOv','pauseOv'])$(id).hidden=true;reset();G.phase='play';
+  if(ac)Promise.resolve(decoding).then(()=>{duck(.34,.01);bgm(true);sfx('start',.6)});pingPlay()}
+function pause(on){if(on){if(G.phase!=='play')return;G.phase='pause';G.hold=null;pid=null;$('pauseOv').hidden=false;if(ac)ac.suspend()}else{if(G.phase!=='pause')return;$('pauseOv').hidden=true;G.phase='play';last=performance.now();if(ac)ac.resume()}}
+function toTitle(){bgm(false);G.phase='title';for(const id of ['pauseOv','resultOv'])$(id).hidden=true;$('titleOv').hidden=false;reset();refreshTitle();if(ac&&ac.state==='suspended')ac.resume()}
+function refreshTitle(){const b=LS.get('imohori-best',0);$('bestLine').textContent=b?`ベスト ${b}てん`:''}
+$('startBtn').onclick=start;$('againBtn').onclick=start;
+$('pauseBtn').onclick=()=>pause(true);$('resumeBtn').onclick=()=>pause(false);$('quitBtn').onclick=toTitle;
+$('muteBtn').onclick=()=>{unlock();setMute(!muted)};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pause(true)});
+let guarded=false;function guardHistory(){if(guarded)return;try{history.pushState({imohori:1},'');guarded=true}catch(e){}}
+window.addEventListener('popstate',()=>{if(!guarded)return;guarded=false;if(G.phase==='play'){pause(true);guardHistory()}});
+document.addEventListener('touchstart',e=>{const x=e.touches[0].clientX;if(G.phase==='play'&&(x<24||x>innerWidth-24))e.preventDefault()},{passive:false});
+window.addEventListener('resize',resize);
+setMute(muted);refreshTitle();resize();reset();loadArt();requestAnimationFrame(frame);
+window.__T={G,SLOTS,band,pdown,pmove,pup,PULLMAX};
+</script>
+<script>
+function pingPlay(){
+  var G="ずるずる いもほり", K="picoruno-played:"+G;
+  try{ if(sessionStorage.getItem(K)) return; sessionStorage.setItem(K,"1"); }catch(e){}
+  var KEY="sb_publishable_5hbtIPW-1y5MqsoiLC6X_A_oZMG0Z5Z";
+  fetch("https://fymwlpbspigpeaoenhhp.supabase.co/rest/v1/rpc/add_play",{method:"POST",keepalive:true,
+    headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify({g:G})})
+  .then(function(r){ if(!r.ok) throw 0; })
+  .catch(function(){ try{ var d=JSON.parse(localStorage.getItem("picoruno-stats")||"{}"); d[G]=d[G]||{plays:0,likes:0}; d[G].plays++; localStorage.setItem("picoruno-stats",JSON.stringify(d)); }catch(e){} });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+{"key": [7, 9, 11, 2, 4], "sounds": {
+ "grab": ["uisfx:organic/press", -6], "dig": ["kenney:impact-sounds__footstep_grass_002.ogg", 0], "creak": ["uisfx:rubber/drag-start", -8],
+ "snap": ["uisfx:organic/snap", -2], "plop": ["kenney:impact-sounds__impactSoft_medium_001.ogg", -2], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (pop / gold / oops / over): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
