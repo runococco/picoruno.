@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<script src="count.js" defer></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f4ead8">
+<title>つのつの こんぺいとう</title>
+<meta name="description" content="まわる おなべの おさとうに みつを かけて、つのを そだてよう。かけすぎると べたべた くっついちゃう。こんぺいとう づくりの ゲーム。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="つのつの こんぺいとう">
+<meta property="og:description" content="みつを すこしずつ かけて、つのつのの こんぺいとうを つくろう">
+<meta property="og:url" content="https://picoruno.com/konpeito.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://picoruno.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://picoruno.com/og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23c87650'/%3E%3Cpath d='M16 5l3 5 6-1-2 6 4 4-6 2 0 6-5-3-5 3 0-6-6-2 4-4-2-6 6 1z' fill='%23f6a8c4' stroke='%234a2c1d' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<style>
+/* Sugar kitchen: copper pan, clay hearth, pastel sugar sweets, dark-brown outlined flat UI. */
+:root{
+  --ink:#4a2c1d;
+  --ink2:#7a5440;
+  --paper:#fffaf2;
+  --blue:#e07898;
+  --red:#d8603a;
+  --sky:#c87650;
+  --gold:#f2c14e;
+  --display:"Dela Gothic One","Zen Maru Gothic","Hiragino Sans",sans-serif;
+  --body:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%;margin:0;background:#f4ead8}
+[hidden]{display:none!important}
+body{color:var(--ink);font-family:var(--body);overflow:hidden;overscroll-behavior:none;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+#app{position:relative;height:100%;height:100dvh;max-width:560px;margin:0 auto;overflow:hidden}
+#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+button{font-family:inherit;color:inherit;cursor:pointer}
+.hud{position:absolute;left:0;right:0;top:env(safe-area-inset-top);z-index:2;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;pointer-events:none}
+.pill{font-family:var(--display);font-size:1rem;background:var(--paper);color:var(--ink);border:2.5px solid var(--ink);border-radius:12px;padding:4px 10px;box-shadow:0 3px 0 var(--ink);white-space:nowrap}
+.pill.t{min-width:3.6em;text-align:center}
+.pill.t.low{background:#ffd9c8;color:var(--red)}
+.ib{pointer-events:auto;width:40px;height:40px;border-radius:12px;border:2.5px solid var(--ink);background:var(--paper);display:grid;place-items:center;padding:0;box-shadow:0 3px 0 var(--ink)}
+.ib svg{width:22px;height:22px}
+.ov{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(74,44,29,.28)}
+.card{background:var(--paper);color:var(--ink);border:3px solid var(--ink);border-radius:22px;box-shadow:0 6px 0 var(--ink);padding:18px 18px 14px;width:100%;max-width:360px;box-sizing:border-box;text-align:center;max-height:100%;overflow:auto}
+.logo{font-family:var(--display);font-size:1.2rem;line-height:1.1;margin:4px 0 0;color:var(--sky)}
+.logo2{font-family:var(--display);font-size:2.6rem;line-height:1.1;margin:0 0 6px;color:var(--red)}
+.sub{font-size:.9rem;color:var(--ink2);margin:0 0 10px;font-weight:700}
+.how{font-size:.86rem;font-weight:700;background:#fff;border:2px dashed #e0c8a0;border-radius:12px;padding:8px 10px;margin:0 0 12px;line-height:1.6;text-align:left}
+.how ol{margin:0;padding-left:1.3em}
+.how em{font-style:normal;color:var(--red)}
+.how .kinds{display:flex;justify-content:space-around;margin:6px 0 0;font-size:.74rem;text-align:center;color:var(--ink2)}
+.how .kinds img{display:block;width:62px;height:auto;margin:0 auto -4px}
+.big{display:block;width:100%;font-family:var(--display);font-size:1.2rem;padding:13px 10px;border-radius:16px;border:3px solid var(--ink);
+  background:var(--blue);color:#fff;box-shadow:0 5px 0 var(--ink);margin:0 0 12px;letter-spacing:.04em;text-decoration:none;box-sizing:border-box}
+.big:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.big.sec{background:#fff;color:var(--ink)}
+.best{font-size:.85rem;color:var(--ink2);margin:-4px 0 10px;font-weight:700}
+.back{margin:6px 0 0;font-size:.85rem}
+.back a{color:var(--ink2);font-weight:700}
+.bag{display:flex;justify-content:center;gap:10px;margin:6px 0 8px}
+.bag div{width:84px;font-size:.78rem;font-weight:900;line-height:1.3}
+.bag img{display:block;width:76px;height:auto;margin:0 auto -6px}
+.bag b{font-family:var(--display);font-weight:400;font-size:1.25rem}
+.res-big{font-family:var(--display);font-size:2.6rem;line-height:1.05;margin:2px 0}
+.res-rank{display:inline-block;font-family:var(--display);font-size:1rem;background:var(--gold);border:2.5px solid var(--ink);border-radius:999px;padding:4px 14px;margin:4px 0 6px}
+.res-note{font-size:.84rem;font-weight:700;color:var(--ink2);margin:0 0 12px;line-height:1.6}
+.pause-t{font-family:var(--display);font-size:1.6rem;margin:4px 0 12px}
+.res-row{display:flex;justify-content:center;gap:14px;margin:4px 0 6px;font-size:.84rem;font-weight:900;color:var(--ink2)}
+.res-row b{display:block;font-family:var(--display);font-weight:400;font-size:1.3rem;color:var(--ink)}
+.logo2{font-size:1.9rem}
+.mis{display:flex;gap:6px;justify-content:center;align-items:center;margin:0 0 4px}
+.kinds3{display:flex;justify-content:space-around;margin:6px 0 0;font-size:.76rem;text-align:center;color:var(--ink2);font-weight:900}
+.kinds3 b{display:block;font-family:var(--display);font-weight:400;font-size:1rem;color:var(--red)}
+.logo2{font-size:1.9rem}
+.xx{position:relative;width:110px;height:20px;border:2.5px solid var(--ink);border-radius:10px;background:var(--paper);overflow:hidden;box-shadow:0 3px 0 var(--ink)}
+.wet b{position:absolute;left:0;top:0;bottom:0;width:0;background:#5aa8e8}
+.wet span{position:absolute;inset:0;font-size:.7rem;font-weight:900;text-align:center;line-height:16px}
+.pill.n{min-width:4.6em;text-align:center}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="cv"></canvas>
+  <div class="hud"><div class="pill n" id="nP">1 / 4</div><div class="pill" id="scoreP">0 てん</div><button class="ib" id="pauseBtn" aria-label="一時停止"><svg viewBox="0 0 24 24" fill="#4a2c1d"><rect x="6" y="5" width="4.2" height="14" rx="1.2"/><rect x="13.8" y="5" width="4.2" height="14" rx="1.2"/></svg></button></div>
+
+  <div class="ov" id="titleOv">
+    <div class="card">
+      <div class="logo">おさとうの おなべ</div>
+      <div class="logo2">つのつの こんぺいとう</div>
+      <p class="sub">みつを すこしずつ かけて つのを そだてよう</p>
+      <div class="how"><ol>
+        <li>おなべを <em>おさえている あいだ</em>、ひしゃくから みつが たれる。ゆびを うごかして つぶに かけよう</li>
+        <li>みつが かわくと つぶが おおきくなって <em>つの</em> が はえる。ぜんぶ つのつのに なったら できあがり</li>
+        <li>ひとつぶに かけすぎると <em>べたべた</em> で くっつく。ほうっておいた つぶは <em>こげちゃう</em> から、みんなに じゅんばんに かけよう</li></ol>
+        <div class="kinds3"><div><b>つぶ</b>はじめ</div><div><b>でこぼこ</b>もうすこし</div><div><b>つのつの</b>100てん</div></div></div>
+      <button class="big" id="startBtn">みつを かける</button>
+      <p class="best" id="bestLine"></p>
+      <button class="big sec" id="muteBtn" style="font-size:.95rem;padding:9px">♪ 音あり</button>
+      <p class="back"><a href="https://picoruno.com/">← picoruno. のゲーム一覧へ</a></p>
+    </div>
+  </div>
+  <div class="ov" id="pauseOv" hidden>
+    <div class="card">
+      <div class="pause-t">ひとやすみ</div>
+      <button class="big" id="resumeBtn">つづける</button>
+      <button class="big sec" id="quitBtn">タイトルへ</button>
+    </div>
+  </div>
+  <div class="ov" id="resultOv" hidden>
+    <div class="card">
+      <div class="logo">きょうの こんぺいとう</div>
+      <div class="res-big" id="resScore">0 てん</div>
+      <div class="res-row"><div>つのつの<b id="rD">0</b></div><div>くっつき・こげ<b id="rC">0</b></div><div>かんぺき<b id="rP">0</b></div></div>
+      <div class="res-rank" id="resRank"></div>
+      <p class="res-note" id="resNote"></p>
+      <button class="big" id="againBtn">もういちど</button>
+      <a class="big sec" id="shareBtn" href="https://twitter.com/intent/tweet" target="_blank" rel="noopener" style="font-size:1rem">X でじまん</a>
+      <p class="back"><a href="https://picoruno.com/">← picoruno. のゲーム一覧へ</a></p>
+    </div>
+  </div>
+</div>
+<script>
+/*ART*/const ART={},LAYER={},SCENE={pan:[360,720,300]};/*/ART*/
+/*AUDIO*/const AUD={};/*/AUDIO*/
+</script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const W0=720,H0=1280,[CX,CY,PR]=SCENE.pan,SR=40,DY=-90,RATE=1.3,NEED=.9,DRY=.16,STICKY=.45,TIME=34,BURN=6;
+const BATCH=[{c:'w',n:14,om:.7,name:'しろ'},{c:'p',n:16,om:.85,name:'もも'},{c:'y',n:18,om:1.0,name:'きいろ'},{c:'b',n:20,om:1.15,name:'みずいろ'}];
+const COLS={w:'#f8f4ee',p:'#f6a8c4',y:'#f6d65a',b:'#9ed2f2'};
+
+/* ---------- art ---------- */
+const IMG={};
+function loadImg(src){return new Promise(r=>{if(!src)return r(null);const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
+async function loadArt(){await Promise.all(Object.keys(ART).map(k=>loadImg(ART[k]).then(i=>{if(i)IMG[k]=i})))}
+
+/* ---------- audio ---------- */
+const AC=window.AudioContext||window.webkitAudioContext;let ac=null,master=null,bgmGain=null,bgmSrc=null,decoding=null;const BUF={};
+let muted=LS.get('konpeito-mute',false);
+function b64buf(u){const b=atob(u.split(',')[1]);const a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a.buffer}
+function audioInit(){if(ac||!AC)return;ac=new AC();master=ac.createGain();master.gain.value=muted?0:1;master.connect(ac.destination);bgmGain=ac.createGain();bgmGain.gain.value=.3;bgmGain.connect(master);
+  decoding=Promise.all(Object.keys(AUD).map(k=>new Promise((r,j)=>{const p=ac.decodeAudioData(b64buf(AUD[k]),r,j);if(p&&p.then)p.then(r,j)}).then(b=>{BUF[k]=b}).catch(()=>{})))}
+function unlock(){audioInit();if(ac&&ac.state==='suspended')ac.resume()}
+function snapRate(r){const st=12*Math.log2(r);let b=0;for(const a of [-12,-7,-5,0,5,7,12])if(Math.abs(a-st)<Math.abs(b-st))b=a;return Math.pow(2,b/12)}
+function sfx(k,vol=1,rate=1){if(!ac||!BUF[k]||muted)return;const s=ac.createBufferSource();s.buffer=BUF[k];s.playbackRate.value=snapRate(rate);const g=ac.createGain();g.gain.value=vol;s.connect(g);g.connect(master);s.start()}
+function bgm(on){if(!ac)return;if(on){if(bgmSrc||!BUF.bgm)return;bgmSrc=ac.createBufferSource();bgmSrc.buffer=BUF.bgm;bgmSrc.loop=true;bgmSrc.connect(bgmGain);bgmSrc.start()}else if(bgmSrc){try{bgmSrc.stop()}catch(e){}bgmSrc=null}}
+function duck(v,t=.25){if(bgmGain&&ac)bgmGain.gain.setTargetAtTime(v,ac.currentTime,t)}
+function setMute(m){muted=m;LS.set('konpeito-mute',m);if(master)master.gain.value=m?0:1;$('muteBtn').textContent=m?'♪ 音なし':'♪ 音あり'}
+
+/* ---------- state ---------- */
+function rnd(a,b){return a+Math.random()*(b-a)}
+function clamp(v,a,b){return v<a?a:v>b?b:v}
+const G={phase:'title',t:0,texts:[],gr:[],drops:[],tray:[],b:0};
+function fresh(){return {phase:'play',t:0,b:0,score:0,gr:[],drops:[],spots:[],tray:[],texts:[],pour:null,tank:0,left:TIME,state:'intro',stT:0,say:'',sayT:0,endT:0,done:0,clumps:0,burnt:0,perfect:0,pourT:0,stickyWarn:0,ang:0}}
+function radius(g){return 10+14*Math.min(1,g.s)}
+function setupBatch(){const B=BATCH[G.b];G.gr=[];G.spots=[];
+  for(let i=0;i<B.n;i++){const a=rnd(2.2,4.2),r=rnd(80,PR-40);G.gr.push({x:CX+Math.cos(a)*r*.6,y:CY+Math.sin(a)*r*.3+150,vx:0,vy:0,s:rnd(0,.08),wet:0,c:B.c,id:i,ok:false,flash:0,burn:0,fedT:0})}
+  G.tank=B.n*NEED*1.15;G.left=TIME;G.state='intro';G.stT=0;say(`${G.b+1}なべめ ${B.name}`,1.4);hud()}
+function reset(){Object.assign(G,fresh());G.phase='title';G.b=0;setupBatch();G.state='demo';hud()}
+function hud(){$('nP').textContent=`${G.b+1} / ${BATCH.length}`;$('scoreP').textContent=G.score+' てん'}
+function text(s,x,y,c,small){G.texts.push({s,x,y,c,small,t:0})}
+function say(s,t=1.3){G.say=s;G.sayT=t}
+/* ---------- input ---------- */
+function press(x,y){if(G.phase!=='play')return;G.pour=[x,y+DY]}
+function move(x,y){if(G.pour)G.pour=[x,y+DY]}
+function release(){G.pour=null}
+/* ---------- physics ---------- */
+function physics(dt,om){const gs=G.gr;
+  for(const g of gs){const dx=g.x-CX,dy=g.y-CY;const ux=-om*dy,uy=om*dx;const k=g.wet>STICKY?2.2:1.4;g.vx+=(ux-g.vx)*k*dt;g.vy+=(uy-g.vy)*k*dt+520*dt;g.x+=g.vx*dt;g.y+=g.vy*dt;
+    const d=Math.hypot(g.x-CX,g.y-CY),r=radius(g),lim=PR-r-4;if(d>lim){const nx=(g.x-CX)/d,ny=(g.y-CY)/d;g.x=CX+nx*lim;g.y=CY+ny*lim;const vn=g.vx*nx+g.vy*ny;if(vn>0){g.vx-=vn*nx*1.3;g.vy-=vn*ny*1.3}}}
+  for(let i=0;i<gs.length;i++)for(let j=i+1;j<gs.length;j++){const a=gs[i],b=gs[j],dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy),m=radius(a)+radius(b);
+    if(d<m&&d>.01){const nx=dx/d,ny=dy/d,o=(m-d)/2;a.x-=nx*o;a.y-=ny*o;b.x+=nx*o;b.y+=ny*o;const rv=(b.vx-a.vx)*nx+(b.vy-a.vy)*ny;if(rv<0){a.vx+=rv*nx*.5;a.vy+=rv*ny*.5;b.vx-=rv*nx*.5;b.vy-=rv*ny*.5}
+      // two sticky grains touching glue together and are lost
+      if(G.phase==='play'&&a.wet>STICKY&&b.wet>STICKY*.75&&!a.dead&&!b.dead){a.dead=b.dead=1}}}
+  for(let i=gs.length-1;i>=0;i--)if(gs[i].dead){const g=gs[i];gs.splice(i,1);if(G.phase==='play'){G.clumps++;text('くっついた！',g.x,g.y-40,'#ffb0a0',true);G.spots.push({x:g.x,y:g.y,t:0,c:g.c,s:g.s})}}
+  if(G.spots.some(s=>s.t===0)){sfx('clump',.7);for(const s of G.spots)if(s.t===0)s.t=.001}}
+function step(dt){
+  G.t+=dt;G.sayT=Math.max(0,G.sayT-dt);const B=BATCH[Math.min(G.b,BATCH.length-1)];G.ang+=B.om*dt;
+  if(G.phase==='title'){physics(dt,B.om);return}
+  if(G.phase!=='play'){if(G.phase==='end'){G.endT+=dt;physics(dt,B.om);if(G.endT>1.4&&$('resultOv').hidden)showResult()}return}
+  G.stT+=dt;for(const s of G.spots)s.t+=dt;
+  physics(dt,B.om);
+  if(G.state==='intro'){if(G.stT>1.2){G.state='cook';G.stT=0}return}
+  if(G.state==='cook'){G.left-=dt;
+    // syrup falls from the ladle onto whatever is under it
+    if(G.pour&&G.tank>0){const [px,py]=G.pour,amt=Math.min(G.tank,RATE*dt);G.tank-=amt;G.pourT+=dt;
+      const hit=G.gr.filter(g=>Math.hypot(g.x-px,g.y-py)<SR+radius(g)*.5);
+      if(hit.length){for(const g of hit){const was=g.wet;g.wet+=amt/hit.length;g.fedT=.6;if(was<=STICKY&&g.wet>STICKY){sfx('sticky',.45);G.stickyWarn=1}}}
+      else if(Math.hypot(px-CX,py-CY)<PR){G.drops.push({x:px+rnd(-8,8),y:py+rnd(-8,8),t:0})}
+      if(G.pourT>.22){G.pourT=0;sfx(hit.length?'pour':'waste',.25,rnd(.95,1.08))}}
+    G.stickyWarn=Math.max(0,G.stickyWarn-dt);
+    // heat dries the syrup into sugar; the grain grows its horns
+    // a grain left dry on the hot copper starts to scorch
+    for(const g of G.gr){if(!g.ok){if(g.fedT>0){g.fedT-=dt;g.burn=Math.max(0,g.burn-dt*1.5)}else g.burn+=dt/BURN;if(g.burn>=1&&!g.dead){g.dead=2}}}
+    for(let i=G.gr.length-1;i>=0;i--)if(G.gr[i].dead===2){const g=G.gr[i];G.gr.splice(i,1);G.burnt++;text('こげた！',g.x,g.y-40,'#ffb0a0',true);G.spots.push({x:g.x,y:g.y,t:.001,c:g.c,s:g.s});sfx('clump',.6,.7)}
+    for(const g of G.gr){g.flash=Math.max(0,g.flash-dt);if(g.wet>0){const d=Math.min(g.wet,DRY*dt);g.wet-=d;const s0=g.s;g.s+=d/NEED;
+      if(s0<.35&&g.s>=.35||s0<.75&&g.s>=.75){g.flash=.5;sfx('grow',.35,1.2)}if(!g.ok&&g.s>=1){g.ok=true;g.flash=.8;sfx('done',.45,rnd(.98,1.04));text('つのつの！',g.x,g.y-40,'#fff',true)}}}
+    const allOk=G.gr.length>0&&G.gr.every(g=>g.ok&&g.wet<.05),dry=G.gr.every(g=>g.wet<.02);
+    if(allOk||G.left<=0||(G.tank<=0&&dry)||G.gr.length===0)endBatch(allOk);hud()}
+  else if(G.state==='score'){if(G.stT>2.2){G.b++;if(G.b>=BATCH.length)finish();else setupBatch()}}
+  for(let i=G.drops.length-1;i>=0;i--){G.drops[i].t+=dt;if(G.drops[i].t>1.6)G.drops.splice(i,1)}}
+function endBatch(allOk){G.state='score';G.stT=0;G.pour=null;let pts=0,ok=0;
+  for(const g of G.gr){const p=g.s>=1?100:g.s>=.75?50:Math.round(30*g.s);pts+=p;if(g.s>=1)ok++;G.tray.push({c:g.c,st:g.s>=.75?2:g.s>=.35?1:0})}
+  const B=BATCH[G.b],perfect=ok===B.n;let bonus=0;if(perfect){bonus=300+Math.round(Math.max(0,G.left)*10);G.perfect++}
+  G.score+=pts+bonus;G.done+=ok;hud();sfx('levelup',.6);duck(.12,.1);setTimeout(()=>duck(.3,.6),1600);
+  say(perfect?`かんぺき！ +${pts+bonus}`:`${ok}こ できた +${pts}`,2)}
+function finish(){if(G.phase!=='play')return;G.phase='end';G.endT=0;duck(.08,.2);sfx('over',.7)}
+function rank(n){return n>=7000?'こんぺいとう しょくにん':n>=5600?'おさとうの まほうつかい':n>=4000?'つのつの じょうず':n>=2000?'おかしやさん みならい':'はじめての こんぺいとう'}
+function showResult(){const n=G.score,best=LS.get('konpeito-best',0),nb=n>best;if(nb){LS.set('konpeito-best',n);if(n>0)sfx('best',.6)}
+  $('resScore').textContent=n+' てん';$('rD').textContent=G.done;$('rC').textContent=G.clumps+G.burnt;$('rP').textContent=G.perfect+'/'+BATCH.length;$('resRank').textContent=rank(n);
+  $('resNote').innerHTML=(nb&&n>0?'ベスト更新！<br>':'')+(n>=5600?'どの つぶも つのが そろって きらきら！':'ひとつぶに とめず、ころがる つぶの うえを なぞるように かけると そろって そだつよ。');
+  $('shareBtn').href='https://twitter.com/intent/tweet?text='+encodeURIComponent(`つのつの こんぺいとう🍬 ${n}てん「${rank(n)}」\n#つのつのこんぺいとう #picoruno`)+'&url='+encodeURIComponent('https://picoruno.com/konpeito.html');
+  $('resultOv').hidden=false;bgm(false);refreshTitle()}
+/* ---------- draw ---------- */
+const cv=$('cv'),ctx=cv.getContext('2d');let CW=0,CH=0,DPR=1,S=1,OX=0,OY=0;
+function resize(){DPR=Math.min(devicePixelRatio||1,2.5);const r=cv.getBoundingClientRect();CW=r.width;CH=r.height;cv.width=Math.round(CW*DPR);cv.height=Math.round(CH*DPR);
+  S=Math.min(CW/W0,Math.max(CH/H0,CW/W0*.92));OX=(CW-W0*S)/2;OY=(CH-H0*S)*.5}
+function outlineText(c,s,x,y,sz,fill,lw){c.font=`${sz}px "Dela Gothic One",sans-serif`;c.lineJoin='round';c.lineWidth=lw||sz*.28;c.strokeStyle='#4a2c1d';c.strokeText(s,x,y);c.fillStyle=fill;c.fillText(s,x,y)}
+function grain(c,g,x,y,rot){const st=g.s>=.75?2:g.s>=.35?1:0,im=IMG['ko_'+g.c+st],r=radius(g),d=r*2/(st===2?.62:st===1?.55:.45);
+  c.save();c.fillStyle='rgba(60,20,0,.22)';c.beginPath();c.arc(x+3,y+5,r*.95,0,7);c.fill();c.restore();
+  if(im){c.save();c.translate(x,y);c.rotate(rot);c.drawImage(im,-d/2,-d/2,d,d);c.restore()}else{c.fillStyle=COLS[g.c];c.beginPath();c.arc(x,y,r,0,7);c.fill()}
+  if(g.wet>.02){c.save();c.globalAlpha=Math.min(.75,g.wet*1.4);c.fillStyle='#fff8e0';c.beginPath();c.arc(x-r*.25,y-r*.3,r*.55,0,7);c.fill();c.restore()}
+  if(g.burn>.25&&!g.ok){c.save();c.globalAlpha=Math.min(.8,(g.burn-.25)*1.1);c.fillStyle='#7a3a12';c.beginPath();c.arc(x,y,r*.9,0,7);c.fill();c.restore();
+    if(g.burn>.65){c.save();c.globalAlpha=.4+.4*Math.sin(G.t*16);c.fillStyle='#8a7a70';for(let k=0;k<2;k++){c.beginPath();c.arc(x+Math.sin(G.t*3+k*3)*6,y-r-10-((G.t*30+k*14)%26),5+k*2,0,7);c.fill()}c.restore()}}
+  if(g.wet>STICKY){c.save();c.globalAlpha=.6+.4*Math.sin(G.t*14);c.strokeStyle='#e0584a';c.lineWidth=4;c.beginPath();c.arc(x,y,r+6,0,7);c.stroke();c.restore()}
+  if(g.flash>0){c.save();c.globalAlpha=g.flash;c.strokeStyle='#fff';c.lineWidth=3;for(let k=0;k<6;k++){const a=k*1.047+G.t*3,r1=r+6,r2=r+16;c.beginPath();c.moveTo(x+Math.cos(a)*r1,y+Math.sin(a)*r1);c.lineTo(x+Math.cos(a)*r2,y+Math.sin(a)*r2);c.stroke()}c.restore()}}
+function draw(dt){
+  const c=ctx;c.setTransform(DPR,0,0,DPR,0,0);c.fillStyle='#d6ccbc';c.fillRect(0,0,CW,CH);
+  c.save();c.translate(OX,OY);c.scale(S,S);
+  if(IMG.bg)c.drawImage(IMG.bg,0,0,W0,H0);
+  const B=BATCH[Math.min(G.b,BATCH.length-1)];
+  c.save();c.textAlign='center';c.textBaseline='middle';c.fillStyle='#c8483a';c.font='30px "Dela Gothic One",sans-serif';c.fillText('こんぺいとう',360,166);c.fillStyle='#7a5440';c.font='20px "Zen Maru Gothic",sans-serif';c.fillText(`${BATCH.indexOf(B)+1}なべめ ・ ${B.name}`,360,198);c.restore();
+  // the pan turns: a faint sheen sweeping round
+  c.save();c.globalAlpha=.12;c.strokeStyle='#fff';c.lineWidth=18;c.lineCap='round';c.beginPath();c.arc(CX,CY,PR-60,G.ang,G.ang+.7);c.stroke();c.beginPath();c.arc(CX,CY,PR-150,G.ang+3,G.ang+3.5);c.stroke();c.restore();
+  for(const d of G.drops){c.save();c.globalAlpha=.7*(1-d.t/1.6);c.fillStyle='#f6dca0';c.beginPath();c.arc(d.x,d.y,9+d.t*5,0,7);c.fill();c.restore()}
+  for(const s of G.spots){if(s.t>1.5)continue;c.save();c.globalAlpha=1-s.t/1.5;c.fillStyle='#c89a5a';c.beginPath();c.arc(s.x,s.y,24+s.t*10,0,7);c.fill();c.restore()}
+  for(const g of G.gr)grain(c,g,g.x,g.y,G.ang*1.3+g.id);
+  // the ladle and the syrup thread
+  if(G.pour&&G.phase==='play'){const [px,py]=G.pour,on=G.tank>0&&G.state==='cook';c.save();
+    if(on){c.globalAlpha=.85;c.fillStyle='#fff4d6';c.strokeStyle='#e8c88a';c.lineWidth=2;c.beginPath();c.arc(px,py,8+Math.sin(G.t*20)*1.5,0,7);c.fill();c.stroke();c.globalAlpha=.25;c.beginPath();c.arc(px,py,SR,0,7);c.fill()}
+    const lx=px+46,ly=py-64;if(on){c.globalAlpha=.8;c.strokeStyle='#fff4d6';c.lineWidth=6;c.lineCap='round';c.beginPath();c.moveTo(lx-22,ly+18);c.quadraticCurveTo(px+4,py-20,px,py);c.stroke()}
+    c.globalAlpha=1;if(IMG.pot){c.translate(lx,ly);c.rotate(-.5);c.drawImage(IMG.pot,-100,-100,200,200)}c.restore()}
+  // tray of finished sweets
+  for(let i=0;i<G.tray.length;i++){const t=G.tray[i],im=IMG['ko_'+t.c+t.st],k=i%24,row=Math.floor(i/24),x=96+k*22.5,y=1172+(row%3)*-12+(k%2)*6;if(im)c.drawImage(im,x-18,y-18,36,36)}
+  // syrup tank and time
+  if(G.phase==='play'||G.phase==='pause'){const x0=200,y0=1092,w=300,full=B.n*NEED*1.15;c.save();c.fillStyle='rgba(255,250,242,.94)';c.strokeStyle='#4a2c1d';c.lineWidth=3;c.beginPath();c.roundRect(x0-80,y0-18,w+96,36,16);c.fill();c.stroke();
+    c.fillStyle='#4a2c1d';c.font='20px "Dela Gothic One",sans-serif';c.textBaseline='middle';c.fillText('みつ',x0-66,y0+1);c.fillStyle='#e8e0d0';c.fillRect(x0,y0-8,w,16);c.fillStyle='#f2c46a';c.fillRect(x0,y0-8,w*clamp(G.tank/full,0,1),16);c.restore();
+    const tl=clamp(G.left/TIME,0,1);c.save();c.lineWidth=10;c.strokeStyle='rgba(255,250,242,.9)';c.beginPath();c.arc(640,250,30,0,7);c.stroke();c.strokeStyle=tl<.25?'#e0584a':'#8fd46a';c.beginPath();c.arc(640,250,30,-Math.PI/2,-Math.PI/2+tl*6.283);c.stroke();
+    c.textAlign='center';c.textBaseline='middle';outlineText(c,Math.ceil(Math.max(0,G.left))+'',640,251,24,'#fff',6);c.restore();
+    const ok=G.gr.filter(g=>g.ok).length;c.save();c.textAlign='left';c.textBaseline='middle';outlineText(c,`つのつの ${ok}/${B.n}`,40,250,28,'#fff',8);c.restore()}
+  if(G.sayT>0){c.save();c.globalAlpha=Math.min(1,G.sayT*4);c.translate(360,330);c.fillStyle='#fffaf2';c.strokeStyle='#4a2c1d';c.lineWidth=4;c.beginPath();c.roundRect(-190,-30,380,58,22);c.fill();c.stroke();
+    c.textAlign='center';c.textBaseline='middle';c.fillStyle='#4a2c1d';c.font='28px "Dela Gothic One",sans-serif';c.fillText(G.say,0,-2);c.restore()}
+  for(let i=G.texts.length-1;i>=0;i--){const x=G.texts[i];x.t+=dt;if(x.t>1.3){G.texts.splice(i,1);continue}
+    c.save();const sz=x.small?28:38;c.textAlign='center';c.textBaseline='middle';c.translate(Math.max(150,Math.min(W0-150,x.x)),x.y-x.t*24);c.globalAlpha=x.t>1?(1.3-x.t)/.3:1;outlineText(c,x.s,0,0,sz,x.c);c.restore()}
+  if(G.phase==='play'&&G.state==='cook'&&G.b===0&&!G.pour&&G.t<12){c.save();c.textAlign='center';outlineText(c,'おさえて うごかすと みつが たれるよ',360,1040,28,'#fff',8);c.restore()}
+  else if(G.stickyWarn>0){c.save();c.textAlign='center';c.globalAlpha=Math.min(1,G.stickyWarn*2);outlineText(c,'べたべた！ ほかの つぶに かけて',360,1040,28,'#ffd0c0',8);c.restore()}
+  c.restore()}
+let last=performance.now();
+function frame(n){const dt=Math.min(.033,(n-last)/1000);last=n;if(G.phase!=='pause')step(dt);draw(G.phase==='pause'?0:dt);requestAnimationFrame(frame)}
+
+let downP=false;
+function toGame(e){const r=cv.getBoundingClientRect();return [(e.clientX-r.left-OX)/S,(e.clientY-r.top-OY)/S]}
+cv.addEventListener('pointerdown',e=>{e.preventDefault();unlock();if(G.phase!=='play')return;try{cv.setPointerCapture(e.pointerId)}catch(_){}downP=true;press(...toGame(e))},{passive:false});
+cv.addEventListener('pointermove',e=>{if(!downP)return;move(...toGame(e))});
+for(const ev of ['pointerup','pointercancel'])cv.addEventListener(ev,()=>{if(downP){downP=false;release()}});
+function start(){unlock();guardHistory();for(const id of ['titleOv','resultOv','pauseOv'])$(id).hidden=true;Object.assign(G,fresh());G.b=0;setupBatch();hud();
+  if(ac)Promise.resolve(decoding).then(()=>{duck(.3,.01);bgm(true);sfx('start',.5)});pingPlay()}
+function pause(on){if(on){if(G.phase!=='play')return;if(downP){downP=false;release()}G.phase='pause';$('pauseOv').hidden=false;if(ac)ac.suspend()}else{if(G.phase!=='pause')return;$('pauseOv').hidden=true;G.phase='play';last=performance.now();if(ac)ac.resume()}}
+function toTitle(){bgm(false);reset();for(const id of ['pauseOv','resultOv'])$(id).hidden=true;$('titleOv').hidden=false;refreshTitle();if(ac&&ac.state==='suspended')ac.resume()}
+function refreshTitle(){const b=LS.get('konpeito-best',0);$('bestLine').textContent=b?`ベスト ${b}てん`:''}
+$('startBtn').onclick=start;$('againBtn').onclick=start;
+$('pauseBtn').onclick=()=>pause(true);$('resumeBtn').onclick=()=>pause(false);$('quitBtn').onclick=toTitle;
+$('muteBtn').onclick=()=>{unlock();setMute(!muted)};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pause(true)});
+let guarded=false;function guardHistory(){if(guarded)return;try{history.pushState({konpeito:1},'');guarded=true}catch(e){}}
+window.addEventListener('popstate',()=>{if(!guarded)return;guarded=false;if(G.phase==='play'){pause(true);guardHistory()}});
+document.addEventListener('touchstart',e=>{const x=e.touches[0].clientX;if(G.phase==='play'&&(x<24||x>innerWidth-24))e.preventDefault()},{passive:false});
+window.addEventListener('resize',resize);
+setMute(muted);refreshTitle();resize();reset();loadArt();requestAnimationFrame(frame);
+window.__T={G,press,move,release,radius,SR,DY,STICKY};
+</script>
+<script>
+function pingPlay(){
+  var G="つのつの こんぺいとう", K="picoruno-played:"+G;
+  try{ if(sessionStorage.getItem(K)) return; sessionStorage.setItem(K,"1"); }catch(e){}
+  var KEY="sb_publishable_5hbtIPW-1y5MqsoiLC6X_A_oZMG0Z5Z";
+  fetch("https://fymwlpbspigpeaoenhhp.supabase.co/rest/v1/rpc/add_play",{method:"POST",keepalive:true,
+    headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify({g:G})})
+  .then(function(r){ if(!r.ok) throw 0; })
+  .catch(function(){ try{ var d=JSON.parse(localStorage.getItem("picoruno-stats")||"{}"); d[G]=d[G]||{plays:0,likes:0}; d[G].plays++; localStorage.setItem("picoruno-stats",JSON.stringify(d)); }catch(e){} });
+}
+</script>
+</body>
+</html>

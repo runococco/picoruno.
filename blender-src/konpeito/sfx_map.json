@@ -1,0 +1,5 @@
+{"key": [0, 2, 4, 7, 9], "sounds": {
+ "pour": ["uisfx:organic/drop", -10], "grow": ["kenney:interface-sounds__pluck_001.ogg", -10], "done": ["kenney:interface-sounds__maximize_003.ogg", -8],
+ "sticky": ["uisfx:soft/warning", -8], "clump": ["kenney:impact-sounds__impactSoft_medium_002.ogg", -4], "waste": ["uisfx:soft/drop", -10],
+ "batch": ["kenney:interface-sounds__confirmation_001.ogg", -4], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (levelup / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
