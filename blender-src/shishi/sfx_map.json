@@ -1,0 +1,5 @@
+{"key": [2, 4, 7, 9, 11], "sounds": {
+ "clack": ["kenney:impact-sounds__impactWood_heavy_002.ogg", -2], "pour": ["uisfx:organic/drop", -10], "slide": ["kenney:rpg-audio__cloth2.ogg", -10],
+ "flap": ["kenney:rpg-audio__cloth3.ogg", -6], "scare": ["kenney:interface-sounds__pluck_001.ogg", -6], "close": ["kenney:interface-sounds__maximize_003.ogg", -6],
+ "lost": ["uisfx:soft/warning", -6], "miss": ["kenney:interface-sounds__minimize_002.ogg", -12], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (levelup / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
