@@ -1,0 +1,5 @@
+{"key": [2, 4, 7, 9, 11], "sounds": {
+ "snip": ["kenney:rpg-audio__knifeSlice.ogg", -8], "snip2": ["kenney:rpg-audio__knifeSlice2.ogg", -8], "oops": ["kenney:interface-sounds__minimize_002.ogg", -8],
+ "rustle": ["kenney:rpg-audio__cloth4.ogg", -12], "grow": ["uisfx:soft/notification", -14], "round": ["uisfx:organic/achievement", -4], "good": ["uisfx:organic/success", -4],
+ "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (levelup / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
