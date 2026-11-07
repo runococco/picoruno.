@@ -1,0 +1,4 @@
+{"key": [0, 2, 4, 7, 9], "sounds": {
+ "scoop": ["kenney:rpg-audio__handleCoins.ogg", -10], "pour": ["kenney:rpg-audio__cloth2.ogg", -6], "fluff": ["kenney:rpg-audio__cloth4.ogg", -12], "tear": ["kenney:rpg-audio__clothBelt.ogg", -6],
+ "hand": ["kenney:interface-sounds__confirmation_002.ogg", -6], "good": ["kenney:interface-sounds__maximize_003.ogg", -8], "tick": ["kenney:interface-sounds__tick_002.ogg", -12], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (levelup / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
