@@ -1,0 +1,5 @@
+{"key": [2, 4, 7, 9, 11], "sounds": {
+ "twist": ["kenney:rpg-audio__creak1.ogg", -10], "pick": ["uisfx:organic/select", -6], "sweet": ["uisfx:organic/success", -4], "shibui": ["kenney:interface-sounds__minimize_002.ogg", -8],
+ "drop": ["kenney:impact-sounds__footstep_carpet_001.ogg", -6], "splat": ["kenney:impact-sounds__footstep_carpet_003.ogg", -4], "crow": ["kenney:rpg-audio__cloth3.ogg", -6],
+ "shoo": ["kenney:interface-sounds__pluck_001.ogg", -6], "steal": ["uisfx:soft/warning", -8], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (levelup / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
