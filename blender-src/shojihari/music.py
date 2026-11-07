@@ -1,4 +1,4 @@
-# BGM and jingles for shoji.html (FluidSynth + FluidR3_GM).  python3 music.py <outdir>
+# BGM and jingles for shojihari.html (FluidSynth + FluidR3_GM).  python3 music.py <outdir>
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'common'))
 from gm import Song, melody, n, E, loop_render, one_shot

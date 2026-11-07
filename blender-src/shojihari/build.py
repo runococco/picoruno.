@@ -1,4 +1,4 @@
-# Packs the sunny shoji room background and audio into shoji.html. python3 build.py <render-dir> <out-html>
+# Packs the sunny shoji room background and audio into shojihari.html. python3 build.py <render-dir> <out-html>
 import sys, io, base64, json, re, os
 from PIL import Image
 HERE = os.path.dirname(os.path.abspath(__file__))

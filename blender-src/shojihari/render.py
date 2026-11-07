@@ -1,4 +1,4 @@
-# Renders the layers for shoji.html: a sunny tatami room seen from the front, filled by a big shoji screen (4 x 6 panes)
+# Renders the layers for shojihari.html: a sunny tatami room seen from the front, filled by a big shoji screen (4 x 6 panes)
 # with warm light behind the paper, plus a glue pot and brush on the tatami.  python3 render.py <what> <outdir>
 # python3 render.py <what> <outdir>
 import bpy, bmesh, math, sys, os, random, json
