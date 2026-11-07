@@ -1,0 +1,5 @@
+{"key": [0, 2, 4, 7, 9], "sounds": {
+ "splash": ["uisfx:organic/drop", -4], "swish": ["uisfx:dreamy/swipe", -10], "peep": ["kenney:interface-sounds__pluck_002.ogg", -8], "home": ["kenney:interface-sounds__pluck_001.ogg", -6],
+ "hot": ["uisfx:soft/warning", -6], "wet": ["uisfx:zen/drop", -10], "empty": ["kenney:interface-sounds__minimize_002.ogg", -10], "gold": ["kenney:interface-sounds__maximize_003.ogg", -6],
+ "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (levelup / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
