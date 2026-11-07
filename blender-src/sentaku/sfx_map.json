@@ -1,0 +1,4 @@
+{"key": [0, 2, 4, 7, 9], "sounds": {
+ "pin": ["kenney:interface-sounds__click_002.ogg", -4], "flap": ["kenney:rpg-audio__cloth2.ogg", -4], "fit": ["kenney:interface-sounds__confirmation_002.ogg", -6], "drop": ["kenney:impact-sounds__impactSoft_medium_001.ogg", -4],
+ "miss": ["kenney:interface-sounds__error_004.ogg", -10], "next": ["kenney:rpg-audio__cloth1.ogg", -8], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (levelup / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
