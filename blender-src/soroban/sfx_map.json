@@ -1,0 +1,4 @@
+{"key": [0, 2, 4, 7, 9], "sounds": {
+ "pachi": ["kenney:impact-sounds__impactWood_light_002.ogg", -6], "pachi2": ["kenney:impact-sounds__impactWood_light_004.ogg", -6], "clear": ["kenney:impact-sounds__impactPlank_medium_001.ogg", -6],
+ "ok": ["kenney:interface-sounds__confirmation_002.ogg", -6], "q": ["kenney:interface-sounds__select_002.ogg", -12], "tick": ["kenney:interface-sounds__tick_002.ogg", -12], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (levelup / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
