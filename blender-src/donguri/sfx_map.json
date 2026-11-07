@@ -1,0 +1,5 @@
+{"key": [2, 4, 6, 9, 11], "sounds": {
+ "flip": ["kenney:impact-sounds__impactWood_light_001.ogg", -6], "roll": ["kenney:impact-sounds__footstep_wood_001.ogg", -14], "drop": ["uisfx:organic/drop", -6],
+ "good": ["uisfx:organic/select", -4], "gold": ["uisfx:organic/achievement", -4], "fire": ["uisfx:soft/notification", -6], "bad": ["kenney:interface-sounds__minimize_002.ogg", -8],
+ "lost": ["uisfx:soft/warning", -6], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (levelup / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
