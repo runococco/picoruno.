@@ -1,0 +1,5 @@
+{"key": [0, 2, 5, 7, 9], "sounds": {
+ "drip": ["uisfx:zen/drop", -6], "catch": ["uisfx:organic/drop", -2], "splash": ["kenney:impact-sounds__impactSoft_medium_000.ogg", -2],
+ "full": ["uisfx:soft/notification", -6], "pour": ["kenney:rpg-audio__cloth2.ogg", -10], "grab": ["kenney:impact-sounds__impactWood_light_003.ogg", -8],
+ "new": ["kenney:interface-sounds__pluck_001.ogg", -6], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (levelup / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
