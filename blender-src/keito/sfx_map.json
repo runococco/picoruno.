@@ -1,0 +1,4 @@
+{"key": [2, 4, 6, 9, 11], "sounds": {
+ "grab": ["kenney:rpg-audio__cloth1.ogg", -8], "put": ["kenney:rpg-audio__cloth2.ogg", -10], "untie": ["uisfx:organic/check", -8], "clear": ["uisfx:organic/achievement", -4],
+ "skip": ["kenney:interface-sounds__minimize_002.ogg", -8], "tick": ["uisfx:soft/notification", -12], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (levelup / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
