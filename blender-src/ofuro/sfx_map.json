@@ -1,0 +1,5 @@
+{"key": [0, 2, 5, 7, 9], "sounds": {
+ "wood": ["kenney:impact-sounds__impactWood_heavy_001.ogg", -6], "water": ["uisfx:organic/drop", -2], "water2": ["uisfx:zen/drop", -4],
+ "good": ["uisfx:organic/success", -6], "hot": ["uisfx:soft/notification", -6], "change": ["kenney:interface-sounds__maximize_003.ogg", -6],
+ "tick": ["kenney:interface-sounds__pluck_001.ogg", -10], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (levelup / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
