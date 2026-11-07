@@ -1,0 +1,5 @@
+{"key": [5, 7, 9, 0, 2], "sounds": {
+ "join": ["uisfx:glass/select", -8], "deliver": ["uisfx:organic/success", -4], "big": ["uisfx:organic/achievement", -4], "bonk": ["kenney:impact-sounds__impactWood_medium_002.ogg", -4],
+ "scatter": ["kenney:interface-sounds__minimize_003.ogg", -8], "paddle": ["uisfx:organic/drop", -14], "hatch": ["uisfx:soft/notification", -10],
+ "warn": ["uisfx:soft/warning", -8], "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (levelup / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT)."}

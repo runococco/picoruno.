@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<script src="count.js" defer></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#cfe8d8">
+<title>すいすい かもの おやこ</title>
+<meta name="description" content="おやがもを ゆびで みちびいて、いけに ちらばった こがもたちを いちれつに あつめ、すまで つれて かえろう。ながれてくる まるたに きを つけて。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="すいすい かもの おやこ">
+<meta property="og:description" content="こがもを いちれつに あつめて すまで つれて かえろう">
+<meta property="og:url" content="https://picoruno.com/kamo.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://picoruno.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://picoruno.com/og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%233c9aa6'/%3E%3Cellipse cx='14' cy='19' rx='9' ry='6' fill='%23f2c43a' stroke='%234a2c1d' stroke-width='2'/%3E%3Ccircle cx='21' cy='12' r='5' fill='%23f2c43a' stroke='%234a2c1d' stroke-width='2'/%3E%3Cpath d='M25 12h4' stroke='%23f09a30' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='22' cy='11' r='1.3' fill='%234a2c1d'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<style>
+/* Duck pond seen from above: teal water, grassy banks, straw nest, dark-brown outlined flat UI. */
+:root{
+  --ink:#4a2c1d;
+  --ink2:#7a5440;
+  --paper:#fffaf2;
+  --blue:#3c9aa6;
+  --red:#d8603a;
+  --sky:#4e8e3e;
+  --gold:#f2c14e;
+  --display:"Dela Gothic One","Zen Maru Gothic","Hiragino Sans",sans-serif;
+  --body:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%;margin:0;background:#cfe8d8}
+[hidden]{display:none!important}
+body{color:var(--ink);font-family:var(--body);overflow:hidden;overscroll-behavior:none;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+#app{position:relative;height:100%;height:100dvh;max-width:560px;margin:0 auto;overflow:hidden}
+#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+button{font-family:inherit;color:inherit;cursor:pointer}
+.hud{position:absolute;left:0;right:0;top:env(safe-area-inset-top);z-index:2;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;pointer-events:none}
+.pill{font-family:var(--display);font-size:1rem;background:var(--paper);color:var(--ink);border:2.5px solid var(--ink);border-radius:12px;padding:4px 10px;box-shadow:0 3px 0 var(--ink);white-space:nowrap}
+.pill.t{min-width:3.6em;text-align:center}
+.pill.t.low{background:#ffd9c8;color:var(--red)}
+.ib{pointer-events:auto;width:40px;height:40px;border-radius:12px;border:2.5px solid var(--ink);background:var(--paper);display:grid;place-items:center;padding:0;box-shadow:0 3px 0 var(--ink)}
+.ib svg{width:22px;height:22px}
+.ov{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(74,44,29,.28)}
+.card{background:var(--paper);color:var(--ink);border:3px solid var(--ink);border-radius:22px;box-shadow:0 6px 0 var(--ink);padding:18px 18px 14px;width:100%;max-width:360px;box-sizing:border-box;text-align:center;max-height:100%;overflow:auto}
+.logo{font-family:var(--display);font-size:1.2rem;line-height:1.1;margin:4px 0 0;color:var(--sky)}
+.logo2{font-family:var(--display);font-size:2.6rem;line-height:1.1;margin:0 0 6px;color:var(--red)}
+.sub{font-size:.9rem;color:var(--ink2);margin:0 0 10px;font-weight:700}
+.how{font-size:.86rem;font-weight:700;background:#fff;border:2px dashed #e0c8a0;border-radius:12px;padding:8px 10px;margin:0 0 12px;line-height:1.6;text-align:left}
+.how ol{margin:0;padding-left:1.3em}
+.how em{font-style:normal;color:var(--red)}
+.how .kinds{display:flex;justify-content:space-around;margin:6px 0 0;font-size:.74rem;text-align:center;color:var(--ink2)}
+.how .kinds img{display:block;width:62px;height:auto;margin:0 auto -4px}
+.big{display:block;width:100%;font-family:var(--display);font-size:1.2rem;padding:13px 10px;border-radius:16px;border:3px solid var(--ink);
+  background:var(--blue);color:#fff;box-shadow:0 5px 0 var(--ink);margin:0 0 12px;letter-spacing:.04em;text-decoration:none;box-sizing:border-box}
+.big:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.big.sec{background:#fff;color:var(--ink)}
+.best{font-size:.85rem;color:var(--ink2);margin:-4px 0 10px;font-weight:700}
+.back{margin:6px 0 0;font-size:.85rem}
+.back a{color:var(--ink2);font-weight:700}
+.bag{display:flex;justify-content:center;gap:10px;margin:6px 0 8px}
+.bag div{width:84px;font-size:.78rem;font-weight:900;line-height:1.3}
+.bag img{display:block;width:76px;height:auto;margin:0 auto -6px}
+.bag b{font-family:var(--display);font-weight:400;font-size:1.25rem}
+.res-big{font-family:var(--display);font-size:2.6rem;line-height:1.05;margin:2px 0}
+.res-rank{display:inline-block;font-family:var(--display);font-size:1rem;background:var(--gold);border:2.5px solid var(--ink);border-radius:999px;padding:4px 14px;margin:4px 0 6px}
+.res-note{font-size:.84rem;font-weight:700;color:var(--ink2);margin:0 0 12px;line-height:1.6}
+.pause-t{font-family:var(--display);font-size:1.6rem;margin:4px 0 12px}
+.res-row{display:flex;justify-content:center;gap:14px;margin:4px 0 6px;font-size:.84rem;font-weight:900;color:var(--ink2)}
+.res-row b{display:block;font-family:var(--display);font-weight:400;font-size:1.3rem;color:var(--ink)}
+.logo2{font-size:1.9rem}
+.mis{display:flex;gap:6px;justify-content:center;align-items:center;margin:0 0 4px}
+.kinds3{display:flex;justify-content:space-around;margin:6px 0 0;font-size:.76rem;text-align:center;color:var(--ink2);font-weight:900}
+.kinds3 b{display:block;font-family:var(--display);font-weight:400;font-size:1rem;color:var(--red)}
+.logo2{font-size:1.9rem}
+.xx{position:relative;width:110px;height:20px;border:2.5px solid var(--ink);border-radius:10px;background:var(--paper);overflow:hidden;box-shadow:0 3px 0 var(--ink)}
+.wet b{position:absolute;left:0;top:0;bottom:0;width:0;background:#5aa8e8}
+.wet span{position:absolute;inset:0;font-size:.7rem;font-weight:900;text-align:center;line-height:16px}
+.pill.n{min-width:4.6em;text-align:center}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="cv"></canvas>
+  <div class="hud"><div class="pill t" id="tP">90</div><div class="pill" id="scoreP">0 わ</div><button class="ib" id="pauseBtn" aria-label="一時停止"><svg viewBox="0 0 24 24" fill="#4a2c1d"><rect x="6" y="5" width="4.2" height="14" rx="1.2"/><rect x="13.8" y="5" width="4.2" height="14" rx="1.2"/></svg></button></div>
+
+  <div class="ov" id="titleOv">
+    <div class="card">
+      <div class="logo">いけの おさんぽ</div>
+      <div class="logo2">すいすい かもの おやこ</div>
+      <p class="sub">こがもを あつめて すまで かえろう</p>
+      <div class="how"><ol>
+        <li>がめんを <em>おさえた ところ</em> へ おやがもが およいでいく</li>
+        <li>こがもに ちかづくと うしろに ついてくる。<em>いちれつ</em> で つれて あるこう</li>
+        <li>したの <em>す</em> に はいると おうち とうちゃく。ながれてくる <em>まるた</em> に あたると れつが きれちゃう</li></ol>
+        <div class="kinds3"><div><b>1わ</b>100てん</div><div><b>5わ いじょう</b>2ばい</div><div><b>じかん</b>90びょう</div></div></div>
+      <button class="big" id="startBtn">おさんぽ スタート</button>
+      <p class="best" id="bestLine"></p>
+      <button class="big sec" id="muteBtn" style="font-size:.95rem;padding:9px">♪ 音あり</button>
+      <p class="back"><a href="https://picoruno.com/">← picoruno. のゲーム一覧へ</a></p>
+    </div>
+  </div>
+  <div class="ov" id="pauseOv" hidden>
+    <div class="card">
+      <div class="pause-t">ひとやすみ</div>
+      <button class="big" id="resumeBtn">つづける</button>
+      <button class="big sec" id="quitBtn">タイトルへ</button>
+    </div>
+  </div>
+  <div class="ov" id="resultOv" hidden>
+    <div class="card">
+      <div class="logo">きょうの おさんぽ</div>
+      <div class="res-big" id="resScore">0 てん</div>
+      <div class="res-row"><div>つれて かえった<b id="rS">0</b></div><div>いちどに さいだい<b id="rC">0</b></div><div>まるたに ぶつかった<b id="rT">0</b></div></div>
+      <div class="res-rank" id="resRank"></div>
+      <p class="res-note" id="resNote"></p>
+      <button class="big" id="againBtn">もういちど</button>
+      <a class="big sec" id="shareBtn" href="https://twitter.com/intent/tweet" target="_blank" rel="noopener" style="font-size:1rem">X でじまん</a>
+      <p class="back"><a href="https://picoruno.com/">← picoruno. のゲーム一覧へ</a></p>
+    </div>
+  </div>
+</div>
+<script>
+/*ART*/const ART={},LAYER={},SCENE={nest:[360,1168],water:[[40,128],[680,1056]],pads:[[168,272,54],[568,576,48],[136,784,45],[456,176,38]]};/*/ART*/
+/*AUDIO*/const AUD={};/*/AUDIO*/
+</script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const W0=720,H0=1280,NEST=SCENE.nest,X0=SCENE.water[0][0]+34,X1=SCENE.water[1][0]-34,Y0=SCENE.water[0][1]+34,Y1=SCENE.water[1][1]-14,TIME=90,GAP=46,MAXV=270,LOOSE=7;
+const LOGS={log_s:{len:192,size:222},log_l:{len:304,size:334}};
+
+/* ---------- art ---------- */
+const IMG={};
+function loadImg(src){return new Promise(r=>{if(!src)return r(null);const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
+async function loadArt(){await Promise.all(Object.keys(ART).map(k=>loadImg(ART[k]).then(i=>{if(i)IMG[k]=i})))}
+
+/* ---------- audio ---------- */
+const AC=window.AudioContext||window.webkitAudioContext;let ac=null,master=null,bgmGain=null,bgmSrc=null,decoding=null;const BUF={};
+let muted=LS.get('kamo-mute',false);
+function b64buf(u){const b=atob(u.split(',')[1]);const a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a.buffer}
+function audioInit(){if(ac||!AC)return;ac=new AC();master=ac.createGain();master.gain.value=muted?0:1;master.connect(ac.destination);bgmGain=ac.createGain();bgmGain.gain.value=.3;bgmGain.connect(master);
+  decoding=Promise.all(Object.keys(AUD).map(k=>new Promise((r,j)=>{const p=ac.decodeAudioData(b64buf(AUD[k]),r,j);if(p&&p.then)p.then(r,j)}).then(b=>{BUF[k]=b}).catch(()=>{})))}
+function unlock(){audioInit();if(ac&&ac.state==='suspended')ac.resume()}
+function snapRate(r){const st=12*Math.log2(r);let b=0;for(const a of [-12,-7,-5,0,5,7,12])if(Math.abs(a-st)<Math.abs(b-st))b=a;return Math.pow(2,b/12)}
+function sfx(k,vol=1,rate=1){if(!ac||!BUF[k]||muted)return;const s=ac.createBufferSource();s.buffer=BUF[k];s.playbackRate.value=snapRate(rate);const g=ac.createGain();g.gain.value=vol;s.connect(g);g.connect(master);s.start()}
+function bgm(on){if(!ac)return;if(on){if(bgmSrc||!BUF.bgm)return;bgmSrc=ac.createBufferSource();bgmSrc.buffer=BUF.bgm;bgmSrc.loop=true;bgmSrc.connect(bgmGain);bgmSrc.start()}else if(bgmSrc){try{bgmSrc.stop()}catch(e){}bgmSrc=null}}
+function duck(v,t=.25){if(bgmGain&&ac)bgmGain.gain.setTargetAtTime(v,ac.currentTime,t)}
+function setMute(m){muted=m;LS.set('kamo-mute',m);if(master)master.gain.value=m?0:1;$('muteBtn').textContent=m?'♪ 音なし':'♪ 音あり'}
+
+/* ---------- state ---------- */
+function rnd(a,b){return a+Math.random()*(b-a)}
+function clamp(v,a,b){return v<a?a:v>b?b:v}
+function angTo(a,b){let d=b-a;while(d>Math.PI)d-=Math.PI*2;while(d<-Math.PI)d+=Math.PI*2;return d}
+function mkMom(){return {x:360,y:900,a:-Math.PI/2,v:0,stun:0,ph:0}}
+function freeSpot(){for(let k=0;k<40;k++){const x=rnd(X0+20,X1-20),y=rnd(Y0+20,Y1-170);if(Math.hypot(x-G.mom.x,y-G.mom.y)>180&&G.loose.every(c=>Math.hypot(c.x-x,c.y-y)>90))return [x,y]}return [rnd(X0,X1),rnd(Y0,Y1-200)]}
+function mkLoose(x,y,a){return {x,y,a:a??rnd(0,6.28),t:rnd(0,9),cx:x,cy:y,r:rnd(14,26),vx:0,vy:0,pop:0}}
+const G={phase:'title',t:0,texts:[],mom:mkMom(),trail:[],chain:[],loose:[],logs:[],ripples:[],home:[]};
+function fresh(){return {phase:'play',t:0,left:TIME,score:0,mom:mkMom(),trail:[],chain:[],loose:[],logs:[],ripples:[],home:[],texts:[],hold:false,tx:360,ty:900,
+  logT:3,hatchT:0,saved:0,bestRun:0,hits:0,say:'',sayT:0,endT:0,touches:0,lastLog:0}}
+function reset(){Object.assign(G,fresh());G.phase='title';for(let i=0;i<5;i++){const [x,y]=freeSpot();G.loose.push(mkLoose(x,y))}hud()}
+function hud(){$('tP').textContent=Math.ceil(Math.max(0,G.left));$('tP').classList.toggle('low',G.left<=10&&G.phase==='play');$('scoreP').textContent=G.score+' てん'}
+function text(s,x,y,c,small){G.texts.push({s,x,y,c,small,t:0})}
+function say(s,t=1.3){G.say=s;G.sayT=t}
+/* trail: mother's past positions, newest first, used to place the chain */
+function pushTrail(){const m=G.mom,tr=G.trail;if(!tr.length||Math.hypot(tr[0].x-m.x,tr[0].y-m.y)>=3){tr.unshift({x:m.x,y:m.y});if(tr.length>900)tr.length=900}}
+function along(d){const tr=G.trail;let acc=0,px=G.mom.x,py=G.mom.y;for(let i=0;i<tr.length;i++){const s=Math.hypot(tr[i].x-px,tr[i].y-py);if(acc+s>=d){const k=s?(d-acc)/s:0;return [px+(tr[i].x-px)*k,py+(tr[i].y-py)*k,Math.atan2(py-tr[i].y,px-tr[i].x)]}acc+=s;px=tr[i].x;py=tr[i].y}
+  return [px,py,G.mom.a]}
+function spawnLog(){const k=Math.random()<.45+G.t/400?'log_l':'log_s',L=LOGS[k].len,dir=Math.random()<.5?1:-1,y=rnd(Y0+60,Y1-200),sp=rnd(55,90)+G.t*.9;
+  G.logs.push({k,x:dir>0?-L/2-20:W0+L/2+20,y,vx:dir*sp,a:rnd(-.25,.25),va:rnd(-.15,.15),L,bob:rnd(0,6)})}
+/* ---------- input ---------- */
+function steer(x,y,on){if(G.phase!=='play')return;if(on&&!G.hold)G.touches++;G.hold=on;if(x!=null){G.tx=x;G.ty=y}}
+/* ---------- flow ---------- */
+function segDist(px,py,l){const c=Math.cos(l.a),s=Math.sin(l.a),dx=px-l.x,dy=py-l.y,u=clamp(dx*c+dy*s,-l.L/2,l.L/2);return Math.hypot(dx-u*c,dy-u*s)}
+function breakAt(i,lg){const lost=G.chain.splice(i);G.hits++;sfx('bonk',.6);sfx('scatter',.5);text(lost.length>1?`${lost.length}わ はぐれた！`:'はぐれた！',lost[0].x,lost[0].y-50,'#ff9a7a',true);
+  for(const c of lost){const a=Math.atan2(c.y-lg.y,c.x-lg.x)+rnd(-.6,.6),l=mkLoose(c.x,c.y,c.a);l.vx=Math.cos(a)*rnd(120,200);l.vy=Math.sin(a)*rnd(120,200);l.pop=.4;G.loose.push(l)}}
+function deliver(){const n=G.chain.length;if(!n)return;const mul=n>=5?2:1,pts=100*n*mul;G.score+=pts;G.saved+=n;G.bestRun=Math.max(G.bestRun,n);
+  for(const c of G.chain)G.home.push({x:c.x,y:c.y,t:0,tx:NEST[0]+rnd(-38,38),ty:NEST[1]+rnd(-22,18),a:c.a});G.chain=[];
+  sfx(n>=5?'big':'deliver',.6);text(n>=5?`だいかぞく！ +${pts}`:`ただいま +${pts}`,NEST[0],NEST[1]-130,n>=5?'#ffe27a':'#fff',n<5);hud()}
+function step(dt){G.t+=dt;G.sayT=Math.max(0,G.sayT-dt);if(G.phase==='pause')return;const play=G.phase==='play',m=G.mom;
+  if(play){G.left-=dt;if(G.left<=0){G.left=0;finish()}}
+  // mother swims toward the held point
+  m.stun=Math.max(0,m.stun-dt);
+  if(play&&G.hold&&!m.stun){const dx=G.tx-m.x,dy=G.ty-m.y,d=Math.hypot(dx,dy);if(d>8){const want=Math.atan2(dy,dx);m.a+=clamp(angTo(m.a,want),-7*dt,7*dt);m.v=Math.min(MAXV,m.v+700*dt,d*4)}else m.v=Math.max(0,m.v-900*dt)}
+  else if(G.phase==='title'){const want=Math.atan2(640-m.y,360-m.x)+Math.sin(G.t*.7)*1.2;m.a+=clamp(angTo(m.a,want),-1.5*dt,1.5*dt);m.v=70}
+  else m.v=Math.max(0,m.v-500*dt);
+  m.x+=Math.cos(m.a)*m.v*dt;m.y+=Math.sin(m.a)*m.v*dt;
+  const nearNest=Math.abs(m.x-NEST[0])<110;m.x=clamp(m.x,X0,X1);m.y=clamp(m.y,Y0,nearNest?Y1+40:Y1);m.ph+=dt*(m.v>20?9:2);
+  pushTrail();if(m.v>40&&Math.random()<dt*5)G.ripples.push({x:m.x-Math.cos(m.a)*30,y:m.y-Math.sin(m.a)*30,t:0,r:30});
+  // chain follows the trail
+  G.chain.forEach((c,i)=>{const [x,y,a]=along(GAP*(i+1)+22);c.x+=(x-c.x)*Math.min(1,dt*14);c.y+=(y-c.y)*Math.min(1,dt*14);c.a=a;c.t+=dt});
+  // loose ducklings paddle in small circles; the mother picks them up
+  for(let i=G.loose.length-1;i>=0;i--){const c=G.loose[i];c.t+=dt;c.pop=Math.max(0,c.pop-dt);
+    if(c.vx||c.vy){c.x+=c.vx*dt;c.y+=c.vy*dt;c.vx*=Math.pow(.05,dt);c.vy*=Math.pow(.05,dt);if(Math.hypot(c.vx,c.vy)<8){c.vx=c.vy=0;c.cx=c.x;c.cy=c.y}}
+    else{const w=c.t*.9;c.x=c.cx+Math.cos(w)*c.r;c.y=c.cy+Math.sin(w)*c.r*.7;c.a=w+Math.PI/2}
+    c.x=clamp(c.x,X0,X1);c.y=clamp(c.y,Y0,Y1);
+    if(play&&Math.hypot(c.x-m.x,c.y-m.y)<58&&!c.pop){G.loose.splice(i,1);G.chain.push({x:c.x,y:c.y,a:c.a,t:0});sfx('join',.5,1+Math.min(G.chain.length,6)*.06);text(`${G.chain.length}わ`,c.x,c.y-40,'#fff',true)}}
+  if(play&&G.chain.length&&m.y>Y1-6&&nearNest)deliver();
+  for(let i=G.home.length-1;i>=0;i--){const h=G.home[i];h.t+=dt;h.x+=(h.tx-h.x)*Math.min(1,dt*3);h.y+=(h.ty-h.y)*Math.min(1,dt*3);if(h.t>2.2)G.home.splice(i,1)}
+  // logs drift across
+  for(let i=G.logs.length-1;i>=0;i--){const l=G.logs[i];l.x+=l.vx*dt;l.a+=l.va*dt;l.bob+=dt;if(l.x<-400||l.x>W0+400){G.logs.splice(i,1);continue}
+    if(!play)continue;
+    for(let j=0;j<G.chain.length;j++){if(segDist(G.chain[j].x,G.chain[j].y,l)<34){breakAt(j,l);break}}
+    if(segDist(m.x,m.y,l)<40&&!m.stun){m.stun=.6;m.v=0;const s=Math.sign(m.y-l.y)||1;m.y+=s*12;sfx('bonk',.5,.75);text('ごつん',m.x,m.y-50,'#fff',true)}}
+  for(let i=G.ripples.length-1;i>=0;i--){G.ripples[i].t+=dt;if(G.ripples[i].t>1)G.ripples.splice(i,1)}
+  if(!play){if(G.phase==='end'){G.endT+=dt;if(G.endT>1.4&&$('resultOv').hidden)showResult()}return}
+  G.logT-=dt;if(G.logT<=0){spawnLog();G.logT=Math.max(1.4,4.2-G.t*.03)*rnd(.75,1.25)}
+  G.hatchT-=dt;if(G.loose.length<LOOSE&&G.hatchT<=0){const [x,y]=freeSpot();const l=mkLoose(x,y);l.pop=.5;G.loose.push(l);G.hatchT=1.2;sfx('hatch',.25)}
+  hud()}
+function finish(){if(G.phase!=='play')return;G.phase='end';G.hold=false;G.endT=0;duck(.08,.2);sfx('over',.7);say(G.chain.length?'ゆうやけ… おうちに かえろう':'ゆうやけの じかん',1.6)}
+function rank(n){return n>=6000?'いけの おやだま':n>=4200?'たよれる おやがも':n>=2600?'すいすい じょうず':n>=1200?'おさんぽ みならい':'はじめての おさんぽ'}
+function showResult(){const n=G.score,best=LS.get('kamo-best',0),nb=n>best;if(nb){LS.set('kamo-best',n);if(n>0)sfx('best',.6)}
+  $('resScore').textContent=n+' てん';$('rS').textContent=G.saved+'わ';$('rC').textContent=G.bestRun+'わ';$('rT').textContent=G.hits;$('resRank').textContent=rank(n);
+  $('resNote').innerHTML=(nb&&n>0?'ベスト更新！<br>':'')+(n>=4200?'こがもたちも ぐっすり おやすみ。':'5わ いじょう まとめて つれて かえると 2ばい。まるたが とおりすぎるのを まってから わたろう。');
+  $('shareBtn').href='https://twitter.com/intent/tweet?text='+encodeURIComponent(`すいすい かもの おやこ🦆 ${n}てん「${rank(n)}」\n#すいすいかものおやこ #picoruno`)+'&url='+encodeURIComponent('https://picoruno.com/kamo.html');
+  $('resultOv').hidden=false;bgm(false);refreshTitle()}
+/* ---------- draw ---------- */
+const cv=$('cv'),ctx=cv.getContext('2d');let CW=0,CH=0,DPR=1,S=1,OX=0,OY=0;
+function resize(){DPR=Math.min(devicePixelRatio||1,2.5);const r=cv.getBoundingClientRect();CW=r.width;CH=r.height;cv.width=Math.round(CW*DPR);cv.height=Math.round(CH*DPR);
+  S=Math.min(CW/W0,Math.max(CH/H0,CW/W0*.92));OX=(CW-W0*S)/2;OY=(CH-H0*S)*.5}
+function outlineText(c,s,x,y,sz,fill,lw){c.font=`${sz}px "Dela Gothic One",sans-serif`;c.lineJoin='round';c.lineWidth=lw||sz*.28;c.strokeStyle='#4a2c1d';c.strokeText(s,x,y);c.fillStyle=fill;c.fillText(s,x,y)}
+function bird(k,x,y,a,sz,bob){const c=ctx,im=IMG[k];c.save();c.translate(x,y);c.rotate(a+Math.PI/2);
+  c.globalAlpha=.18;c.fillStyle='#1a3a3a';c.beginPath();c.ellipse(4,6,sz*.3,sz*.42,0,0,7);c.fill();c.globalAlpha=1;
+  const s=1+Math.sin(bob)*.03;if(im)c.drawImage(im,-sz/2*s,-sz/2*s,sz*s,sz*s);else{c.fillStyle=k[0]==='m'?'#8a6a4a':'#f2c43a';c.beginPath();c.ellipse(0,0,sz*.25,sz*.38,0,0,7);c.fill()}c.restore()}
+function draw(dt){
+  const c=ctx;c.setTransform(DPR,0,0,DPR,0,0);c.fillStyle='#90c060';c.fillRect(0,0,CW,CH);
+  c.save();c.translate(OX,OY);c.scale(S,S);
+  if(IMG.bg)c.drawImage(IMG.bg,0,0,W0,H0);else{c.fillStyle='#3c9aa6';c.fillRect(X0,Y0,X1-X0,Y1-Y0)}
+  // nest glow when ducklings are in tow
+  if(G.phase==='play'&&G.chain.length){c.save();c.globalAlpha=.35+.25*Math.sin(G.t*5);c.strokeStyle='#ffe27a';c.lineWidth=6;c.setLineDash([14,10]);c.beginPath();c.ellipse(NEST[0],NEST[1],92,70,0,0,7);c.stroke();c.restore()}
+  for(const r of G.ripples){c.save();c.globalAlpha=(1-r.t)*.5;c.strokeStyle='#e8fbff';c.lineWidth=3;c.beginPath();c.ellipse(r.x,r.y,r.r+r.t*40,(r.r+r.t*40)*.7,0,0,7);c.stroke();c.restore()}
+  // logs (shadow + sprite)
+  for(const l of G.logs){const im=IMG[l.k],sz=LOGS[l.k].size;c.save();c.translate(l.x,l.y+Math.sin(l.bob*2)*2);c.rotate(l.a);
+    c.globalAlpha=.2;c.fillStyle='#1a3a3a';c.beginPath();c.roundRect(-l.L/2+6,-14,l.L,34,17);c.fill();c.globalAlpha=1;
+    if(im)c.drawImage(im,-sz/2,-sz/2,sz,sz);else{c.fillStyle='#7a5a3a';c.beginPath();c.roundRect(-l.L/2,-19,l.L,38,19);c.fill()}c.restore()}
+  // where the mother is heading
+  if(G.phase==='play'&&G.hold){c.save();c.globalAlpha=.6;c.strokeStyle='#fff';c.lineWidth=4;c.beginPath();c.arc(G.tx,G.ty,18+Math.sin(G.t*8)*3,0,7);c.stroke();c.restore()}
+  for(const h of G.home){c.save();c.globalAlpha=h.t>1.6?Math.max(0,(2.2-h.t)/.6):1;bird('chick'+(Math.floor(h.t*8)%2),h.x,h.y,h.a+h.t*3,72,h.t*9);c.restore()}
+  for(const l of G.loose){const s=l.pop?1+l.pop:1;bird('chick'+(Math.floor(l.t*3)%2),l.x,l.y,l.a,72*s,l.t*6);
+    if(G.phase==='play'&&!l.pop){c.save();c.globalAlpha=.55+.3*Math.sin(l.t*4);c.textAlign='center';outlineText(c,'ピヨ',l.x,l.y-44,22,'#fff',6);c.restore()}}
+  for(let i=G.chain.length-1;i>=0;i--){const ch=G.chain[i];bird('chick'+(Math.floor((G.t*6)+i)%2),ch.x,ch.y,ch.a,72,G.t*8+i)}
+  const m=G.mom;c.save();if(m.stun)c.globalAlpha=.6+.4*Math.sin(G.t*30);bird('mom'+(Math.floor(m.ph)%2),m.x,m.y,m.a,120,m.ph);c.restore();
+  if(G.chain.length){c.save();c.textAlign='center';outlineText(c,`${G.chain.length}わ`,m.x,m.y-62,24,G.chain.length>=5?'#ffe27a':'#fff',7);c.restore()}
+  if(G.sayT>0){c.save();c.globalAlpha=Math.min(1,G.sayT*4);c.translate(360,170);c.fillStyle='#fffaf2';c.strokeStyle='#4a2c1d';c.lineWidth=4;c.beginPath();c.roundRect(-250,-30,500,58,22);c.fill();c.stroke();
+    c.textAlign='center';c.textBaseline='middle';c.fillStyle='#4a2c1d';c.font='26px "Dela Gothic One",sans-serif';c.fillText(G.say,0,-2);c.restore()}
+  for(let i=G.texts.length-1;i>=0;i--){const x=G.texts[i];x.t+=dt;if(x.t>1.3){G.texts.splice(i,1);continue}
+    c.save();c.textAlign='center';c.textBaseline='middle';c.translate(Math.max(140,Math.min(W0-140,x.x)),x.y-x.t*30);c.globalAlpha=x.t>1?(1.3-x.t)/.3:1;outlineText(c,x.s,0,0,x.small?26:32,x.c);c.restore()}
+  if(G.phase==='play'&&G.t<7&&G.touches<2){c.save();c.textAlign='center';outlineText(c,'おさえた ところへ およいでいくよ',360,1000,28,'#fff',8);c.restore()}
+  c.restore()}
+let last=performance.now();
+function frame(n){const dt=Math.min(.033,(n-last)/1000);last=n;step(dt);draw(G.phase==='pause'?0:dt);requestAnimationFrame(frame)}
+
+function toGame(e){const r=cv.getBoundingClientRect();return [(e.clientX-r.left-OX)/S,(e.clientY-r.top-OY)/S]}
+cv.addEventListener('pointerdown',e=>{e.preventDefault();unlock();try{cv.setPointerCapture(e.pointerId)}catch(_){}const [x,y]=toGame(e);steer(x,y,true)},{passive:false});
+cv.addEventListener('pointermove',e=>{if(!G.hold)return;const [x,y]=toGame(e);steer(x,y,true)});
+for(const ev of ['pointerup','pointercancel','lostpointercapture'])cv.addEventListener(ev,()=>steer(null,null,false));
+function start(){unlock();guardHistory();for(const id of ['titleOv','resultOv','pauseOv'])$(id).hidden=true;Object.assign(G,fresh());for(let i=0;i<5;i++){const [x,y]=freeSpot();G.loose.push(mkLoose(x,y))}hud();
+  if(ac)Promise.resolve(decoding).then(()=>{duck(.3,.01);bgm(true);sfx('start',.5)});pingPlay()}
+function pause(on){if(on){if(G.phase!=='play')return;G.phase='pause';G.hold=false;$('pauseOv').hidden=false;if(ac)ac.suspend()}else{if(G.phase!=='pause')return;$('pauseOv').hidden=true;G.phase='play';last=performance.now();if(ac)ac.resume()}}
+function toTitle(){bgm(false);reset();for(const id of ['pauseOv','resultOv'])$(id).hidden=true;$('titleOv').hidden=false;refreshTitle();if(ac&&ac.state==='suspended')ac.resume()}
+function refreshTitle(){const b=LS.get('kamo-best',0);$('bestLine').textContent=b?`ベスト ${b}てん`:''}
+$('startBtn').onclick=start;$('againBtn').onclick=start;
+$('pauseBtn').onclick=()=>pause(true);$('resumeBtn').onclick=()=>pause(false);$('quitBtn').onclick=toTitle;
+$('muteBtn').onclick=()=>{unlock();setMute(!muted)};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pause(true)});
+let guarded=false;function guardHistory(){if(guarded)return;try{history.pushState({kamo:1},'');guarded=true}catch(e){}}
+window.addEventListener('popstate',()=>{if(!guarded)return;guarded=false;if(G.phase==='play'){pause(true);guardHistory()}});
+document.addEventListener('touchstart',e=>{const x=e.touches[0].clientX;if(G.phase==='play'&&(x<24||x>innerWidth-24))e.preventDefault()},{passive:false});
+window.addEventListener('resize',resize);
+setMute(muted);refreshTitle();resize();reset();loadArt();requestAnimationFrame(frame);
+window.__T={G,steer,segDist,NEST,Y1,X0,X1};
+</script>
+<script>
+function pingPlay(){
+  var G="すいすい かもの おやこ", K="picoruno-played:"+G;
+  try{ if(sessionStorage.getItem(K)) return; sessionStorage.setItem(K,"1"); }catch(e){}
+  var KEY="sb_publishable_5hbtIPW-1y5MqsoiLC6X_A_oZMG0Z5Z";
+  fetch("https://fymwlpbspigpeaoenhhp.supabase.co/rest/v1/rpc/add_play",{method:"POST",keepalive:true,
+    headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify({g:G})})
+  .then(function(r){ if(!r.ok) throw 0; })
+  .catch(function(){ try{ var d=JSON.parse(localStorage.getItem("picoruno-stats")||"{}"); d[G]=d[G]||{plays:0,likes:0}; d[G].plays++; localStorage.setItem("picoruno-stats",JSON.stringify(d)); }catch(e){} });
+}
+</script>
+</body>
+</html>
