@@ -1,0 +1,5 @@
+{"key": [2, 4, 7, 9, 11], "sounds": {
+ "brush": ["kenney:rpg-audio__cloth1.ogg", -14], "lift": ["kenney:rpg-audio__cloth2.ogg", -14], "hana": ["uisfx:organic/achievement", -4], "maru": ["uisfx:organic/success", -4],
+ "sankaku": ["uisfx:soft/notification", -6], "stamp": ["kenney:impact-sounds__impactWood_light_003.ogg", -4], "next": ["kenney:rpg-audio__bookFlip2.ogg", -8],
+ "start": ["kenney:interface-sounds__confirmation_001.ogg", -2]},
+ "extra": "BGM and jingles (levelup / over / best): original (music.py), FluidSynth + FluidR3_GM (MIT)."}
