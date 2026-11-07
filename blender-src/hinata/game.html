@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<script src="count.js" defer></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#c8c47a">
+<title>ねこの ひなたぼっこ</title>
+<meta name="description" content="まどから さしこむ ひだまりは すこしずつ うごくよ。ねこの ざぶとんを ひだまりへ うごかして、ぽかぽか おひるねさせよう。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ねこの ひなたぼっこ">
+<meta property="og:description" content="うごく ひだまりへ ざぶとんごと ねこを はこぼう。60びょうの ぽかぽか">
+<meta property="og:url" content="https://picoruno.com/hinata.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://picoruno.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://picoruno.com/og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23c8c47a'/%3E%3Cpath d='M6 6 H24 L28 22 H10 Z' fill='%23fff3c0'/%3E%3Crect x='11' y='13' width='12' height='10' rx='3' fill='%235a7ac8' stroke='%234a2c1d' stroke-width='1.6'/%3E%3Cellipse cx='17' cy='17.5' rx='4.5' ry='3.2' fill='%23fbf6ec' stroke='%234a2c1d' stroke-width='1.3'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<style>
+/* Tatami afternoon: straw green, sunlight cream, cushion blue, dark-brown outlined flat UI. */
+:root{
+  --ink:#4a2c1d;
+  --ink2:#7a5440;
+  --paper:#fffaf2;
+  --blue:#e8a020;
+  --red:#d8603a;
+  --sky:#5a7ac8;
+  --gold:#f2c14e;
+  --display:"Dela Gothic One","Zen Maru Gothic","Hiragino Sans",sans-serif;
+  --body:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%;margin:0;background:#c8c47a}
+[hidden]{display:none!important}
+body{color:var(--ink);font-family:var(--body);overflow:hidden;overscroll-behavior:none;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+#app{position:relative;height:100%;height:100dvh;max-width:560px;margin:0 auto;overflow:hidden}
+#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+button{font-family:inherit;color:inherit;cursor:pointer}
+.hud{position:absolute;left:0;right:0;top:env(safe-area-inset-top);z-index:2;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;pointer-events:none}
+.pill{font-family:var(--display);font-size:1rem;background:var(--paper);color:var(--ink);border:2.5px solid var(--ink);border-radius:12px;padding:4px 10px;box-shadow:0 3px 0 var(--ink);white-space:nowrap}
+.pill.t{min-width:3.6em;text-align:center}
+.pill.t.low{background:#ffd9c8;color:var(--red)}
+.ib{pointer-events:auto;width:40px;height:40px;border-radius:12px;border:2.5px solid var(--ink);background:var(--paper);display:grid;place-items:center;padding:0;box-shadow:0 3px 0 var(--ink)}
+.ib svg{width:22px;height:22px}
+.ov{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(74,44,29,.28)}
+.card{background:var(--paper);color:var(--ink);border:3px solid var(--ink);border-radius:22px;box-shadow:0 6px 0 var(--ink);padding:18px 18px 14px;width:100%;max-width:360px;box-sizing:border-box;text-align:center;max-height:100%;overflow:auto}
+.logo{font-family:var(--display);font-size:1.2rem;line-height:1.1;margin:4px 0 0;color:var(--sky)}
+.logo2{font-family:var(--display);font-size:2.6rem;line-height:1.1;margin:0 0 6px;color:var(--red)}
+.sub{font-size:.9rem;color:var(--ink2);margin:0 0 10px;font-weight:700}
+.how{font-size:.86rem;font-weight:700;background:#fff;border:2px dashed #e0c8a0;border-radius:12px;padding:8px 10px;margin:0 0 12px;line-height:1.6;text-align:left}
+.how ol{margin:0;padding-left:1.3em}
+.how em{font-style:normal;color:var(--red)}
+.how .kinds{display:flex;justify-content:space-around;margin:6px 0 0;font-size:.74rem;text-align:center;color:var(--ink2)}
+.how .kinds img{display:block;width:62px;height:auto;margin:0 auto -4px}
+.big{display:block;width:100%;font-family:var(--display);font-size:1.2rem;padding:13px 10px;border-radius:16px;border:3px solid var(--ink);
+  background:var(--blue);color:#fff;box-shadow:0 5px 0 var(--ink);margin:0 0 12px;letter-spacing:.04em;text-decoration:none;box-sizing:border-box}
+.big:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.big.sec{background:#fff;color:var(--ink)}
+.best{font-size:.85rem;color:var(--ink2);margin:-4px 0 10px;font-weight:700}
+.back{margin:6px 0 0;font-size:.85rem}
+.back a{color:var(--ink2);font-weight:700}
+.bag{display:flex;justify-content:center;gap:10px;margin:6px 0 8px}
+.bag div{width:84px;font-size:.78rem;font-weight:900;line-height:1.3}
+.bag img{display:block;width:76px;height:auto;margin:0 auto -6px}
+.bag b{font-family:var(--display);font-weight:400;font-size:1.25rem}
+.res-big{font-family:var(--display);font-size:2.6rem;line-height:1.05;margin:2px 0}
+.res-rank{display:inline-block;font-family:var(--display);font-size:1rem;background:var(--gold);border:2.5px solid var(--ink);border-radius:999px;padding:4px 14px;margin:4px 0 6px}
+.res-note{font-size:.84rem;font-weight:700;color:var(--ink2);margin:0 0 12px;line-height:1.6}
+.pause-t{font-family:var(--display);font-size:1.6rem;margin:4px 0 12px}
+.res-row{display:flex;justify-content:center;gap:14px;margin:4px 0 6px;font-size:.84rem;font-weight:900;color:var(--ink2)}
+.res-row b{display:block;font-family:var(--display);font-weight:400;font-size:1.3rem;color:var(--ink)}
+.logo2{font-size:1.9rem}
+.mis{display:flex;gap:6px;justify-content:center;align-items:center;margin:0 0 4px}
+.kinds3{display:flex;justify-content:space-around;margin:6px 0 0;font-size:.76rem;text-align:center;color:var(--ink2);font-weight:900}
+.kinds3 b{display:block;font-family:var(--display);font-weight:400;font-size:1rem;color:var(--red)}
+.logo2{font-size:1.9rem}
+.xx{position:relative;width:110px;height:20px;border:2.5px solid var(--ink);border-radius:10px;background:var(--paper);overflow:hidden;box-shadow:0 3px 0 var(--ink)}
+.wet b{position:absolute;left:0;top:0;bottom:0;width:0;background:#5aa8e8}
+.wet span{position:absolute;inset:0;font-size:.7rem;font-weight:900;text-align:center;line-height:16px}
+.pill.n{min-width:4.6em;text-align:center}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="cv"></canvas>
+  <div class="hud"><div class="pill t" id="timeP">60</div><div class="pill" id="scoreP">0 ぽか</div><button class="ib" id="pauseBtn" aria-label="一時停止"><svg viewBox="0 0 24 24" fill="#4a2c1d"><rect x="6" y="5" width="4.2" height="14" rx="1.2"/><rect x="13.8" y="5" width="4.2" height="14" rx="1.2"/></svg></button></div>
+
+  <div class="ov" id="titleOv">
+    <div class="card">
+      <div class="logo">ぽかぽか おひるね</div>
+      <div class="logo2">ねこの ひなたぼっこ</div>
+      <p class="sub">ひだまりは すこしずつ うごくよ</p>
+      <div class="how"><ol>
+        <li>ざぶとんを <em>ドラッグ</em> すると、ねこごと うごかせる</li>
+        <li>ねこが <em>ひだまり</em> で じっと ねていると ぽかぽかが たまる。ながく ねるほど ふえるよ</li>
+        <li>うごかしている あいだは たまらない。<em>くも</em> が きたら ひとやすみ。<em>きらきら</em> の ひだまりは 2ばい</li></ol></div>
+      <button class="big" id="startBtn">おひるねを はじめる</button>
+      <p class="best" id="bestLine"></p>
+      <button class="big sec" id="muteBtn" style="font-size:.95rem;padding:9px">♪ 音あり</button>
+      <p class="back"><a href="https://picoruno.com/">← picoruno. のゲーム一覧へ</a></p>
+    </div>
+  </div>
+  <div class="ov" id="pauseOv" hidden>
+    <div class="card">
+      <div class="pause-t">ひとやすみ</div>
+      <button class="big" id="resumeBtn">つづける</button>
+      <button class="big sec" id="quitBtn">タイトルへ</button>
+    </div>
+  </div>
+  <div class="ov" id="resultOv" hidden>
+    <div class="card">
+      <div class="logo">きょうの おひるね</div>
+      <div class="res-big" id="resScore">0 ぽか</div>
+      <div class="res-row"><div>ひなたで ねた<b id="rSun">0びょう</b></div><div>いちばん ながく<b id="rLong">0びょう</b></div><div>きらきら<b id="rStar">0</b></div></div>
+      <div class="res-rank" id="resRank"></div>
+      <p class="res-note" id="resNote"></p>
+      <button class="big" id="againBtn">もういちど</button>
+      <a class="big sec" id="shareBtn" href="https://twitter.com/intent/tweet" target="_blank" rel="noopener" style="font-size:1rem">X でじまん</a>
+      <p class="back"><a href="https://picoruno.com/">← picoruno. のゲーム一覧へ</a></p>
+    </div>
+  </div>
+</div>
+<script>
+/*ART*/const ART={},LAYER={},SCENE={};/*/ART*/
+/*AUDIO*/const AUD={};/*/AUDIO*/
+</script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const W0=720,H0=1280,DUR=60,CS=170,SW=380,SH=300,SK=70;
+
+/* ---------- art ---------- */
+const IMG={};
+function loadImg(src){return new Promise(r=>{if(!src)return r(null);const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
+async function loadArt(){await Promise.all(Object.keys(ART).map(k=>loadImg(ART[k]).then(i=>{if(i)IMG[k]=i})))}
+
+/* ---------- audio ---------- */
+const AC=window.AudioContext||window.webkitAudioContext;
+let ac=null,master=null,bgmGain=null,bgmSrc=null,decoding=null;const BUF={};
+let muted=LS.get('hinata-mute',false);
+function b64buf(u){const b=atob(u.split(',')[1]);const a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a.buffer}
+function audioInit(){if(ac||!AC)return;ac=new AC();master=ac.createGain();master.gain.value=muted?0:1;master.connect(ac.destination);bgmGain=ac.createGain();bgmGain.gain.value=.3;bgmGain.connect(master);
+  decoding=Promise.all(Object.keys(AUD).map(k=>new Promise((r,j)=>{const p=ac.decodeAudioData(b64buf(AUD[k]),r,j);if(p&&p.then)p.then(r,j)}).then(b=>{BUF[k]=b}).catch(()=>{})))}
+function unlock(){audioInit();if(ac&&ac.state==='suspended')ac.resume()}
+function snapRate(r){const st=12*Math.log2(r);let b=0;for(const a of [-12,-7,-5,0,5,7,12])if(Math.abs(a-st)<Math.abs(b-st))b=a;return Math.pow(2,b/12)}
+function sfx(k,vol=1,rate=1){if(!ac||!BUF[k]||muted)return;const s=ac.createBufferSource();s.buffer=BUF[k];s.playbackRate.value=snapRate(rate);const g=ac.createGain();g.gain.value=vol;s.connect(g);g.connect(master);s.start()}
+function bgm(on){if(!ac)return;if(on){if(bgmSrc||!BUF.bgm)return;bgmSrc=ac.createBufferSource();bgmSrc.buffer=BUF.bgm;bgmSrc.loop=true;bgmSrc.connect(bgmGain);bgmSrc.start()}else if(bgmSrc){try{bgmSrc.stop()}catch(e){}bgmSrc=null}}
+function duck(v,t=.25){if(bgmGain&&ac)bgmGain.gain.setTargetAtTime(v,ac.currentTime,t)}
+function setMute(m){muted=m;LS.set('hinata-mute',m);if(master)master.gain.value=m?0:1;$('muteBtn').textContent=m?'♪ 音なし':'♪ 音あり'}
+
+/* ---------- state ---------- */
+function rnd(a,b){return a+Math.random()*(b-a)}
+const G={phase:'title',t:0,texts:[],sun:null,star:null,cat:{x:360,y:900}};
+function fresh(){return {phase:'play',t:0,left:DUR,score:0,cat:{x:360,y:960},drag:false,sun:{x:360,y:560,tx:360,ty:560},star:null,starT:14,cloud:null,cloudT:10,
+  rest:0,inSun:false,warm:0,texts:[],say:'',sayT:0,endT:0,sunT:0,longest:0,starN:0,zz:0,shiver:0}}
+function reset(){Object.assign(G,fresh());G.phase='title';hud()}
+function hud(){const s=Math.ceil(Math.max(0,G.left));$('timeP').textContent=s;$('timeP').classList.toggle('low',G.phase==='play'&&s<=10);$('scoreP').textContent=Math.floor(G.score)+' ぽか'}
+function text(s,x,y,c,small){G.texts.push({s,x,y,c,small,t:0})}
+function say(s){G.say=s;G.sayT=1.4}
+// the sun patch is a slanted window shape: inside test in its own frame
+function inPatch(p,x,y,w,h){const dy=y-p.y,dx=x-p.x-dy*SK/h;return Math.abs(dx)<w/2&&Math.abs(dy)<h/2}
+function mult(){return G.rest>=6?3:G.rest>=3?2:1}
+
+/* ---------- flow ---------- */
+function step(dt){
+  G.t+=dt;G.sayT=Math.max(0,G.sayT-dt);G.zz+=dt;
+  if(G.phase!=='play'){if(G.phase==='end'){G.endT+=dt;if(G.endT>1.4&&$('resultOv').hidden)showResult()}return}
+  G.left-=dt;if(G.left<=0){G.left=0;finish();hud();return}
+  // the sun drifts toward a new spot every few seconds, a bit faster as the afternoon goes on
+  const s=G.sun,sp=46+G.t*2.6;const dx=s.tx-s.x,dy=s.ty-s.y,d=Math.hypot(dx,dy);if(d<8){s.tx=rnd(200,520);s.ty=rnd(330,1080)}else{s.x+=dx/d*sp*dt;s.y+=dy/d*sp*dt}
+  // clouds
+  G.cloudT-=dt;if(!G.cloud&&G.cloudT<=0){G.cloud={t:0,dur:rnd(2,3)};sfx('cloud',.5);say('くもった…')}
+  if(G.cloud){G.cloud.t+=dt;if(G.cloud.t>G.cloud.dur+1){G.cloud=null;G.cloudT=rnd(7,11)}}
+  const dark=G.cloud&&G.cloud.t>1&&G.cloud.t<G.cloud.dur+1;
+  // a sparkly little spot
+  G.starT-=dt;if(!G.star&&G.starT<=0){G.star={x:rnd(180,540),y:rnd(380,1060),t:0,life:5};sfx('star',.4,1.5)}
+  if(G.star){G.star.t+=dt;if(G.star.t>G.star.life){G.star=null;G.starT=rnd(6,9)}}
+  const c=G.cat,inS=!dark&&inPatch(s,c.x,c.y,SW-40,SH-40),inStar=!dark&&G.star&&Math.hypot(c.x-G.star.x,c.y-G.star.y)<70;
+  if((inS||inStar)&&!G.drag){if(!G.inSun){sfx('warm',.4)}G.rest+=dt;G.sunT+=dt;G.longest=Math.max(G.longest,G.rest);const m=mult()*(inStar?2:1);G.score+=dt*10*m;G.warm=Math.min(1,G.warm+dt*.8);
+    if(inStar&&!G.star.got){G.star.got=1;G.starN++;text('きらきら ×2',c.x,c.y-120,'#ffe27a',true)}
+    const k=Math.floor(G.rest),k0=Math.floor(G.rest-dt);if(k!==k0&&(k===3||k===6)){sfx('levelup',.4);text('ぐっすり ×'+(k===3?2:3),c.x,c.y-150,'#ffe27a');sfx('purr',.5)}}
+  else{if(G.inSun&&!G.drag&&!dark){sfx('cold',.4);say(['さむい…','ひなた どこ？','くしゅん'][Math.floor(G.t)%3])}if(!G.drag)G.rest=Math.max(0,G.rest-dt*3);G.warm=Math.max(0,G.warm-dt*.5)}
+  G.inSun=(inS||inStar)&&!G.drag;hud()}
+function finish(){if(G.phase!=='play')return;G.phase='end';G.endT=0;duck(.08,.2);sfx('over',.7)}
+function rank(n){return n>=1000?'ひなたぼっこ めいじん':n>=780?'ぽかぽか マイスター':n>=560?'おひるね じょうず':n>=340?'うとうと ねこ':'はじめての ひなたぼっこ'}
+function showResult(){const n=Math.floor(G.score),best=LS.get('hinata-best',0),nb=n>best;if(nb){LS.set('hinata-best',n);if(n>0)sfx('best',.6)}
+  $('resScore').textContent=n+' ぽか';$('rSun').textContent=Math.round(G.sunT)+'びょう';$('rLong').textContent=Math.round(G.longest)+'びょう';$('rStar').textContent=G.starN;$('resRank').textContent=rank(n);
+  $('resNote').innerHTML=(nb&&n>0?'ベスト更新！<br>':'')+(G.longest>=15?'ぐっすり ながく ねられたね。':'ひだまりの すすむ さきに おいておくと、ながく ねられるよ。');
+  $('shareBtn').href='https://twitter.com/intent/tweet?text='+encodeURIComponent(`ねこの ひなたぼっこ☀️ ${n}ぽか（ひなたで ${Math.round(G.sunT)}びょう）「${rank(n)}」\n#ねこのひなたぼっこ #picoruno`)+'&url='+encodeURIComponent('https://picoruno.com/hinata.html');
+  $('resultOv').hidden=false;bgm(false);refreshTitle()}
+
+/* ---------- draw ---------- */
+const cv=$('cv'),ctx=cv.getContext('2d');let CW=0,CH=0,DPR=1,S=1,OX=0,OY=0;
+function resize(){DPR=Math.min(devicePixelRatio||1,2.5);const r=cv.getBoundingClientRect();CW=r.width;CH=r.height;cv.width=Math.round(CW*DPR);cv.height=Math.round(CH*DPR);
+  S=Math.min(CW/W0,Math.max(CH/H0,CW/W0*.92));OX=(CW-W0*S)/2;OY=(CH-H0*S)*.5}
+function outlineText(c,s,x,y,sz,fill,lw){c.font=`${sz}px "Dela Gothic One",sans-serif`;c.lineJoin='round';c.lineWidth=lw||sz*.28;c.strokeStyle='#4a2c1d';c.strokeText(s,x,y);c.fillStyle=fill;c.fillText(s,x,y)}
+function patch(c,p,w,h,a){c.save();c.translate(p.x,p.y);c.globalAlpha=a;c.fillStyle='#ffeaa0';c.filter='blur(5px)';
+  c.beginPath();c.moveTo(-w/2-SK/2,-h/2);c.lineTo(w/2-SK/2,-h/2);c.lineTo(w/2+SK/2,h/2);c.lineTo(-w/2+SK/2,h/2);c.closePath();c.fill();c.filter='none';
+  // window frame shadows
+  c.strokeStyle='rgba(120,110,50,.35)';c.lineWidth=12;c.beginPath();c.moveTo(-SK/2*0,-h/2);c.lineTo(SK/2,h/2);c.moveTo(-w/2,0);c.lineTo(w/2,0);c.stroke();c.restore()}
+function draw(dt){
+  const c=ctx;c.setTransform(DPR,0,0,DPR,0,0);c.fillStyle='#c8c47a';c.fillRect(0,0,CW,CH);
+  c.save();c.translate(OX,OY);c.scale(S,S);
+  if(IMG.bg)c.drawImage(IMG.bg,0,0,W0,H0);
+  const dark=G.cloud&&G.cloud.t>1&&G.cloud.t<G.cloud.dur+1,ca=G.cloud?(G.cloud.t<1?1-G.cloud.t*.7:G.cloud.t>G.cloud.dur+1?.3:(G.cloud.t>G.cloud.dur?.3+(G.cloud.t-G.cloud.dur)*.7:.3)):1;
+  if(G.phase!=='title'){
+    c.save();c.globalCompositeOperation='screen';patch(c,G.sun,SW,SH,.9*ca);c.restore();
+    if(G.star){const st=G.star,a=Math.min(1,st.t*3,(st.life-st.t)*2)*ca;c.save();c.globalAlpha=a;c.fillStyle='rgba(255,240,160,.55)';c.beginPath();c.arc(st.x,st.y,74,0,7);c.fill();
+      c.fillStyle='#ffe27a';c.strokeStyle='#4a2c1d';c.lineWidth=3;for(let i=0;i<3;i++){const an=G.t*1.5+i*2.1,x=st.x+Math.cos(an)*58,y=st.y+Math.sin(an)*58;c.beginPath();for(let k=0;k<8;k++){const r=k%2?5:14,aa=k*Math.PI/4;c.lineTo(x+Math.cos(aa)*r,y+Math.sin(aa)*r)}c.closePath();c.fill();c.stroke()}c.restore()}
+    // cat on the cushion
+    const ct=G.cat,br=1+Math.sin(G.t*2.4)*.015*(G.inSun?1:0),sh=G.inSun||G.drag?0:Math.sin(G.t*40)*2;c.save();c.translate(ct.x+sh,ct.y);c.scale(br*(G.drag?1.06:1),br*(G.drag?1.06:1));
+    if(G.drag){c.fillStyle='rgba(0,0,0,.18)';c.beginPath();c.ellipse(10,18,CS*.48,CS*.4,0,0,7);c.fill()}
+    if(IMG.cat)c.drawImage(IMG.cat,-CS/2*1.28,-CS/2*1.28,CS*1.28,CS*1.28);else{c.fillStyle='#5a7ac8';c.fillRect(-CS/2,-CS/2,CS,CS)}c.restore();
+    if(G.inSun){c.save();c.textAlign='left';const z=G.zz%2;c.globalAlpha=Math.min(1,2-z);outlineText(c,'z',ct.x+60+z*20,ct.y-70-z*40,26+z*10,'#fff',6);c.restore()}
+    // warmth / multiplier tag
+    if(G.phase==='play'){c.save();c.textAlign='center';const m=mult();outlineText(c,G.inSun?(m>1?'ぽかぽか ×'+m:'ぽかぽか'):G.drag?'よいしょ':dark?'くもり…':'さむい…',ct.x,ct.y+CS*.66,28,G.inSun?'#ffe27a':'#fff',8);c.restore()}
+    if(G.cloud&&G.cloud.t<1){c.save();c.globalAlpha=.6+.4*Math.sin(G.cloud.t*20);c.textAlign='center';outlineText(c,'くもが くるよ',360,240,34,'#fff',9);c.restore()}}
+  if(G.sayT>0){c.save();c.globalAlpha=Math.min(1,G.sayT*4);const x=Math.max(130,Math.min(590,G.cat.x)),y=Math.max(200,G.cat.y-190);c.translate(x,y);c.fillStyle='#fffaf2';c.strokeStyle='#4a2c1d';c.lineWidth=4;c.beginPath();c.roundRect(-100,-30,200,56,22);c.fill();c.stroke();
+    c.textAlign='center';c.textBaseline='middle';c.fillStyle='#4a2c1d';c.font='26px "Dela Gothic One",sans-serif';c.fillText(G.say,0,-2);c.restore()}
+  for(let i=G.texts.length-1;i>=0;i--){const x=G.texts[i];x.t+=dt;if(x.t>1.3){G.texts.splice(i,1);continue}
+    c.save();const sz=x.small?30:38;c.textAlign='center';c.textBaseline='middle';c.translate(Math.max(170,Math.min(W0-170,x.x)),x.y-x.t*24);c.globalAlpha=x.t>1?(1.3-x.t)/.3:1;outlineText(c,x.s,0,0,sz,x.c);c.restore()}
+  if(G.phase==='play'&&G.t<5){c.save();c.textAlign='center';outlineText(c,'ざぶとんを ひだまりへ ドラッグ',360,1220,28,'#fff',8);c.restore()}
+  c.restore()}
+let last=performance.now();
+function frame(n){const dt=Math.min(.033,(n-last)/1000);last=n;if(G.phase!=='pause'&&G.phase!=='title')step(dt);draw(G.phase==='pause'?0:dt);requestAnimationFrame(frame)}
+
+let off=[0,0];
+function toGame(e){const r=cv.getBoundingClientRect();return [(e.clientX-r.left-OX)/S,(e.clientY-r.top-OY)/S]}
+function grabAt(x,y){if(G.phase!=='play')return false;if(Math.abs(x-G.cat.x)<CS*.6&&Math.abs(y-G.cat.y)<CS*.6){G.drag=true;off=[G.cat.x-x,G.cat.y-y];G.rest=0;sfx('grab',.5);return true}return false}
+function dragTo(x,y){if(!G.drag)return;G.cat.x=Math.max(110,Math.min(610,x+off[0]));G.cat.y=Math.max(260,Math.min(1180,y+off[1]))}
+function letGo(){if(G.drag){G.drag=false;sfx('purr',.4)}}
+cv.addEventListener('pointerdown',e=>{e.preventDefault();unlock();try{cv.setPointerCapture(e.pointerId)}catch(_){}const [x,y]=toGame(e);grabAt(x,y)},{passive:false});
+cv.addEventListener('pointermove',e=>{if(!G.drag)return;const [x,y]=toGame(e);dragTo(x,y)});
+for(const ev of ['pointerup','pointercancel'])cv.addEventListener(ev,letGo);
+function start(){unlock();guardHistory();for(const id of ['titleOv','resultOv','pauseOv'])$(id).hidden=true;Object.assign(G,fresh());hud();
+  if(ac)Promise.resolve(decoding).then(()=>{duck(.3,.01);bgm(true);sfx('start',.5)});pingPlay()}
+function pause(on){if(on){if(G.phase!=='play')return;letGo();G.phase='pause';$('pauseOv').hidden=false;if(ac)ac.suspend()}else{if(G.phase!=='pause')return;$('pauseOv').hidden=true;G.phase='play';last=performance.now();if(ac)ac.resume()}}
+function toTitle(){bgm(false);reset();for(const id of ['pauseOv','resultOv'])$(id).hidden=true;$('titleOv').hidden=false;refreshTitle();if(ac&&ac.state==='suspended')ac.resume()}
+function refreshTitle(){const b=LS.get('hinata-best',0);$('bestLine').textContent=b?`ベスト ${b}ぽか`:''}
+$('startBtn').onclick=start;$('againBtn').onclick=start;
+$('pauseBtn').onclick=()=>pause(true);$('resumeBtn').onclick=()=>pause(false);$('quitBtn').onclick=toTitle;
+$('muteBtn').onclick=()=>{unlock();setMute(!muted)};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pause(true)});
+let guarded=false;function guardHistory(){if(guarded)return;try{history.pushState({hinata:1},'');guarded=true}catch(e){}}
+window.addEventListener('popstate',()=>{if(!guarded)return;guarded=false;if(G.phase==='play'){pause(true);guardHistory()}});
+document.addEventListener('touchstart',e=>{const x=e.touches[0].clientX;if(G.phase==='play'&&(x<24||x>innerWidth-24))e.preventDefault()},{passive:false});
+window.addEventListener('resize',resize);
+setMute(muted);refreshTitle();resize();reset();loadArt();requestAnimationFrame(frame);
+window.__T={G,grabAt,dragTo,letGo,inPatch,SW,SH};
+</script>
+<script>
+function pingPlay(){
+  var G="ねこの ひなたぼっこ", K="picoruno-played:"+G;
+  try{ if(sessionStorage.getItem(K)) return; sessionStorage.setItem(K,"1"); }catch(e){}
+  var KEY="sb_publishable_5hbtIPW-1y5MqsoiLC6X_A_oZMG0Z5Z";
+  fetch("https://fymwlpbspigpeaoenhhp.supabase.co/rest/v1/rpc/add_play",{method:"POST",keepalive:true,
+    headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify({g:G})})
+  .then(function(r){ if(!r.ok) throw 0; })
+  .catch(function(){ try{ var d=JSON.parse(localStorage.getItem("picoruno-stats")||"{}"); d[G]=d[G]||{plays:0,likes:0}; d[G].plays++; localStorage.setItem("picoruno-stats",JSON.stringify(d)); }catch(e){} });
+}
+</script>
+</body>
+</html>
